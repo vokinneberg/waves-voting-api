@@ -1,0 +1,21 @@
+stages:
+  - build_master
+
+variables:
+  CONTAINER_IMAGE: registry.gitlab.com/trustamust/waves-voting
+  
+services:
+- docker:dind
+
+build_master:
+  stage: build_master
+  only:
+    refs:
+      - master
+  allow_failure: false
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build --tag $CONTAINER_IMAGE:$CI_COMMIT_SHA --tag $CONTAINER_IMAGE:$CI_JOB_ID --tag $CONTAINER_IMAGE:stage-latest .
+    - docker push $CONTAINER_IMAGE:$CI_COMMIT_SHA
+    - docker push $CONTAINER_IMAGE:$CI_JOB_ID
+    - docker push $CONTAINER_IMAGE:dev-latest
