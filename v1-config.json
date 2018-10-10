@@ -1,7 +1,7 @@
 {
   "local": {
     "db": {
-      "host": "localhost",
+      "host": "db",
       "user": "postgres",
       "password": "APASSWORD",
       "database": "voting",
@@ -12,15 +12,28 @@
     "node_schema": "http://",
     "node_path": "/var/www/html/node"
   },
-  "prod": {
+  "stage": {
     "db": {
-      "host": "localhost",
+      "host": "db",
       "user": "postgres",
-      "password": "VSuJTfwhrTxYW9snZxM7sL84nL696GTb82c32445",
+      "password": "VJ94vVjkXOID2SC",
       "database": "voting",
       "port": 5432
     },
-    "domain": "voting.wavesplatform.com",
+    "domain": "stage.mvp.trustamust.com",
+    "node_domain": "localhost",
+    "node_schema": "http://",
+    "node_path": "/var/www/html/node"
+  },
+  "prod": {
+    "db": {
+      "host": "db",
+      "user": "postgres",
+      "password": "L2adNfka4GDCv8A",
+      "database": "voting",
+      "port": 5432
+    },
+    "domain": "mvp.trustamust.com",
     "node_domain": "localhost",
     "node_schema": "http://",
     "node_path": "/var/www/html/node"

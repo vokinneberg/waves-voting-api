@@ -40,7 +40,7 @@ CREATE TABLE votes (
 );
 
 
-DROP VIEW view_votes;
+DROP VIEW IF EXISTS view_votes;
 
 CREATE OR REPLACE VIEW view_votes AS
   SELECT
@@ -54,7 +54,7 @@ CREATE OR REPLACE VIEW view_votes AS
   FROM votes
 ORDER BY votes.wct_balance DESC;
 
-DROP VIEW view_tokens;
+DROP VIEW IF EXISTS view_tokens;
 
 CREATE OR REPLACE VIEW view_tokens AS
   SELECT

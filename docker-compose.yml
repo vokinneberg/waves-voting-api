@@ -1,20 +1,25 @@
 version: '3'
 services:
   web:
-    build: .
+    image: trustamust-waves-voting:latest
     ports:
     - "8080:8080"
     - "443:443"
     - "80:80"
     volumes:
-    - .:/var/www/html
     - logvolume01:/var/log
     links:
-    - postgres
-  postgres:
+    - db
+    depends_on:
+    - db
+  db:
     image: postgres:9.6
     restart: always
+    environment:
+      POSTGRES_DB: 'voting'
+      POSTGRES_PASSWORD: 'VJ94vVjkXOID2SC'
+      POSTGRES_USER: 'postgres'
     volumes:
-    - /var/www/html/v1-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    - ./v1-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   logvolume01: {}

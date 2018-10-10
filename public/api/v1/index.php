@@ -1,7 +1,7 @@
 <?php
 $request_time = new DateTime();
 $_function_called = false;
-require_once '../../../v1-backend/bin/env_variables.php';
+require_once '../../v1-backend/bin/env_variables.php';
 @session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 	http_response_code(200);
