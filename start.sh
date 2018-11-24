@@ -1,3 +1,3 @@
 #!/bin/sh
-/usr/sbin/apache2 -D FOREGROUND
-#node ./node/index.js
+nginx
+./wait-for.sh mongo-db:27017 && node ./server/app.js
