@@ -41,6 +41,7 @@ class AuthController extends BaseController {
           // Find user by waves address. Create new if does not exists.
           let user = User.finByWalletAddress(walletAddress);
           if (!user) {
+            this._logger.info('Create new user.');
             user = new User({
               name: 'New user',
               publicKey,
@@ -49,6 +50,7 @@ class AuthController extends BaseController {
             });
             user = User.addUser(user);
           }
+          this._logger.info(`User ${user.name} fined.`);
           const token = this._jwt.generateToken(user);
           res.header('Authorization', `Bearer ${token}`);
         }
