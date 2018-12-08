@@ -7,6 +7,9 @@ variables:
 services:
 - docker:dind
 
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+
 build_release:
   stage: build_release
   image: docker:latest
@@ -14,9 +17,9 @@ build_release:
     refs:
       - tags
   allow_failure: false
+  variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker build --tag $CONTAINER_IMAGE:$CI_COMMIT_SHA --tag $CONTAINER_IMAGE:$CI_JOB_ID --tag $CONTAINER_IMAGE:prod-latest .
-    - docker push $CONTAINER_IMAGE:$CI_COMMIT_SHA
-    - docker push $CONTAINER_IMAGE:$CI_JOB_ID
-    - docker push $CONTAINER_IMAGE:prod-latest
+    - docker build --tag $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME .
+    - docker push $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME
