@@ -25,7 +25,8 @@ RUN rm -rf /var/cache/apk/*
 RUN mkdir /run/nginx
 COPY --from=build /app/nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/build/server /var/www/trustamust-mvp/server
+COPY --from=build /app/build /var/www/trustamust-mvp
+COPY --from=build /app/node_modules /var/www/trustamust-mvp/node_modules
 COPY --from=build /app/server/node_modules /var/www/trustamust-mvp/server/node_modules
 
 WORKDIR /var/www/trustamust-mvp

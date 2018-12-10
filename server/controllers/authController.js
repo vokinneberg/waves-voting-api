@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import HttpStatus from 'http-status-codes';
 import User from '../models/user';
 import JWTUtil from '../core/utils/jwt';
 import BaseController from './baseController';
@@ -50,12 +49,11 @@ class AuthController extends BaseController {
             });
             user = User.addUser(user);
           }
-          this._logger.info(`User ${user.name} fined.`);
+          this._logger.info(`User ${user.name}.`);
           const token = this._jwt.generateToken(user);
-          res.header('Authorization', `Bearer ${token}`);
+          res.redirect(`${this._config.serverHttpMethod}://${this._config.serverHttpHost}/auth?code=${token}&a=${walletAddress}`);
         }
       }
-      res.redirect(HttpStatus.MOVED_TEMPORARILY, 'http://localhost');
     } catch (err) {
       this._logger.error(err);
       next(err);

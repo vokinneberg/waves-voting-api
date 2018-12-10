@@ -1,5 +1,5 @@
 {
-  "name": "trustamust-mvp-api",
+  "name": "trustamust-mvp",
   "version": "1.0.0",
   "description": "TrustAMust MVP",
   "private": true,
@@ -16,14 +16,14 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
+    "serve": "^10.1.1",
     "whatwg-fetch": "^2.0.4",
     "winston": "^3.1.0"
   },
   "scripts": {
     "clean": "rm -rf build && mkdir build",
     "start": "nodemon ./server/app.js --exec babel-node",
-    "build": "babel ./server -d build/server --presets es2015,stage-2 --ignore spec.js,node_modules",
-    "test": "react-scripts test --env=jsdom",
+    "build": "react-scripts build && babel ./server -d build/server --presets es2015,stage-2 --ignore spec.js,node_modules",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
