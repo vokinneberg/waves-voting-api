@@ -41,7 +41,7 @@ const Footer = () => (
               <h3 class="k-footer__title">Get In Touch</h3>
               <form action="#" class="k-footer__subscribe">
                 <div class="k-input-icon k-input-icon--right">
-                  <input type="text" class="form-control" placeholder="Subscribe...">
+                  <input type="text" class="form-control" placeholder="Subscribe..." />
                   <span class="k-input-icon__icon k-input-icon__icon--right">
                     <span><i class="la la-arrow-right"></i></span>
                   </span>
@@ -73,6 +73,6 @@ const Footer = () => (
       </div>
     </div>
   </div>
-)
-​
+);
+
 export default Footer;
