@@ -18,12 +18,12 @@ app.use('/api', router);
 app.use(expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
-    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') {
       return req.headers.authorization.split(' ')[1];
     }
     return null;
   },
-}).unless({ path: ['/api/wavesAuthSuccess'] }));
+}).unless({ path: ['/api/auth'] }));
 app.use((err, req, res) => {
   logger.error(err.stack);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Something went wrong!');
