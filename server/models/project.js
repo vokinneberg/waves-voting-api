@@ -3,8 +3,12 @@ import mongoose from 'mongoose';
 const ProjectSchema = new mongoose.Schema(
   {
     name: String,
+    email: String,
     description: String,
     feature_img: String,
+    tokensCount: Number,
+    createdAt: Date,
+    updatedAt: Date,
     votes: [
       {
         voter: {
@@ -14,7 +18,7 @@ const ProjectSchema = new mongoose.Schema(
         amount: Number,
       },
     ],
-    author: {
+    owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
@@ -23,10 +27,18 @@ const ProjectSchema = new mongoose.Schema(
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);
 
-ProjectModel.getAll = () => ProjectSchema.find({});
+ProjectModel.update = projectToUpdate => ProjectModel.updateOne(projectToUpdate);
 
-ProjectModel.add = projectToAdd => projectToAdd.save();
-
-ProjectModel.update = projectToUpdate => projectToUpdate.save();
+ProjectModel.toJSON = () => ({
+  name: this.name,
+  email: this.email,
+  description: this.description,
+  feature_img: this.feature_img,
+  createdAt: this.createdAt,
+  updatedAt: this.updatedAt,
+  tokensCount: this.tokensCount,
+  votes: this.votes,
+  owner: this.owner,
+});
 
 export default ProjectModel;

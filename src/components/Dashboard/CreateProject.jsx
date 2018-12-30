@@ -27,19 +27,14 @@ class CreateProject extends React.PureComponent {
 
   createProject = (e) => {
     e.preventDefault();
-    const payload = agent.Projects.create({
-      name: '',
-      email: '',
-      tokensCount: 0,
-      description: '',
-    });
+    const project = Object.assign({}, this.state);
+    project.author = this.state.currentUser;
+    const payload = agent.Projects.create(project);
+    console.info(payload);
     this.props.onSubmit(payload);
-    this.setState({
-      name: '',
-      email: '',
-      tokensCount: 0,
-      description: '',
-    });
+
+    const { history } = this.props;
+    history.push(`/dashboard/projects/${payload._id}`); 
   }
 
   setName = (ev) => {

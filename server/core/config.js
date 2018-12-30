@@ -9,7 +9,7 @@ const config = {
   dbName: process.env.DB_NAME || 'waves-voting',
   dbUser: process.env.DB_USER || 'waves-voting-user',
   dbPassword: process.env.DB_PASSWORD || 'example',
-  serverPort: process.env.SERVER_PORT || 8080,
+  serverPort: process.env.SERVER_PORT || 80,
   jwtSecret: process.env.JWT_SECRET || 'example',
   jwtExpires: process.env.JWT_EXPIRES || 1,
 };

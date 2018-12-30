@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Notification = (props) => {
   const { notifications } = props;
@@ -8,7 +9,7 @@ const Notification = (props) => {
   return (
     <div className="k-header__topbar-item dropdown">
       <div className="k-header__topbar-wrapper" data-toggle="dropdown" data-offset="20px 10px">
-        <span className="k-header__topbar-icon"><i className="flaticon-alarm" /></span>
+        <span className="k-header__topbar-icon"><FontAwesomeIcon icon="bell" size="2x" /></span>
         <span className="k-badge k-badge--danger">{notifications.lengh}</span>
       </div>
       <div className="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-xl">

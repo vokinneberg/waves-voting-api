@@ -1,14 +1,15 @@
-import logger from '../core/logger/logger';
+import logger from '../core/logger';
+import config from '../core/config';
 import ProjectsController from '../controllers/projectsController';
 
-const projectsContoller = new ProjectsController(logger);
+const projectsContoller = new ProjectsController(logger, config);
 
 export default (router) => {
   router
     .route('/projects')
-    .get(projectsContoller.getAll);
+    .get(projectsContoller.all.bind(projectsContoller));
 
   router
-    .route('/projects/:id')
-    .get(projectsContoller.getOne);
+    .route('/projects')
+    .post(projectsContoller.create.bind(projectsContoller));
 };

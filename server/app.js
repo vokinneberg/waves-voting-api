@@ -1,12 +1,14 @@
 import express from 'express';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
 import httpStatus from 'http-status-codes';
 import mongoose from 'mongoose';
 import { createLightship } from 'lightship';
+
 import routes from './routes';
-import logger from './core/logger/logger';
-import config from './core/config/config';
+import logger from './core/logger';
+import config from './core/config';
 
 const app = express();
 const router = express.Router();
@@ -14,16 +16,17 @@ const router = express.Router();
 routes(router);
 
 app.use(cors());
+app.use(bodyParser.json());
 app.use('/api', router);
 app.use(expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
-    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
       return req.headers.authorization.split(' ')[1];
     }
     return null;
   },
-}).unless({ path: ['/api/auth'] }));
+}).unless({ path: ['/api/wavesAuthSuccess'] }));
 app.use((err, req, res) => {
   logger.error(err.stack);
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Something went wrong!');
@@ -31,7 +34,7 @@ app.use((err, req, res) => {
 
 const lightship = createLightship();
 
-mongoose.connect('mongodb://waves-voting:example@mongo-db:27017/waves-voting?authSource=admin');
+mongoose.connect('mongodb://waves-voting:example@localhost:27017/waves-voting?authSource=admin');
 
 const port = config.serverPort;
 const server = app.listen(port, () => logger.info(`App listening on port ${port}!`));
