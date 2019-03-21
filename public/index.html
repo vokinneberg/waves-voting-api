@@ -38,7 +38,9 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <button onclick="exectran()">Vote</button>
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -50,4 +52,36 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script type="text/javascript">
+    function exectran() {
+      WavesKeeper.publicState()
+        .then(state => {
+            console.log(state); 
+        }).catch(error => {
+            console.error(error); 
+        })
+
+      const txData = {
+          type:12,
+          data: {
+            data:[
+            {
+              key:"voter", 
+              type:"string", 
+              value:"vokinneberg"
+            }],
+            fee:{
+            "tokens": "0.01",
+            "assetId": "WAVES"
+            }
+          }
+       };
+
+       WavesKeeper.signAndPublishTransaction(txData).then((data) => {
+           console.log(data)
+       }).catch((error) => {
+           console.log(error)
+       });
+    }
+  </script>
 </html>

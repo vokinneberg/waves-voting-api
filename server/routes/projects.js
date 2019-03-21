@@ -10,6 +10,10 @@ export default (router) => {
     .get(projectsContoller.all.bind(projectsContoller));
 
   router
+    .route('/projects/:id')
+    .get(projectsContoller.byId.bind(projectsContoller));
+
+  router
     .route('/projects')
     .post(projectsContoller.create.bind(projectsContoller));
 };

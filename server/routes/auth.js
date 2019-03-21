@@ -7,6 +7,6 @@ const authController = new AuthController(logger, config);
 export default (router) => {
   /* Auth user with Waves wallet */
   router
-    .route('/wavesAuthSuccess')
+    .route('/vote')
     .get(authController.wavesAuthSuccess.bind(authController));
 };

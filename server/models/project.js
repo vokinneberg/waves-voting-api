@@ -1,44 +1,52 @@
 import mongoose from 'mongoose';
 
+const ProjectStatus = {
+  Unknown: 'Unknown',
+  Described: 'Described',
+  Verified: 'Verified'
+}
+
 const ProjectSchema = new mongoose.Schema(
   {
     name: String,
     email: String,
+    logo: {
+      name: String,
+      link: String
+    },
     description: String,
-    feature_img: String,
-    tokensCount: Number,
-    createdAt: Date,
-    updatedAt: Date,
+    owner: String,
+    country: String,
+    home_page: String,
+    social_links: [
+      {
+        name: String,
+        link: String
+      }
+    ],
+    token: {
+      id: String,
+      code: String,
+      logo: {
+        name: String,
+        link: String
+      }
+    },
     votes: [
       {
-        voter: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-        },
-        amount: Number,
+        wallet_id: String,
+        stake: Number
       },
     ],
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
+    owner: String,
+    rate: Number,
+    status: {
+      type: String,
+      enum: ['Unknown', 'Described', 'Verified']
+    }
   },
 );
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);
 
-ProjectModel.update = projectToUpdate => ProjectModel.updateOne(projectToUpdate);
-
-ProjectModel.toJSON = () => ({
-  name: this.name,
-  email: this.email,
-  description: this.description,
-  feature_img: this.feature_img,
-  createdAt: this.createdAt,
-  updatedAt: this.updatedAt,
-  tokensCount: this.tokensCount,
-  votes: this.votes,
-  owner: this.owner,
-});
-
-export default ProjectModel;
+export { ProjectModel, ProjectStatus };

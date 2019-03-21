@@ -1,19 +1,68 @@
 /* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 
-import Project from '../models/project';
+import { ProjectModel, ProjectStatus } from '../models/project';
 import BaseController from './baseController';
-
 
 class ProjectsController extends BaseController {
   async all(req, res, next) {
     try {
-      const projects = await Project.find({});
-      res.status(HttpCodes.OK).json({
-        projects: projects.map((project) => {
-          return project.toJSON();
-        }),
+      await ProjectModel.where('status')
+      .in([ProjectStatus.Described, ProjectStatus.Verified])
+      .exec((err, projects) => {
+        if (err) {
+          throw err;
+        }
+        this._logger.info(typeof projects)
+        this._logger.info(projects);
+        res.status(HttpCodes.OK).json({
+          projects: projects.map((project) => {
+            this._logger.info(typeof project);
+            return {
+              _id: project._id,
+              name: project.name,
+              logo: project.logo,
+              description: project.description,
+              home_page: project.home_page,
+              token: project.token,
+              rate: project.rate,
+              status: project.status
+            }
+          }),
+        });
       });
+    } catch (err) {
+      this._logger.error(err);
+      next(err);
+    }
+  }
+
+  async byId(req, res, next) {
+    try {
+      let id = req.params.id;
+
+      if (!id) {
+        res.status(HttpCodes.BAD_REQUEST).json({
+          code: 'invalid_request',
+          parameter: 'id',
+          description: 'Project_id is empty or wrong formated.'
+        });
+      }
+
+      await ProjectModel.findById(id, (err, project) => {
+        if (err)
+          throw err;
+
+        if (!project) {
+          res.status(HttpCodes.NOT_FOUND).json({
+            code: 'not_found',
+            description: 'Project not found.'
+          });
+        } else {
+          res.status(HttpCodes.OK).json(project.toJSON())
+        }
+      });
+
     } catch (err) {
       this._logger.error(err);
       next(err);
@@ -22,14 +71,24 @@ class ProjectsController extends BaseController {
 
   async create(req, res, next) {
     try {
-      const proj = new Project({
+
+      const proj = new ProjectModel({
         name: req.body.name,
         email: req.body.email,
-        tokensCount: req.body.tokensCount,
         description: req.body.description,
         owner: req.body.owner,
+        country: req.body.country,
+        home_page: req.body.home_page,
+        token: req.body.token,
+        logo: req.body.logo,
+        social_links: req.body.social_links,
+        papers: req.body.papers,
+        votes: req.body.votes,
+        rate: req.body.rate,
+        status: req.body.status
       });
-      await Project.create(proj, (err, createdProject) => {
+
+      await ProjectModel.create(proj, (err, createdProject) => {
         if (!err) {
           this._logger.info(createdProject);
         }
