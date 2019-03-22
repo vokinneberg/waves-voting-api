@@ -19,6 +19,7 @@ build_release:
   allow_failure: false
   variables:
     DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375
   script:
     - docker build --tag $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME .
     - docker push $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME
