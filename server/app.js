@@ -34,7 +34,7 @@ app.use((err, req, res, next)  => {
 const lightship = createLightship();
 
 mongoose.set('debug', true);
-mongoose.connect('mongodb://waves-voting:example@localhost:27017/waves-voting?authSource=admin', {
+mongoose.connect(config.dbConnString, {
   useNewUrlParser: true
 }).then(() => {
   logger.info("Successfully connected to the database");    
