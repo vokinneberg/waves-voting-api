@@ -34,7 +34,9 @@ app.use((err, req, res, next)  => {
 const lightship = createLightship();
 
 mongoose.set('debug', true);
-mongoose.connect(config.dbConnString, {
+mongoose.connect('mongodb://' 
++ config.dbUser + '@' + config.dbPassword + ':' 
++ config.dbHost + '/' + config.dbName, {
   useNewUrlParser: true
 }).then(() => {
   logger.info("Successfully connected to the database");    
@@ -52,8 +54,6 @@ lightship.registerShutdownHandler(() => {
   server.close();
 });
 
-// Lightship default state is "SERVER_IS_NOT_READY". Therefore, you must signal
-// that the server is now ready to accept connections.
 lightship.signalReady();
 
 export default app;
