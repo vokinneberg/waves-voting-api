@@ -38,9 +38,11 @@ mongoose.connect(config.dbConnString, {
   useNewUrlParser: true
 }).then(() => {
   logger.info("Successfully connected to the database");    
-}).catch(err => {
-  logger.info('Could not connect to the database. Exiting now...', err);
-  process.exit();
+},(err) => {
+  logger.info('Could not connect to the database. Exiting now...', { 
+    'message': err.message,
+    'stack': err.stack
+  });
 });
 
 const port = config.serverPort;

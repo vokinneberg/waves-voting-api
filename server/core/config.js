@@ -4,7 +4,7 @@ const config = {
   authData: process.env.AUTH_DATA || 'IAmVoting',
   nodeEnv: process.env.NODE_ENV || 'development',
   logLevel: process.env.LOG_LEVEL || 'debug',
-  dbConnString: process.env.DB_CONNECTION_STRING || 'mongodb://waves-voting:example@localhost:27017/waves-voting?authSource=admin',
+  dbConnString: process.env.DB_CONNECTION_STRING || '',
   dbName: process.env.DB_NAME || 'waves-voting',
   dbUser: process.env.DB_USER || 'waves-voting-user',
   dbPassword: process.env.DB_PASSWORD || 'example',
