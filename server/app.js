@@ -38,8 +38,8 @@ mongoose.connect(config.dbConnString, {
   useNewUrlParser: true
 }).then(() => {
   logger.info("Successfully connected to the database");    
-},(err) => {
-  logger.err('Could not connect to the database. Exiting now...', { 
+}).catch(err => {
+  logger.error('Could not connect to the database. Exiting now...', { 
     'message': err.message,
     'stack': err.stack
   });
