@@ -30,9 +30,5 @@ COPY --from=build /app/node_modules /var/www/trustamust-mvp/node_modules
 COPY --from=build /app/server/node_modules /var/www/trustamust-mvp/server/node_modules
 
 WORKDIR /var/www/trustamust-mvp
-COPY --from=build /app/wait-for.sh wait-for.sh
-COPY --from=build /app/start.sh start.sh
-RUN chmod +x wait-for.sh
-RUN chmod +x start.sh
 EXPOSE 80
-CMD ["./start.sh"]
+ENTRYPOINT [ "node", "./server/app.js" ]
