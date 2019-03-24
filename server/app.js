@@ -33,10 +33,14 @@ app.use((err, req, res, next)  => {
 
 const lightship = createLightship();
 
+const dbConnectionString = 'mongodb://' 
++ config.dbUser + ':' + config.dbPassword + '@' 
++ config.dbHost + '/' + config.dbName;
+
+logger.info('DB Connections tring:' + dbConnectionString);
+
 mongoose.set('debug', true);
-mongoose.connect('mongodb://' 
-+ config.dbUser + '@' + config.dbPassword + ':' 
-+ config.dbHost + '/' + config.dbName, {
+mongoose.connect(dbConnectionString, {
   useNewUrlParser: true
 }).then(() => {
   logger.info("Successfully connected to the database");    
