@@ -6,24 +6,50 @@ const ProjectVerificationStatus = {
   Verified: 'Verified'
 }
 
-
 const ProjectStatus = {
   Idea: 'Idea',
   MVP: 'MVP',
   Business: 'Working business'
 }
 
+const TokenMonetizationType = {
+  ICO: 'ICO',
+  Private: 'Private Investors',
+  Business: 'Working Business',
+  DAOICO: 'Trustamust DAOICO'
+}
+
 const StartingProjectRank = 0;
 
 const ProjectSchema = new mongoose.Schema({
-    name: String,
-    short_description: String,
-    description: String,
+    name: {
+      type: String,
+      required: [true, 'Name required.']
+    },
+    project_id: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      required: [true, 'Unique Id required.']
+    },
+    short_description: {
+      type: String,
+      required: [true, 'Short description required.']
+    },
+    description: {
+      type: String,
+      required: [true, 'Description required.']
+    },
     project_site: String,
     project_status: {
       type: String,
-      enum: ['Idea', 'MVP', 'Working Business']
+      enum: ['Idea', 'MVP', 'Working Business', 'Working Business', 'Trustamust DAOICO']
     },
+    monetization_type: [{
+      type: String,
+      enum: ['ICO', 'Private Investors', ]
+    }],
     social_links: [
       {
         name: String,
@@ -72,4 +98,4 @@ const ProjectSchema = new mongoose.Schema({
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);
 
-export { ProjectModel, ProjectStatus, ProjectVerificationStatus, StartingProjectRank };
+export { ProjectModel, ProjectStatus, ProjectVerificationStatus, StartingProjectRank, TokenMonetizationType };

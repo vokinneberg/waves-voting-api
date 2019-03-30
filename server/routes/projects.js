@@ -1,8 +1,10 @@
 import logger from '../core/logger';
 import config from '../core/config';
 import ProjectsController from '../controllers/projectsController';
+import WavesHelper from '../core/utils/waves';
 
-const projectsContoller = new ProjectsController(logger, config);
+const wavesHelper = new WavesHelper(logger, config);
+const projectsContoller = new ProjectsController(logger, config, wavesHelper);
 
 export default (router) => {
   router
@@ -16,4 +18,8 @@ export default (router) => {
   router
     .route('/projects')
     .post(projectsContoller.create.bind(projectsContoller));
+
+  router
+    .route('/projects/:id/vote')
+    .get(projectsContoller.vote.bind(projectsContoller));
 };

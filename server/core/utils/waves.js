@@ -1,17 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import User from '../models/user';
 import JWTUtil from '../core/utils/jwt';
-import BaseController from './baseController';
 
 // TODO: Does not work with import. Fix later.
 const WavesAPI = require('@waves/waves-api');
 const sg = require('@waves/signature-generator');
 
-class AuthController extends BaseController {
+export default class WavesHelper {
   constructor(logger, config) {
-    super(logger, config);
-    this._waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+    this._logger = logger;
+    this._config = config;
+    this._waves = WavesAPI.create(this._config.nodeEnv === 'development'? WavesAPI.TESTNET_CONFIG: WavesAPI.MAINNET_CONFIG);
     this.wavesAuthSuccess = this.wavesAuthSuccess.bind(this);
     this._crypto = sg.utils.crypto;
     this._base58 = sg.libs.base58;
@@ -23,41 +22,6 @@ class AuthController extends BaseController {
       new StringWithLength('host'),
       new StringWithLength('data'),
     ]);
-  }
-
-  async wavesAuthSuccess(req, res, next) {
-    try {
-      this._logger.info(req.url);
-      const valid = this._checkValidity(req.url);
-      if (valid) {
-        this._logger.info('Waves wallet is valid.');
-        const parsedUrl = URL.parse(req.url, true);
-        const publicKey = parsedUrl.query.p;
-        const walletAddress = parsedUrl.query.a;
-
-        const validWallet = this._addressValidate(publicKey, walletAddress);
-        if (validWallet) {
-          // Find user by waves address. Create new if does not exists.
-          let user = User.finByWalletAddress(walletAddress);
-          if (!user) {
-            this._logger.info('Create new user.');
-            user = new User({
-              name: 'New user',
-              publicKey,
-              wavesWalletAddress: walletAddress,
-              createdAt: new Date(),
-            });
-            user = User.addUser(user);
-          }
-          this._logger.info(`User ${user.name}.`);
-          const token = this._jwt.generateToken(user);
-          res.redirect(`${this._config.serverHttpMethod}://${this._config.serverHttpHost}/auth?code=${token}&a=${walletAddress}`);
-        }
-      }
-    } catch (err) {
-      this._logger.error(err);
-      next(err);
-    }
   }
 
   _checkValidity(url) {
@@ -107,5 +71,3 @@ class AuthController extends BaseController {
     return (addressFromPublicKey === address);
   }
 }
-
-export default AuthController;

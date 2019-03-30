@@ -1,10 +1,14 @@
-/* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
 
 class ProjectsController extends BaseController {
+  constructor(logger, config, wavesHelper) {
+    super(logger, config)
+    this._wavesHelper = wavesHelper;
+  }
+
   async all(req, res, next) {
     try {
       await ProjectModel.where('status')
@@ -97,7 +101,30 @@ class ProjectsController extends BaseController {
           this._logger.info(createdProject);
         }
       });
-      res.status(HttpCodes.CREATED).json(proj);
+      res.status(HttpCodes.CREATED).json(createdProject.toJSON());
+    } catch (err) {
+      this._logger.error(err);
+      next(err);
+    }
+  }
+
+  async vote(req, res, next) {
+    try {
+      this._logger.info(req.url);
+      const valid = this._checkValidity(req.url);
+      if (valid) {
+        this._logger.info('Waves wallet is valid.');
+        const parsedUrl = URL.parse(req.url, true);
+        const publicKey = parsedUrl.query.p;
+        const walletAddress = parsedUrl.query.a;
+
+        const validWallet = this._addressValidate(publicKey, walletAddress);
+        if (validWallet) {
+        //TODO: Check WCT stake and if greater than 10 write it to the Project and recalculate project rank. 
+
+          res.redirect(`${this._config.serverHttpMethod}://${this._config.serverHttpHost}/auth?code=${token}&a=${walletAddress}`);
+        }
+      }
     } catch (err) {
       this._logger.error(err);
       next(err);
