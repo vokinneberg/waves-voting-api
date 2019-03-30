@@ -13,6 +13,8 @@ const ProjectStatus = {
   Business: 'Working business'
 }
 
+const StartingProjectRank = 0;
+
 const ProjectSchema = new mongoose.Schema({
     name: String,
     short_description: String,
@@ -70,4 +72,4 @@ const ProjectSchema = new mongoose.Schema({
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);
 
-export { ProjectModel, ProjectStatus, ProjectVerificationStatus };
+export { ProjectModel, ProjectStatus, ProjectVerificationStatus, StartingProjectRank };

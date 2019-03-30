@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 
-import { ProjectModel, ProjectVerificationStatus } from '../models/project';
+import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
 
 class ProjectsController extends BaseController {
@@ -13,7 +13,6 @@ class ProjectsController extends BaseController {
         if (err) {
           throw err;
         }
-        this._logger.info(typeof projects)
         this._logger.info(projects);
         res.status(HttpCodes.OK).json({
           projects: projects.map((project) => {
@@ -21,12 +20,19 @@ class ProjectsController extends BaseController {
             return {
               _id: project._id,
               name: project.name,
-              logo: project.logo,
-              description: project.description,
-              home_page: project.home_page,
-              token: project.token,
-              rate: project.rate,
-              status: project.status
+              short_descripton: project.short_description,
+              project_site: project.project_site,
+              token: {
+                id: project.token.id,
+                ticker: project.token.ticker,
+                description: project.token.description,
+                logo: {
+                  name: project.token.name,
+                  link: project.token.link
+                }
+              },
+              rank: project.rank,
+              verification_status: project.verification_status
             }
           }),
         });
@@ -74,18 +80,16 @@ class ProjectsController extends BaseController {
 
       const proj = new ProjectModel({
         name: req.body.name,
-        email: req.body.email,
+        short_description: req.body.short_description,
         description: req.body.description,
-        owner: req.body.owner,
-        country: req.body.country,
-        home_page: req.body.home_page,
-        token: req.body.token,
-        logo: req.body.logo,
+        project_site: req.body.home_page,
+        project_status: req.body.project_status,
         social_links: req.body.social_links,
-        papers: req.body.papers,
-        votes: req.body.votes,
-        rate: req.body.rate,
-        status: req.body.status
+        token: req.body.token,
+        team: req.body.team,
+        owner: req.body.owner,
+        rank: StartingProjectRank,
+        verification_status: ProjectVerificationStatus.Unknown
       });
 
       await ProjectModel.create(proj, (err, createdProject) => {
