@@ -1,14 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 
-import { ProjectModel, ProjectStatus } from '../models/project';
+import { ProjectModel, ProjectVerificationStatus } from '../models/project';
 import BaseController from './baseController';
 
 class ProjectsController extends BaseController {
   async all(req, res, next) {
     try {
       await ProjectModel.where('status')
-      .in([ProjectStatus.Described, ProjectStatus.Verified])
+      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
       .exec((err, projects) => {
         if (err) {
           throw err;

@@ -1,23 +1,27 @@
 import mongoose from 'mongoose';
 
-const ProjectStatus = {
+const ProjectVerificationStatus = {
   Unknown: 'Unknown',
   Described: 'Described',
   Verified: 'Verified'
 }
 
-const ProjectSchema = new mongoose.Schema(
-  {
+
+const ProjectStatus = {
+  Idea: 'Idea',
+  MVP: 'MVP',
+  Business: 'Working business'
+}
+
+const ProjectSchema = new mongoose.Schema({
     name: String,
-    email: String,
-    logo: {
-      name: String,
-      link: String
-    },
+    short_description: String,
     description: String,
-    owner: String,
-    country: String,
-    home_page: String,
+    project_site: String,
+    project_status: {
+      type: String,
+      enum: ['Idea', 'MVP', 'Working Business']
+    },
     social_links: [
       {
         name: String,
@@ -26,21 +30,38 @@ const ProjectSchema = new mongoose.Schema(
     ],
     token: {
       id: String,
-      code: String,
+      ticker: String,
+      description: String,
       logo: {
         name: String,
         link: String
       }
     },
+    team: [
+      {
+        name: String,
+        surname: String,
+        social_link: {
+          name: String,
+          link: String
+        }
+      }
+    ],
     votes: [
       {
         wallet_id: String,
-        stake: Number
+        stake: Number,
+        date:  Date
       },
     ],
-    owner: String,
-    rate: Number,
-    status: {
+    owner: {
+      name: String,
+      surname: String,
+      email: String,
+      country: String,
+    },
+    rank: Number,
+    verification_status: {
       type: String,
       enum: ['Unknown', 'Described', 'Verified']
     }
@@ -49,4 +70,4 @@ const ProjectSchema = new mongoose.Schema(
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);
 
-export { ProjectModel, ProjectStatus };
+export { ProjectModel, ProjectStatus, ProjectVerificationStatus };
