@@ -8,10 +8,7 @@ export default class JWTUtil {
 
   generateToken(user) {
     const u = {
-      name: user.name,
-      email: user.email,
-      wavesWalletAddress: user.wavesWalletAddress,
-      createdAt: user.createdAt,
+      user: user.email,
     };
 
     const token = JWT.sign(u, this._config.jwtSecret, {

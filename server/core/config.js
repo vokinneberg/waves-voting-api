@@ -11,6 +11,7 @@ const config = {
   serverPort: process.env.SERVER_PORT || 8080,
   jwtSecret: process.env.JWT_SECRET || 'example',
   jwtExpires: process.env.JWT_EXPIRES || 1,
+  saltRounds: process.env.SALT_ROUNDS || 10,
 };
 
 export default config;

@@ -6,7 +6,6 @@ const logFormat = winston.format.printf(({ level, message, stack, label, timesta
 });
 
 const logger = winston.createLogger({
-  level: config.logLevel,
   format: winston.format.combine(
     winston.format.label({label: 'waves-voting'}),
     winston.format.timestamp(),
@@ -14,9 +13,15 @@ const logger = winston.createLogger({
   ),
   transports: [
     new (winston.transports.Console)({
-      colorize: true,
+      console: {
+        level: config.logLevel,
+        handleExceptions: true,
+        json: false,
+        colorize: true,
+      },
     }),
   ],
+  exitOnError: false,
 });
 
 export default logger;

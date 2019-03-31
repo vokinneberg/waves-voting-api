@@ -21,21 +21,26 @@ adminRoutes(adminRouter);
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/api/v1', router);
-app.use('/admin/api/v1', adminRouter)
-app.use(expressJwt({
+app.all('/admin/api/v1/*', expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      logger.info('Extracting token.');
       return req.headers.authorization.split(' ')[1];
     }
     return null;
   },
-}).unless({ path: ['/api/v1/projects','/api/v1/projects/:id'] }));
+}).unless({ path : ['/admin/api/v1/auth'] }));
 app.use((err, req, res, next)  => {
   logger.error(err.stack);
+
+  if (err.name === 'UnauthorizedError') {
+    res.status(httpStatus.UNAUTHORIZED).send(err.message);
+  }
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Something went wrong!');
 });
+app.use('/api/v1', router);
+app.use('/admin/api/v1', adminRouter)
 
 const lightship = createLightship();
 
