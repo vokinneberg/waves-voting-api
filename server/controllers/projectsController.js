@@ -3,7 +3,7 @@ import HttpCodes from 'http-status-codes';
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
 
-class ProjectsController extends BaseController {
+export default class ProjectsController extends BaseController {
   constructor(logger, config, wavesHelper) {
     super(logger, config)
     this._wavesHelper = wavesHelper;
@@ -120,7 +120,7 @@ class ProjectsController extends BaseController {
 
         const validWallet = this._addressValidate(publicKey, walletAddress);
         if (validWallet) {
-        //TODO: Check WCT stake and if greater than 10 write it to the Project and recalculate project rank. 
+          //TODO: Check WCT stake and if greater than 10 write it to the Project and recalculate project rank. 
 
           res.redirect(`${this._config.serverHttpMethod}://${this._config.serverHttpHost}/auth?code=${token}&a=${walletAddress}`);
         }
@@ -131,5 +131,3 @@ class ProjectsController extends BaseController {
     }
   }
 }
-
-export default ProjectsController;

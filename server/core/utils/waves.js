@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import URL from 'url';
-import JWTUtil from '../core/utils/jwt';
+import JWTUtil from './jwt';
 
 // TODO: Does not work with import. Fix later.
 const WavesAPI = require('@waves/waves-api');
@@ -11,7 +11,6 @@ export default class WavesHelper {
     this._logger = logger;
     this._config = config;
     this._waves = WavesAPI.create(this._config.nodeEnv === 'development'? WavesAPI.TESTNET_CONFIG: WavesAPI.MAINNET_CONFIG);
-    this.wavesAuthSuccess = this.wavesAuthSuccess.bind(this);
     this._crypto = sg.utils.crypto;
     this._base58 = sg.libs.base58;
     this._jwt = new JWTUtil(config);

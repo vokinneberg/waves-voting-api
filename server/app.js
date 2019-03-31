@@ -7,18 +7,22 @@ import expressJwt from 'express-jwt';
 import { createLightship } from 'lightship';
 
 import routes from './routes';
+import adminRoutes from './routes/admin';
 import logger from './core/logger';
 import config from './core/config';
 import ConnectionStringBuilder from './core/utils/db';
 
 const app = express();
 const router = express.Router();
+const adminRouter = express.Router();
 
 routes(router);
+adminRoutes(adminRouter);
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/v1', router);
+app.use('/admin/api/v1', adminRouter)
 app.use(expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
