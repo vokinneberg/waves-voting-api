@@ -1,5 +1,8 @@
 FROM node:10.12.0-alpine as build
 
+RUN apk update
+RUN apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
+
 WORKDIR /app
 COPY . .
 
