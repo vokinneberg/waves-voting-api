@@ -12,7 +12,7 @@ export default class ProjectsController extends BaseController {
   async all(req, res, next) {
     try {
       await ProjectModel.where('verification_status')
-      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
+      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified, ProjectVerificationStatus.Unknown])
       .exec((err, projects) => {
         if (err) {
           throw err;
@@ -84,10 +84,12 @@ export default class ProjectsController extends BaseController {
 
       const proj = new ProjectModel({
         name: req.body.name,
+        project_id: req.body.project_id,
         short_description: req.body.short_description,
         description: req.body.description,
         project_site: req.body.home_page,
         project_status: req.body.project_status,
+        monetezation_type: req.body.monetezation_type,
         social_links: req.body.social_links,
         token: req.body.token,
         team: req.body.team,
@@ -95,13 +97,13 @@ export default class ProjectsController extends BaseController {
         rank: StartingProjectRank,
         verification_status: ProjectVerificationStatus.Unknown
       });
-
+      
       await ProjectModel.create(proj, (err, createdProject) => {
-        if (!err) {
-          this._logger.info(createdProject);
-        }
+        if (err)
+          throw err;
+        this._logger.info(`Project created: ${createdProject}.`);
+        res.status(HttpCodes.CREATED).json(createdProject.toJSON());
       });
-      res.status(HttpCodes.CREATED).json(createdProject.toJSON());
     } catch (err) {
       this._logger.error(err);
       next(err);

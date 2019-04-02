@@ -44,7 +44,7 @@ const ProjectSchema = new mongoose.Schema({
     project_site: String,
     project_status: {
       type: String,
-      enum: ['Idea', 'MVP', 'Working Business', 'Working Business', 'Trustamust DAOICO']
+      enum: ['Idea', 'MVP', 'Working Business', 'Trustamust DAOICO']
     },
     monetization_type: [{
       type: String,
@@ -94,6 +94,7 @@ const ProjectSchema = new mongoose.Schema({
       enum: ['Unknown', 'Described', 'Verified']
     }
   },
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );
 
 const ProjectModel = mongoose.model('Project', ProjectSchema);

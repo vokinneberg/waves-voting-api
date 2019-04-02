@@ -9,15 +9,15 @@ export default (adminRouter) => {
     .route('/projects')
     .get(adminProjectsController.all.bind(adminProjectsController));
 
-    adminRouter
+  adminRouter
     .route('/projects/:id')
     .get(adminProjectsController.byId.bind(adminProjectsController));
 
-    adminRouter
+  adminRouter
     .route('/projects/:id/confirm')
     .put(adminProjectsController.confirm.bind(adminProjectsController));
 
-    adminRouter
+  adminRouter
     .route('/projects/:id')
     .put(adminProjectsController.update.bind(adminProjectsController));
 };
