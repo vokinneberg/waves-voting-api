@@ -11,7 +11,7 @@ export default class ProjectsController extends BaseController {
 
   async all(req, res, next) {
     try {
-      await ProjectModel.where('status')
+      await ProjectModel.where('verification_status')
       .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
       .exec((err, projects) => {
         if (err) {
@@ -31,8 +31,8 @@ export default class ProjectsController extends BaseController {
                 ticker: project.token.ticker,
                 description: project.token.description,
                 logo: {
-                  name: project.token.name,
-                  link: project.token.link
+                  name: project.token.logo.name,
+                  link: project.token.logo.link
                 }
               },
               rank: project.rank,
