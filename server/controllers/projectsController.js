@@ -2,6 +2,7 @@ import HttpCodes from 'http-status-codes';
 
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
+import ObjectNotFoundError from '../core/errors/ObjectNotFoundError';
 
 export default class ProjectsController extends BaseController {
   constructor(logger, config, wavesHelper) {
@@ -11,35 +12,32 @@ export default class ProjectsController extends BaseController {
 
   async all(req, res, next) {
     try {
-      await ProjectModel.where('verification_status')
+      const projects = await ProjectModel.where('verification_status')
       .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
-      .exec((err, projects) => {
-        if (err) {
-          throw err;
-        }
-        this._logger.info(projects);
-        res.status(HttpCodes.OK).json({
-          projects: projects.map((project) => {
-            this._logger.info(typeof project);
-            return {
-              _id: project._id,
-              name: project.name,
-              short_descripton: project.short_description,
-              project_site: project.project_site,
-              token: {
-                id: project.token.id,
-                ticker: project.token.ticker,
-                description: project.token.description,
-                logo: {
-                  name: project.token.logo.name,
-                  link: project.token.logo.link
-                }
-              },
-              rank: project.rank,
-              verification_status: project.verification_status
-            }
-          }),
-        });
+      .exec();
+
+      this._logger.info(projects);
+      res.status(HttpCodes.OK).json({
+        projects: projects.map((project) => {
+          this._logger.info(typeof project);
+          return {
+            _id: project._id,
+            name: project.name,
+            short_descripton: project.short_description,
+            project_site: project.project_site,
+            token: {
+              id: project.token.id,
+              ticker: project.token.ticker,
+              description: project.token.description,
+              logo: {
+                name: project.token.logo.name,
+                link: project.token.logo.link
+              }
+            },
+            rank: project.rank,
+            verification_status: project.verification_status
+          }
+        }),
       });
     } catch (err) {
       this._logger.error(err);
@@ -59,20 +57,13 @@ export default class ProjectsController extends BaseController {
         });
       }
 
-      await ProjectModel.findById(id, (err, project) => {
-        if (err)
-          throw err;
+      const project = await ProjectModel.findById(id);
 
-        if (!project) {
-          res.status(HttpCodes.NOT_FOUND).json({
-            code: 'not_found',
-            description: 'Project not found.'
-          });
-        } else {
-          res.status(HttpCodes.OK).json(project.toJSON())
-        }
-      });
-
+      if (!project) {
+        throw new ObjectNotFoundError(`Project _id ${id} not found.`);
+      } else {
+        res.status(HttpCodes.OK).json(project.toJSON())
+      }
     } catch (err) {
       this._logger.error(err);
       next(err);
@@ -98,12 +89,9 @@ export default class ProjectsController extends BaseController {
         verification_status: ProjectVerificationStatus.Unknown
       });
 
-      await ProjectModel.create(proj, (err, createdProject) => {
-        if (err)
-          throw err;
-        this._logger.info(`Project created: ${createdProject}.`);
-        res.status(HttpCodes.CREATED).json(createdProject.toJSON());
-      });
+      const newProj = await ProjectModel.create(proj);
+      this._logger.info(`Project created: ${newProj}.`);
+      res.status(HttpCodes.CREATED).json(newProj.toJSON());
     } catch (err) {
       this._logger.error(err);
       next(err);

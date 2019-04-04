@@ -1,8 +1,8 @@
 import * as winston from 'winston';
 import config from './config';
 
-const logFormat = winston.format.printf(({ level, message, stack, label, timestamp }) => {
-  return `${timestamp} [${label}] ${level}: ${message} ${stack}`;
+const logFormat = winston.format.printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
 const logger = winston.createLogger({

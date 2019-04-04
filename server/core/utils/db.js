@@ -3,7 +3,7 @@ export default class ConnectionStringBuilder {
     this._config = config;
   }
 
-  buildConncetionString() {
+  buildConneсtionString() {
     var dbConnectionString = 'mongodb://';
 
     if (this._config.dbUser) {

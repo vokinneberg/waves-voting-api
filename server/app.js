@@ -36,8 +36,8 @@ app.use('/api/v1', router);
 app.use('/admin/api/v1', adminRouter);
 app.use((err, req, res, next)  => {
   logger.error(`Error: ${err.message}. Stack trace: ${err.stack}.`);
-  if (err.code) {
-    res.status(err.httpStatus).send({code: err.code, message: err.message});
+  if (err.status) {
+    res.status(err.status).send({code: err.code, message: err.message});
   }
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send({code: 'internal_error', message: 'Something went wrong!'});
 });
@@ -46,7 +46,7 @@ const lightship = createLightship();
 
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
-var mongoConnString = new ConnectionStringBuilder(config).buildConncetionString();
+var mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
 mongoose.connect(mongoConnString, {
   useNewUrlParser: true
 }).then(() => {

@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt';
+import HttpCodes from 'http-status-codes';
 import BaseController from '../baseController';
 import UserModel from '../../models/user';
 import UnauthorizedError from '../../core/errors/UnauthorizedError';
+import ObjectNotFoundError from '../../core/errors/ObjectNotFoundError';
 
 export default class AdminAuthController extends BaseController {
   constructor(logger, config, jwtUtils) {
@@ -38,28 +40,18 @@ export default class AdminAuthController extends BaseController {
         });
       }
 
-      await UserModel.findOne({email: email}, (err, user) => {
-        if (err)
-          throw err;
+      const user = await UserModel.findOne({email: email});
+      if (!user) {
+        throw new ObjectNotFoundError(`User email:${email} not found`);
+      } else {
+        const match = await bcrypt.compare(password, user.hashedPassword);
 
-        if (!user) {
-          res.status(HttpCodes.NOT_FOUND).json({
-            code: 'not_found',
-            description: 'User not found.'
-          });
-        } else {
-          bcrypt.compare(password, user.hashedPassword, function(err, res) {
-            if (err)
-              throw err;
+        if (!match)
+          throw new UnauthorizedError('Wrong password!');
 
-            if (!res)
-              throw new UnauthorizedError('Unauthorized: wrong password!');
-
-            const token = this._jwtUtils.generateToken(user);
-            res.status(HttpCodes.OK).json({'JWT': token});
-          });
-        }
-      });
+        const token = this._jwtUtils.generateToken(user);
+        res.status(HttpCodes.OK).json({'JWT': token});
+      }
     } catch (err) {
       this._logger.error(err);
       next(err);
