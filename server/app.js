@@ -20,6 +20,7 @@ routes(router);
 adminRoutes(adminRouter);
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/api/v1', router);
 // app.all('/admin/api/v1/*', expressJwt({
@@ -32,19 +33,13 @@ app.use('/api/v1', router);
 //     return null;
 //   },
 // }).unless({ path : ['/admin/api/v1/auth'] }));
-app.use('/admin/api/v1', adminRouter)
+app.use('/admin/api/v1', adminRouter);
 app.use((err, req, res, next)  => {
   logger.error(`Error: ${err.message}. Stack trace: ${err.stack}.`);
-
-  if (err.name === 'UnauthorizedError') {
-    res.status(httpStatus.UNAUTHORIZED).send(err.message);
+  if (err.code) {
+    res.status(err.httpStatus).send({code: err.code, message: err.message});
   }
-
-  if (err.name === 'MongoError') {
-    res.status(httpStatus.BAD_REQUEST).send(err.message);
-  }
-
-  res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Something went wrong!');
+  res.status(httpStatus.INTERNAL_SERVER_ERROR).send({code: 'internal_error', message: 'Something went wrong!'});
 });
 
 const lightship = createLightship();

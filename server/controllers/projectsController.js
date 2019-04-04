@@ -89,7 +89,7 @@ export default class ProjectsController extends BaseController {
         description: req.body.description,
         project_site: req.body.home_page,
         project_status: req.body.project_status,
-        monetezation_type: req.body.monetezation_type,
+        monetization_type: req.body.monetization_type,
         social_links: req.body.social_links,
         token: req.body.token,
         team: req.body.team,
