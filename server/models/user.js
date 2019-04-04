@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema(
       required: [true, 'Email required.'],
       unique: true,
     },
-    passwordHash: String
+    hashedPassword: String
   },
   { timestamps: { createdAt: 'created_at' } }
 );

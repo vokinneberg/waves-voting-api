@@ -44,7 +44,11 @@ export default class AdminAuthController extends BaseController {
       if (!user) {
         throw new ObjectNotFoundError(`User email:${email} not found`);
       } else {
-        const match = await bcrypt.compare(password, user.hashedPassword);
+        const match = await new Promise((resolve, reject) => bcrypt.compare(password, user.hashedPassword, (err, res) => {
+          if (err) 
+            reject(err);
+          resolve(res);
+        }));
 
         if (!match)
           throw new UnauthorizedError('Wrong password!');

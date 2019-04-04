@@ -23,19 +23,19 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/api/v1', router);
-// app.all('/admin/api/v1/*', expressJwt({
-//   secret: config.jwtSecret,
-//   getToken: function fromHeader(req) {
-//     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-//       logger.info('Extracting token.');
-//       return req.headers.authorization.split(' ')[1];
-//     }
-//     return null;
-//   },
-// }).unless({ path : ['/admin/api/v1/auth'] }));
+app.all('/admin/api/v1/*', expressJwt({
+  secret: config.jwtSecret,
+  getToken: function fromHeader(req) {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      logger.info('Extracting token.');
+      return req.headers.authorization.split(' ')[1];
+    }
+    return null;
+  },
+}).unless({ path : ['/admin/api/v1/auth'] }));
 app.use('/admin/api/v1', adminRouter);
 app.use((err, req, res, next)  => {
-  logger.error(`Error: ${err.message}. Stack trace: ${err.stack}.`);
+  logger.error(`${err.message}. Stack trace: ${err.stack}.`);
   if (err.status) {
     res.status(err.status).send({code: err.code, message: err.message});
   }
