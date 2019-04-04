@@ -69,6 +69,7 @@ const ProjectSchema = new mongoose.Schema({
       {
         name: String,
         surname: String,
+        role: String,
         social_link: {
           name: String,
           link: String
