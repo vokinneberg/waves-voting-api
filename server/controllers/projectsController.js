@@ -12,7 +12,7 @@ export default class ProjectsController extends BaseController {
   async all(req, res, next) {
     try {
       await ProjectModel.where('verification_status')
-      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified, ProjectVerificationStatus.Unknown])
+      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
       .exec((err, projects) => {
         if (err) {
           throw err;
@@ -97,7 +97,7 @@ export default class ProjectsController extends BaseController {
         rank: StartingProjectRank,
         verification_status: ProjectVerificationStatus.Unknown
       });
-      
+
       await ProjectModel.create(proj, (err, createdProject) => {
         if (err)
           throw err;

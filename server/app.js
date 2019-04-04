@@ -21,26 +21,31 @@ adminRoutes(adminRouter);
 
 app.use(cors());
 app.use(bodyParser.json());
-app.all('/admin/api/v1/*', expressJwt({
-  secret: config.jwtSecret,
-  getToken: function fromHeader(req) {
-    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-      logger.info('Extracting token.');
-      return req.headers.authorization.split(' ')[1];
-    }
-    return null;
-  },
-}).unless({ path : ['/admin/api/v1/auth'] }));
+app.use('/api/v1', router);
+// app.all('/admin/api/v1/*', expressJwt({
+//   secret: config.jwtSecret,
+//   getToken: function fromHeader(req) {
+//     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+//       logger.info('Extracting token.');
+//       return req.headers.authorization.split(' ')[1];
+//     }
+//     return null;
+//   },
+// }).unless({ path : ['/admin/api/v1/auth'] }));
+app.use('/admin/api/v1', adminRouter)
 app.use((err, req, res, next)  => {
-  logger.error(err.stack);
+  logger.error(`Error: ${err.message}. Stack trace: ${err.stack}.`);
 
   if (err.name === 'UnauthorizedError') {
     res.status(httpStatus.UNAUTHORIZED).send(err.message);
   }
+
+  if (err.name === 'MongoError') {
+    res.status(httpStatus.BAD_REQUEST).send(err.message);
+  }
+
   res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Something went wrong!');
 });
-app.use('/api/v1', router);
-app.use('/admin/api/v1', adminRouter)
 
 const lightship = createLightship();
 
