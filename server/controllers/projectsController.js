@@ -3,7 +3,7 @@ import HttpCodes from 'http-status-codes';
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
-import RequestValidationError from '../core/errors/objectNotFoundError';
+import RequestValidationError from '../core/errors/requestValidationError';
 
 export default class ProjectsController extends BaseController {
   constructor(logger, config, wavesHelper) {
