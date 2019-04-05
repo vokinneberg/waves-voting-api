@@ -2,7 +2,8 @@ import HttpCodes from 'http-status-codes';
 
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
-import ObjectNotFoundError from '../core/errors/ObjectNotFoundError';
+import ObjectNotFoundError from '../core/errors/objectNotFoundError';
+import RequestValidationError from '../core/errors/objectNotFoundError';
 
 export default class ProjectsController extends BaseController {
   constructor(logger, config, wavesHelper) {
@@ -23,6 +24,7 @@ export default class ProjectsController extends BaseController {
           return {
             _id: project._id,
             name: project.name,
+            project_id: project.project_id,
             short_descripton: project.short_description,
             project_site: project.project_site,
             token: {
@@ -50,11 +52,7 @@ export default class ProjectsController extends BaseController {
       let id = req.params.id;
 
       if (!id) {
-        res.status(HttpCodes.BAD_REQUEST).json({
-          code: 'invalid_request',
-          parameter: 'id',
-          description: 'Project_id is empty or wrong formated.'
-        });
+        throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
       const project = await ProjectModel.findById(id);
@@ -72,10 +70,18 @@ export default class ProjectsController extends BaseController {
 
   async create(req, res, next) {
     try {
+      if (!req.body || req.body == "") {
+        throw new RequestValidationError('Request body should not be empty.', 'body');
+      }
+      
+      // Generate project id.
+      const projectId = req.body.name.split(' ').map((str) => {
+        return str.split(/(?=[A-Z])/).join('-').toLowerCase();
+      }).join('-');
 
       const proj = new ProjectModel({
         name: req.body.name,
-        project_id: req.body.project_id,
+        project_id: projectId,
         short_description: req.body.short_description,
         description: req.body.description,
         project_site: req.body.home_page,

@@ -31,7 +31,8 @@ const ProjectSchema = new mongoose.Schema({
       unique: true,
       lowercase: true,
       trim: true,
-      required: [true, 'Unique Id required.']
+      required: [true, 'Unique Id required.'],
+      tags: { type: [String], index: true }
     },
     short_description: {
       type: String,

@@ -16,12 +16,18 @@ const logger = winston.createLogger({
       console: {
         level: config.logLevel,
         handleExceptions: true,
-        json: false,
+        json: config.nodeEnv === 'production',
         colorize: true,
       },
     }),
   ],
   exitOnError: false,
 });
+
+logger.stream = {
+  write: function(message, encoding) {
+    logger.info(message);
+  },
+};
 
 export default logger;

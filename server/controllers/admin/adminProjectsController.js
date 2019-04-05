@@ -1,6 +1,6 @@
 import HttpCodes from 'http-status-codes';
 import ProjectsController from '../projectsController';
-import ObjectNotFoundError from '../../core/errors/ObjectNotFoundError';
+import ObjectNotFoundError from '../../core/errors/objectNotFoundError';
 import { ProjectModel, ProjectVerificationStatus } from '../../models/project';
 
 export default class AdminProjectsController extends ProjectsController {
@@ -16,6 +16,7 @@ export default class AdminProjectsController extends ProjectsController {
           return {
             _id: project._id,
             name: project.name,
+            project_id: project.project_id,
             owner: project.owner,
             rank: project.rank,
             verification_status: project.verification_status
@@ -33,11 +34,7 @@ export default class AdminProjectsController extends ProjectsController {
       let id = req.params.id;
 
       if (!id) {
-        res.status(HttpCodes.BAD_REQUEST).json({
-          code: 'invalid_request',
-          parameter: 'id',
-          description: 'Project_id is empty or wrong formated.'
-        });
+        throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
       const project = await ProjectModel.findById(id);
@@ -61,19 +58,11 @@ export default class AdminProjectsController extends ProjectsController {
       let id = req.params.id;
 
       if (!id) {
-        res.status(HttpCodes.BAD_REQUEST).json({
-          code: 'invalid_request',
-          parameter: 'id',
-          description: 'Project_id is empty or wrong formated.'
-        });
+        throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
       if (!req.body || req.body == "") {
-        res.status(HttpCodes.BAD_REQUEST).json({
-          code: 'invalid_request',
-          parameter: 'body',
-          description: 'Request body is empty or wrong formated.'
-        });
+        throw new RequestValidationError('Request body should not be empty.', 'body');
       }
 
       var project = await ProjectModel.findById(id);
