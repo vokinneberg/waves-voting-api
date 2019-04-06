@@ -49,7 +49,7 @@ const ProjectSchema = new mongoose.Schema({
     },
     monetization_type: [{
       type: String,
-      enum: ['ICO', 'Private Investors', ]
+      enum: ['ICO', 'Private Investors', 'Working Business', 'Trustamust DAOICO']
     }],
     social_links: [
       {

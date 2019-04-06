@@ -95,7 +95,7 @@ export default class ProjectsController extends BaseController {
         verification_status: ProjectVerificationStatus.Unknown
       });
 
-      this._logger.info(`Creating project: ${newProj}.`);
+      this._logger.info(`Creating project: ${proj}.`);
       const newProj = await ProjectModel.create(proj);
       this._logger.info(`Project created: ${newProj._id}.`);
       res.status(HttpCodes.CREATED).json(newProj.toJSON());
