@@ -9,5 +9,4 @@
     "babel-plugin-inline-import",
     "transform-runtime"
   ]
-
 }
