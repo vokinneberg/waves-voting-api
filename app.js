@@ -46,6 +46,10 @@ app.all('/admin/api/v1/*', expressJwt({
 app.use('/admin/api/v1', adminRouter);
 app.use((err, req, res, next)  => {
   logger.error(`${err.message}. Stack trace: ${err.stack}.`);
+  if (err instanceof MongoError) {
+    err.status = httpStatus.BAD_REQUEST;
+    err.code = 'db_error';
+  }
   if (err.status) {
     res.status(err.status).send({code: err.code, message: err.message});
   }
