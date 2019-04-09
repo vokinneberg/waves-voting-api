@@ -7,6 +7,7 @@ import expressJwt from 'express-jwt';
 import morgan from 'morgan';
 import uuid from 'node-uuid';
 import { createLightship } from 'lightship';
+import { MongooseError} from 'mongoose';
 
 import routes from './routes';
 import adminRoutes from './routes/admin';
@@ -45,8 +46,16 @@ app.all('/admin/api/v1/*', expressJwt({
 }).unless({ path : ['/admin/api/v1/auth'] }));
 app.use('/admin/api/v1', adminRouter);
 app.use((err, req, res, next)  => {
-  logger.error(`${err.message}. Stack trace: ${err.stack}.`);
-  if (err instanceof MongoError) {
+  logger.error(`${err.name} - ${err.message}. Stack trace: ${err.stack}.`);
+  if (err.name === 'CastError') {
+    err.status = httpStatus.BAD_REQUEST;
+    err.code = 'cast_error';
+  }
+  if (err.name === 'ValidationError') {
+    err.status = httpStatus.BAD_REQUEST;
+    err.code = 'validation_error';
+  }
+  if (err.name === 'MongoError') {
     err.status = httpStatus.BAD_REQUEST;
     err.code = 'db_error';
   }

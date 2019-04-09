@@ -14,8 +14,9 @@ const ProjectStatus = {
 
 const TokenMonetizationType = {
   ICO: 'ICO',
+  Grant: 'Grant',
   Private: 'Private Investors',
-  Business: 'Working Business',
+  Venture: 'Venture Investments',
   DAOICO: 'Trustamust DAOICO'
 }
 
@@ -49,7 +50,7 @@ const ProjectSchema = new mongoose.Schema({
     },
     monetization_type: [{
       type: String,
-      enum: ['ICO', 'Private Investors', 'Working Business', 'Trustamust DAOICO']
+      enum: ['ICO', 'Grant', 'Private Investors', 'Venture Investments', 'Trustamust DAOICO']
     }],
     social_links: [
       {

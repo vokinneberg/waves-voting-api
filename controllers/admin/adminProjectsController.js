@@ -19,7 +19,8 @@ export default class AdminProjectsController extends ProjectsController {
             project_id: project.project_id,
             owner: project.owner,
             rank: project.rank,
-            verification_status: project.verification_status
+            verification_status: project.verification_status,
+            created_at: project.created_at
           }
         }),
       });
