@@ -5,9 +5,8 @@ import httpStatus from 'http-status-codes';
 import mongoose from 'mongoose';
 import expressJwt from 'express-jwt';
 import morgan from 'morgan';
-import uuid from 'node-uuid';
+import uuidv4 from 'uuid';
 import { createLightship } from 'lightship';
-import { MongooseError} from 'mongoose';
 
 import routes from './routes';
 import adminRoutes from './routes/admin';
@@ -24,9 +23,9 @@ adminRoutes(adminRouter);
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: config.uploadSizeLimit}));
 app.use((err, req, res, next) => {
-  req.id = uuid.v4();
+  req.id = uuidv4();
   next();
 });
 morgan.token('id', function getId (req) {

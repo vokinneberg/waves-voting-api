@@ -12,6 +12,11 @@ const config = {
   jwtSecret: process.env.JWT_SECRET || 'example',
   jwtExpires: process.env.JWT_EXPIRES || 1,
   saltRounds: process.env.SALT_ROUNDS || 10,
+  uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
+  minioHost: process.env.MINIO_HOST || '104.248.101.178',
+  minioPort: process.env.MINIO_PORT || 9000,
+  minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
+  minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ'
 };
 
 export default config;

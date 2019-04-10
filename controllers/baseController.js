@@ -1,9 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-class BaseController {
+export default class BaseController {
   constructor(logger, config) {
     this._logger = logger;
     this._config = config;
   }
 }
-
-export default BaseController;
