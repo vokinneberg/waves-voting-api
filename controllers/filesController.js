@@ -10,15 +10,15 @@ export default class FilesController extends BaseController {
 
   async upload(req, res, next) {
     try {
-      const fileName = new Base64Helper().generateUniqueString();
+      const fileName = Base64Helper.generateUniqueString();
       await this._minioClient.putObject('trustamust', fileName, req.file.buffer);
-      res.status(HttpCodes.CREATED).json({'file':fileName});
+      res.status(HttpCodes.CREATED).json({ file: fileName });
     } catch (err) {
       this._logger.error(err);
       if (err.name === 'S3Error') {
         err.status = HttpCodes.BAD_REQUEST;
         err.code = 'file_error';
-        err.message = `Unable to upload file ${reg.fileName}.`;
+        err.message = `Unable to upload file ${req.fileName}.`;
       }
       next(err);
     }
@@ -33,7 +33,7 @@ export default class FilesController extends BaseController {
       if (err.name === 'S3Error') {
         err.status = HttpCodes.BAD_REQUEST;
         err.code = 'file_error';
-        err.message = `File does not exists.`;
+        err.message = 'File does not exists.';
       }
       next(err);
     }

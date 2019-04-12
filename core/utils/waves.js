@@ -10,7 +10,7 @@ export default class WavesHelper {
   constructor(logger, config) {
     this._logger = logger;
     this._config = config;
-    this._waves = WavesAPI.create(this._config.nodeEnv === 'development'? WavesAPI.TESTNET_CONFIG: WavesAPI.MAINNET_CONFIG);
+    this._waves = WavesAPI.create(this._config.nodeEnv === 'development' ? WavesAPI.TESTNET_CONFIG : WavesAPI.MAINNET_CONFIG);
     this._crypto = sg.utils.crypto;
     this._base58 = sg.libs.base58;
     this._jwt = new JWTUtil(config);

@@ -16,7 +16,7 @@ const config = {
   minioHost: process.env.MINIO_HOST || '104.248.101.178',
   minioPort: process.env.MINIO_PORT || 9000,
   minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
-  minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ'
+  minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ',
 };
 
 export default config;

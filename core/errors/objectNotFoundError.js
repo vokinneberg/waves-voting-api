@@ -4,7 +4,7 @@ export default class ObjectNotFoundError extends Error {
   constructor(message) {
     super(message);
     this.name = this.constructor.name;
-    this.status= httpStatus.NOT_FOUND;
+    this.status = httpStatus.NOT_FOUND;
     this.code = 'not_found';
     Error.captureStackTrace(this, this.constructor);
   }

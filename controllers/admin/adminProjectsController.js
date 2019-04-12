@@ -1,72 +1,70 @@
+/* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 import ProjectsController from '../projectsController';
 import ObjectNotFoundError from '../../core/errors/objectNotFoundError';
+import RequestValidationError from '../../core/errors/requestValidationError';
 import { ProjectModel, ProjectVerificationStatus } from '../../models/project';
 
 export default class AdminProjectsController extends ProjectsController {
   async all(req, res, next) {
     try {
       const projects = await ProjectModel.where('verification_status')
-      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified, ProjectVerificationStatus.Unknown])
-      .exec();
+        .in([ProjectVerificationStatus.Described,
+          ProjectVerificationStatus.Verified,
+          ProjectVerificationStatus.Unknown])
+        .exec();
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
-        projects: projects.map((project) => {
-          return {
-            _id: project._id,
-            name: project.name,
-            project_id: project.project_id,
-            owner: project.owner,
-            rank: project.rank,
-            verification_status: project.verification_status,
-            created_at: project.created_at
-          }
-        }),
+        projects: projects.map(project => ({
+          name: project.name,
+          project_id: project.project_id,
+          owner: project.owner,
+          rank: project.rank,
+          verification_status: project.verification_status,
+          created_at: project.created_at,
+        })),
       });
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }
 
   async confirm(req, res, next) {
     try {
-      let id = req.params.id;
+      const { id } = req.params;
 
       if (!id) {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      const project = await ProjectModel.findById(id);
+      const project = await ProjectModel.findOne({ project_id: id });
 
       if (!project) {
-        throw new ObjectNotFoundError(`Project _id ${id} not found.`);
+        throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
         project.verification_status = ProjectVerificationStatus.Described;
         project.save();
-        res.status(HttpCodes.OK).json(project.toJSON())
+        res.status(HttpCodes.OK).json(project.toJSON());
       }
-
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }
 
   async update(req, res, next) {
     try {
-      let id = req.params.id;
+      const { id } = req.params;
 
       if (!id) {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      if (!req.body || req.body == "") {
+      if (!req.body || req.body === '') {
         throw new RequestValidationError('Request body should not be empty.', 'body');
       }
 
-      var project = await ProjectModel.findById(id);
+      const project = await ProjectModel.findOne({ project_id: id });
 
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
@@ -84,14 +82,11 @@ export default class AdminProjectsController extends ProjectsController {
         project.team = req.body.team;
         project.owner = req.body.owner;
         project.save((err) => {
-          if (err)
-            throw err;
-          res.status(HttpCodes.OK).json(project.toJSON())
-        })
+          if (err) throw err;
+          res.status(HttpCodes.OK).json(project.toJSON());
+        });
       }
-
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }

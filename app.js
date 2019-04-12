@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import httpStatus from 'http-status-codes';
 import mongoose from 'mongoose';
 import expressJwt from 'express-jwt';
 import morgan from 'morgan';
@@ -13,6 +12,7 @@ import adminRoutes from './routes/admin';
 import logger from './core/logger';
 import config from './core/config';
 import ConnectionStringBuilder from './core/utils/db';
+import errorHandler from './core/middleware/errorHandler';
 
 const app = express();
 const router = express.Router();
@@ -23,14 +23,12 @@ adminRoutes(adminRouter);
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json({limit: config.uploadSizeLimit}));
+app.use(bodyParser.json({ limit: config.uploadSizeLimit }));
 app.use((err, req, res, next) => {
   req.id = uuidv4();
   next();
 });
-morgan.token('id', function getId (req) {
-  return req.id
-})
+morgan.token('id', req => req.id);
 app.use(morgan(':id :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', { stream: logger.stream }));
 app.use('/api/v1', router);
 app.all('/admin/api/v1/*', expressJwt({
@@ -42,41 +40,23 @@ app.all('/admin/api/v1/*', expressJwt({
     }
     return null;
   },
-}).unless({ path : ['/admin/api/v1/auth'] }));
+}).unless({ path: ['/admin/api/v1/auth'] }));
 app.use('/admin/api/v1', adminRouter);
-app.use((err, req, res, next)  => {
-  logger.error(`${err.name} - ${err.message}. Stack trace: ${err.stack}.`);
-  if (err.name === 'CastError') {
-    err.status = httpStatus.BAD_REQUEST;
-    err.code = 'cast_error';
-  }
-  if (err.name === 'ValidationError') {
-    err.status = httpStatus.BAD_REQUEST;
-    err.code = 'validation_error';
-  }
-  if (err.name === 'MongoError') {
-    err.status = httpStatus.BAD_REQUEST;
-    err.code = 'db_error';
-  }
-  if (err.status) {
-    res.status(err.status).send({code: err.code, message: err.message});
-  }
-  res.status(httpStatus.INTERNAL_SERVER_ERROR).send({code: 'internal_error', message: 'Something went wrong!'});
-});
+app.use(errorHandler.handleError({ logger }));
 
 const lightship = createLightship();
 
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
-var mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
+const mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
 mongoose.connect(mongoConnString, {
-  useNewUrlParser: true
+  useNewUrlParser: true,
 }).then(() => {
-  logger.info("Successfully connected to the database");    
-}).catch(err => {
-  logger.error('Could not connect to the database. Exiting now...', { 
-    'message': err.message,
-    'stack': err.stack
+  logger.info('Successfully connected to the database');
+}).catch((err) => {
+  logger.error('Could not connect to the database. Exiting now...', {
+    message: err.message,
+    stack: err.stack,
   });
 });
 

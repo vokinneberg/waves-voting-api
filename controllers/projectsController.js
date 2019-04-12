@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
@@ -6,22 +7,21 @@ import RequestValidationError from '../core/errors/requestValidationError';
 
 export default class ProjectsController extends BaseController {
   constructor(logger, config, wavesHelper) {
-    super(logger, config)
+    super(logger, config);
     this._wavesHelper = wavesHelper;
   }
 
   async all(req, res, next) {
     try {
       const projects = await ProjectModel.where('verification_status')
-      .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
-      .exec();
+        .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
+        .exec();
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
         projects: projects.map((project) => {
           this._logger.info(typeof project);
           return {
-            _id: project._id,
             name: project.name,
             project_id: project.project_id,
             short_descripton: project.short_description,
@@ -32,58 +32,54 @@ export default class ProjectsController extends BaseController {
               description: project.token.description,
               logo: {
                 name: project.token.logo.name,
-                link: project.token.logo.link
-              }
+                link: project.token.logo.link,
+              },
             },
             rank: project.rank,
-            verification_status: project.verification_status
-          }
+            verification_status: project.verification_status,
+          };
         }),
       });
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }
 
   async byId(req, res, next) {
     try {
-      let id = req.params.id;
+      const { id } = req.params;
 
       if (!id) {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      const project = await ProjectModel.findById(id);
+      const project = await ProjectModel.findOne({ project_id: id });
 
       if (!project) {
-        throw new ObjectNotFoundError(`Project _id ${id} not found.`);
+        throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
-        res.status(HttpCodes.OK).json(project.toJSON())
+        res.status(HttpCodes.OK).json(project.toJSON());
       }
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }
 
   async create(req, res, next) {
     try {
-      if (!req.body || req.body == "") {
+      if (!req.body || req.body === '') {
         throw new RequestValidationError('Request body should not be empty.', 'body');
       }
-      
+
       // Generate project id.
-      const projectId = req.body.name.split(' ').map((str) => {
-        return str.split(/(?=[A-Z])/).join('-').toLowerCase();
-      }).join('-');
+      const projectId = req.body.name.split(' ').map(str => str.split(/(?=[A-Z])/).join('-').toLowerCase()).join('-');
 
       const proj = new ProjectModel({
         name: req.body.name,
         project_id: projectId,
         short_description: req.body.short_description,
         description: req.body.description,
-        project_site: req.body.home_page,
+        project_site: req.body.project_site,
         project_status: req.body.project_status,
         monetization_type: req.body.monetization_type,
         social_links: req.body.social_links,
@@ -91,7 +87,7 @@ export default class ProjectsController extends BaseController {
         team: req.body.team,
         owner: req.body.owner,
         rank: StartingProjectRank,
-        verification_status: ProjectVerificationStatus.Unknown
+        verification_status: ProjectVerificationStatus.Unknown,
       });
 
       this._logger.info(`Creating project: ${proj}.`);
@@ -99,7 +95,6 @@ export default class ProjectsController extends BaseController {
       this._logger.info(`Project created: ${newProj._id}.`);
       res.status(HttpCodes.CREATED).json(newProj.toJSON());
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }
@@ -116,13 +111,11 @@ export default class ProjectsController extends BaseController {
 
         const validWallet = this._addressValidate(publicKey, walletAddress);
         if (validWallet) {
-          //TODO: Check WCT stake and if greater than 10 write it to the Project and recalculate project rank. 
-
-          res.redirect(`${this._config.serverHttpMethod}://${this._config.serverHttpHost}/auth?code=${token}&a=${walletAddress}`);
+          /* TODO: Check WCT stake and if greater than 10 write it
+           to the Project and recalculate project rank. */
         }
       }
     } catch (err) {
-      this._logger.error(err);
       next(err);
     }
   }

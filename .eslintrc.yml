@@ -2,3 +2,10 @@ extends: airbnb
 parser: babel-eslint
 rules:
     strict: 0
+    no-underscore-dangle:
+        - 2
+        - allowAfterThis: true
+    new-cap: 
+        - error
+        - newIsCapExceptions: 
+            - generate
