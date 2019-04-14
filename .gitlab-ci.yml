@@ -4,16 +4,18 @@ stages:
 
 variables:
   CONTAINER_IMAGE: registry.gitlab.com/trustamust/waves-voting
-  
-services:
-  - docker:dind
-
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
 
 lint:
   stage: lint
-  script: yarn lint
+  image: node:latest
+  only:
+    refs:
+      - tags
+      - merge_requests
+  allow_failure: false
+  script: 
+    - npm i eslint
+    - npm run lint
 
 build_job:
   stage: build
@@ -21,10 +23,14 @@ build_job:
   only:
     refs:
       - tags
+  services:
+  - docker:dind
   allow_failure: false
   variables:
     DOCKER_DRIVER: overlay
     DOCKER_HOST: tcp://localhost:2375
+  before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
     - docker build --tag $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME .
     - docker push $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME
