@@ -1,17 +1,22 @@
 stages:
-  - build_release
+  - lint
+  - build
 
 variables:
   CONTAINER_IMAGE: registry.gitlab.com/trustamust/waves-voting
   
 services:
-- docker:dind
+  - docker:dind
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
 
-build_release:
-  stage: build_release
+lint:
+  stage: lint
+  script: yarn lint
+
+build_job:
+  stage: build
   image: docker:latest
   only:
     refs:

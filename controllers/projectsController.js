@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
 import BaseController from './baseController';
@@ -58,6 +57,7 @@ export default class ProjectsController extends BaseController {
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
+        this._logger.info(`Project ${id} fiund.`);
         res.status(HttpCodes.OK).json(project.toJSON());
       }
     } catch (err) {
@@ -92,7 +92,7 @@ export default class ProjectsController extends BaseController {
 
       this._logger.info(`Creating project: ${proj}.`);
       const newProj = await ProjectModel.create(proj);
-      this._logger.info(`Project created: ${newProj._id}.`);
+      this._logger.info(`Project created: ${newProj.project_id}.`);
       res.status(HttpCodes.CREATED).json(newProj.toJSON());
     } catch (err) {
       next(err);

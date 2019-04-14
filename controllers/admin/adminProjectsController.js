@@ -38,6 +38,7 @@ export default class AdminProjectsController extends ProjectsController {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
+      this._logger.info(`Confirm project ${id}.`);
       const project = await ProjectModel.findOne({ project_id: id });
 
       if (!project) {

@@ -1,12 +1,12 @@
 version: '3'
 services:
-  # web:
-  #   image: trustamust-waves-voting:latest
-  #   ports:
-  #   - "443:443"
-  #   - "80:80"
-  #   links:
-  #   - mongo-db
+  web:
+    image: waves-voting-api:latest
+    ports:
+    - "443:443"
+    - "80:80"
+    links:
+    - mongo-db
   mongo-db:
     image: mongo:latest
     restart: always

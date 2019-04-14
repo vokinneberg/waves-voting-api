@@ -5,7 +5,3 @@ rules:
     no-underscore-dangle:
         - 2
         - allowAfterThis: true
-    new-cap: 
-        - error
-        - newIsCapExceptions: 
-            - generate

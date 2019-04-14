@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import URL from 'url';
 import JWTUtil from './jwt';
 
@@ -16,6 +15,7 @@ export default class WavesHelper {
     this._jwt = new JWTUtil(config);
 
     const { StringWithLength } = sg;
+    /* eslint new-cap: ["error", { "newIsCap": false }] */
     this._generator = new sg.generate([
       new StringWithLength('prefix'),
       new StringWithLength('host'),

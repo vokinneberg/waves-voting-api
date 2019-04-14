@@ -100,7 +100,8 @@ const ProjectSchema = new mongoose.Schema({
 },
 { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
-ProjectSchema.methods.toJSON = function () {
+/* eslint no-underscore-dangle: ["error", { "allow": ["__v", "_id"] }] */
+ProjectSchema.methods.toJSON = () => {
   const obj = this.toObject();
   delete obj._id;
   delete obj.__v;
