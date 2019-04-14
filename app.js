@@ -44,8 +44,6 @@ app.all('/admin/api/v1/*', expressJwt({
 app.use('/admin/api/v1', adminRouter);
 app.use(errorHandler.handleError({ logger }));
 
-const lightship = createLightship();
-
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
 const mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
@@ -60,9 +58,15 @@ mongoose.connect(mongoConnString, {
   });
 });
 
+const snapshotJob = new SnapshotJob(logger, config);
+cron.schedule(`*/${config.timeCheckBlockchain} * * * *`, () => {
+  snapshotJob.run();
+})
+
 const port = config.serverPort;
 const server = app.listen(port, () => logger.info(`App listening on port ${port}!`));
 
+const lightship = createLightship();
 lightship.registerShutdownHandler(() => {
   server.close();
 });

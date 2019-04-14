@@ -5,19 +5,18 @@ import config from '../core/config';
 import { ProjectModel, ProjectVerificationStatus } from '../models/project';
 
 export default class SnapshotJob {
-  constructor(logger, config) {
-    this._logger = logger;
-    this._config = config;
-  }
+    constructor(logger, config) {
+        this._logger = logger;
+        this._config = config;
+    }
 
     async run() {
-
         try {
-
             const projects = await ProjectModel.find({
                 status: ProjectVerificationStatus.Described
             })
-            console.log(projects)
+
+            this._logger.info(`${projects.length} projects found.`)
             async.forEach(projects, (project, callbackProject) => {
 
                 let rankProject = 0
@@ -27,7 +26,7 @@ export default class SnapshotJob {
                 async.forEach(project.votes, (vote, callbackVote) => {
 
                     request({
-                        url: `${config.apiBlockchainHost}/assets/balance/${vote.wallet_id}/${config.apiAssetsId}`,
+                        url: `${this._config.apiBlockchainHost}/assets/balance/${vote.wallet_id}/${this._config.apiAssetsId}`,
                         method: 'get',
                         json: true
                     }, (error, response, body) => {
