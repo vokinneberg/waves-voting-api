@@ -21,6 +21,12 @@ const TokenMonetizationType = {
   DAOICO: 'TrustAmust DAOICO',
 };
 
+const VoteStatus = {
+  'Init': 'Init',
+  'NoFunds': 'No Funds',
+  'Settled': 'Settled'
+}
+
 const StartingProjectRank = 0;
 
 const ProjectSchema = new mongoose.Schema({
@@ -81,9 +87,14 @@ const ProjectSchema = new mongoose.Schema({
   ],
   votes: [
     {
-      wallet_id: String,
-      stake: Number,
+      waves_address: String,
+      stake: mongoose.Decimal128,
       date: Date,
+      status: {
+        type: String,
+        enum: [VoteStatus.Init, VoteStatus.NoFunds, VoteStatus.Settled],
+        default: VoteStatus.Init
+      }
     },
   ],
   owner: {
@@ -95,7 +106,8 @@ const ProjectSchema = new mongoose.Schema({
   rank: Number,
   verification_status: {
     type: String,
-    enum: ['Unknown', 'Described', 'Verified'],
+    enum: [ProjectVerificationStatus.Unknown, ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified],
+    default: ProjectVerificationStatus.Unknown
   },
 },
 { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
@@ -116,4 +128,5 @@ export {
   ProjectVerificationStatus,
   StartingProjectRank,
   TokenMonetizationType,
+  VoteStatus
 };

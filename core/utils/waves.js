@@ -23,7 +23,11 @@ export default class WavesHelper {
     ]);
   }
 
-  _checkValidity(url) {
+  checkAssetStake(wavesAddress, ticker) {
+    return this._waves.balance(wavesAddress, ticker);
+  }
+
+  checkValidity(url) {
     // Get redirect url and parse it.
     const signedData = {
       host: this._config.serverHost,
@@ -45,12 +49,12 @@ export default class WavesHelper {
     try {
       return this._authValidate(signedData, signature, publicKey);
     } catch (err) {
-      this._logger.error(`Signature validation error: ${err}`);
+      this._logger.error(`Signature validation error: ${err}.`);
       return false;
     }
   }
 
-  _authValidate(data, sign, publicKey) {
+  authValidate(data, sign, publicKey) {
     const prefix = 'WavesWalletAuthentication';
 
     const byteGen = new this._generator({
@@ -63,10 +67,9 @@ export default class WavesHelper {
       .then(bytes => this._crypto.isValidSignature(bytes, sign, publicKey));
   }
 
-  _addressValidate(publicKey, address) {
+  addressValidate(publicKey, address) {
     const publicKeyBytes = this._base58.decode(publicKey);
     const addressFromPublicKey = this._crypto.buildRawAddress(publicKeyBytes);
-
     return (addressFromPublicKey === address);
   }
 }

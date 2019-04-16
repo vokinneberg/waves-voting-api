@@ -1,143 +1,69 @@
-import request from 'request';
 import async from 'async';
-import logger from '../core/logger';
-import config from '../core/config';
-import { ProjectModel, ProjectVerificationStatus } from '../models/project';
+import { ProjectModel, ProjectVerificationStatus, VoteStatus } from '../models/project';
 
 export default class SnapshotJob {
-    constructor(logger, config) {
+    constructor(wavesHelper, logger, config) {
         this._logger = logger;
         this._config = config;
+        this._wavesHelper = wavesHelper;
     }
 
     async run() {
         try {
             const projects = await ProjectModel.find({
                 status: ProjectVerificationStatus.Described
-            })
-
-            this._logger.info(`${projects.length} projects found.`)
-            async.forEach(projects, (project, callbackProject) => {
-
-                let rankProject = 0
-                let updateProjectVotes = false
-                let updateVotes = []
-
-                async.forEach(project.votes, (vote, callbackVote) => {
-
-                    request({
-                        url: `${this._config.apiBlockchainHost}/assets/balance/${vote.wallet_id}/${this._config.apiAssetsId}`,
-                        method: 'get',
-                        json: true
-                    }, (error, response, body) => {
-
-                        if (!error) {
-
-                            if (body.error) {
-                                logger.error('Error response API check voites');
-                                return callbackVote()
-                            }
-
-                            const balanceApi = body.balance
-                            rankProject += config.karma * Math.log(balanceApi)
-
-                            if ((balanceApi != vote.stake) || (balanceApi < 10 && vote.status != 2)) {
-
-                                updateProjectVotes = true
-                                let newStatus = 1
-                                let newBalance = vote.stake
-
-                                if (balanceApi != vote.stake) {
-                                    newBalance = balanceApi
-                                }
-                                if (balanceApi < 10) {
-                                    newStatus = 2
-                                }
-
-                                vote.stake = newBalance
-                                vote.status = newStatus
-                                updateVotes.push(vote)
-
-                                callbackVote()
-                            } else {
-
-                                updateVotes.push(vote)
-                                callbackVote()
-                            }
-                        } else {
-                            logger.error('Request API voites', {
-                                'message': error.message,
-                                'stack': error.stack
-                            });
-                            callbackVote()
-                        }
-                    })
-                }, error => {
-
-                    if (!error) {
-
-                        if (updateProjectVotes) {
-
-                            let verificationStatus = project.verification_status
-
-                            if (rankProject >= 100) {
-                                verificationStatus = ProjectVerificationStatus.Verified
-                            }
-
-                            ProjectModel.findOneAndUpdate(
-                                {
-                                    project_id: project.project_id
-                                }, {
-                                    $set: {
-                                        rank: rankProject,
-                                        votes: updateVotes,
-                                        verification_status: verificationStatus
-                                    }
-                                }, (error, update) => {
-
-                                    if (!error) {
-
-                                        if (update.nModified === 1) {
-
-                                            callbackProject()
-                                        } else {
-
-                                            callbackProject()
-                                        }
-                                    } else {
-                                        console.error(error)
-                                    }
-                                })
-                        } else {
-                            callbackProject()
-                        }
-                    } else {
-                        logger.error('Async check voites', {
-                            'message': error.message,
-                            'stack': error.stack
-                        });
-                        callbackProject()
-                    }
-                })
-            }, error => {
-
-                if (!error) {
-
-                    logger.info("Successfully check projects");
-                } else {
-                    logger.error('Async check projects', {
-                        'message': error.message,
-                        'stack': error.stack
-                    });
-                }
-            })
-
-        } catch (error) {
-
-            logger.error('Catch check projects', {
-                'message': error.message,
-                'stack': error.stack
             });
+
+            this._logger.info(`${projects.length} projects found.`);
+
+            async.forEach(projects, async project => {
+                var projectRank = project.rank;
+                var projectVotes = project.votes;
+
+                async.forEach(projectVotes, async vote => {
+                    const stake = this._wavesHelper.checkAssetStake();
+                    const currentVoteRank = Math.log(stake);
+                    switch(vote.status) {
+                        case VoteStatus.Init:
+                            // TODO: Check transtaction in blcokchain and confirm. If not enough WCT set NoFunds status.
+                            if (stake < this._config.votingThreshold) {
+                                this._logger.info(`Not enough funds to confirm vote.`);
+                                vote.status = VoteStatus.NoFunds;
+                            }
+                            projectRank += currentVoteRank;
+                            vote.status = VoteStatus.Settled;
+                            break;
+                        case VoteStatus.NoFunds:
+                            if (stake < this._config.votingThreshold) {
+                                this._logger.info(`Not enough funds to confirm vote.`);
+                            }
+                            projectRank += currentVoteRank;
+                            vote.status = VoteStatus.Settled;
+                            break;
+                        case VoteStatus.Settled:
+                            if (stake < this._config.votingThreshold) {
+                                this._logger.info(`Not enough funds. Revoke vote.`);
+                                projectRank -= currentVoteRank;
+                                vote.status = VoteStatus.NoFunds;
+                            }
+                            break;
+                        default:
+                            this._logger.info(`Not enough funds to confirm vote.`);
+                    }
+
+                    if (project.rank != projectRank) {
+                        project.rank = projectRank;
+                        project.votes = projectVotes;
+                        await project.save();
+                    }
+                }, (err) => {
+                    if (err) throw err;
+                });
+            }, (err) => {
+                if (err) throw err;
+            });
+        } catch (error) {
+            this._logger.error(`SnapshotJob execution Error: ${err}.`);
         }
     }
 }

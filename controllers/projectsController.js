@@ -1,5 +1,5 @@
 import HttpCodes from 'http-status-codes';
-import { ProjectModel, ProjectVerificationStatus, StartingProjectRank } from '../models/project';
+import { ProjectModel, ProjectVerificationStatus, StartingProjectRank, VoteStatus } from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';
@@ -101,18 +101,39 @@ export default class ProjectsController extends BaseController {
 
   async vote(req, res, next) {
     try {
-      this._logger.info(req.url);
-      const valid = this._checkValidity(req.url);
+      const { id } = req.params;
+      if (!id) {
+        throw new RequestValidationError('Project id should not be empty.', 'id');
+      }
+
+      const project = await ProjectModel.findOne({ 'project_id': id }).where('verification_status')
+      .in([ProjectVerificationStatus.Described])
+      .exec();
+
+      if (!project)
+        throw new ObjectNotFoundError(`Project ${id} does not exists or in incorrect state.`);
+
+      const valid = this._wavesHelper.checkValidity(req.url);
       if (valid) {
         this._logger.info('Waves wallet is valid.');
         const parsedUrl = URL.parse(req.url, true);
         const publicKey = parsedUrl.query.p;
         const walletAddress = parsedUrl.query.a;
 
-        const validWallet = this._addressValidate(publicKey, walletAddress);
+        const validWallet = this._wavesHelper.addressValidate(publicKey, walletAddress);
         if (validWallet) {
-          /* TODO: Check WCT stake and if greater than 10 write it
-           to the Project and recalculate project rank. */
+          const stake = this._wavesHelper.checkAssetStake(walletAddress, this._config.votingTicker);
+          const vote = {
+            'waves_address': walletAddress,
+            'stake': stake,
+            'date': new Date(),
+            'status': VoteStatus.Init
+          }
+          if (stake >= this._config.votingLimit) {
+            project.votes.push(vote);
+            await project.save();
+            res.status(HttpCodes.CREATED).json(JSON.stringify(vote));
+          }
         }
       }
     } catch (err) {

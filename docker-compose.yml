@@ -7,6 +7,10 @@ services:
     - "80:80"
     links:
     - mongo-db
+    environment:
+      DB_NAME: waves-voting
+      DB_USER: waves-voting
+      DB_PASSWORD: example
   mongo-db:
     image: mongo:latest
     restart: always
