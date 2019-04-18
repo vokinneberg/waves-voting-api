@@ -17,16 +17,20 @@ export default class SnapshotJob {
             this._logger.info(`${projects.length} projects found.`);
 
             async.forEach(projects, async project => {
-                var projectRank = project.rank;
-                var projectVotes = project.votes;
+                let projectRank = project.rank;
+                let projectVotes = project.votes;
 
                 async.forEach(projectVotes, async vote => {
                     const stake = this._wavesHelper.checkAssetStake();
                     const currentVoteRank = Math.log(stake);
                     switch(vote.status) {
                         case VoteStatus.Init:
-                            // TODO: Check transtaction in blcokchain and confirm. If not enough WCT set NoFunds status.
-                            if (stake < this._config.votingThreshold) {
+                            const transaction = this._wavesHelper.checkTransaction(vote.transaction_id);
+                            if (!transaction) {
+                                
+                            }
+
+                            if (stake < this._config.votingMinumumStake) {
                                 this._logger.info(`Not enough funds to confirm vote.`);
                                 vote.status = VoteStatus.NoFunds;
                             }
@@ -34,14 +38,14 @@ export default class SnapshotJob {
                             vote.status = VoteStatus.Settled;
                             break;
                         case VoteStatus.NoFunds:
-                            if (stake < this._config.votingThreshold) {
+                            if (stake < this._config.votingMinumumStake) {
                                 this._logger.info(`Not enough funds to confirm vote.`);
                             }
                             projectRank += currentVoteRank;
                             vote.status = VoteStatus.Settled;
                             break;
                         case VoteStatus.Settled:
-                            if (stake < this._config.votingThreshold) {
+                            if (stake < this._config.votingMinumumStake) {
                                 this._logger.info(`Not enough funds. Revoke vote.`);
                                 projectRank -= currentVoteRank;
                                 vote.status = VoteStatus.NoFunds;

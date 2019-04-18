@@ -90,6 +90,7 @@ const ProjectSchema = new mongoose.Schema({
       waves_address: String,
       stake: mongoose.Decimal128,
       date: Date,
+      transaction_id: String,
       status: {
         type: String,
         enum: [VoteStatus.Init, VoteStatus.NoFunds, VoteStatus.Settled],

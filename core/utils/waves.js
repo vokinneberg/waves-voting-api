@@ -27,6 +27,10 @@ export default class WavesHelper {
     return this._waves.balance(wavesAddress, ticker);
   }
 
+  checkTransaction(transactionId) {
+    return this._waves.get(transactionId);
+  }
+
   checkValidity(url) {
     // Get redirect url and parse it.
     const signedData = {

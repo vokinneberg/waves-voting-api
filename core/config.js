@@ -10,8 +10,12 @@ const config = {
   dbPassword: process.env.DB_PASSWORD,
   serverPort: process.env.SERVER_PORT || 8080,
   jwtSecret: process.env.JWT_SECRET || 'example',
-  jwtExpires: process.env.JWT_EXPIRES || 1,
+  jwtAdminExpires: process.env.JWT_ADMIN_EXPIRES || 60 * 24, // 24 hour
+  jwtVoteExpires: process.env.JWT_VOTE_EXPIRES || 5, // 5 minutes
   saltRounds: process.env.SALT_ROUNDS || 10,
+  votingMaximumRank: process.env.VOTING_MAXIMUM_RANK|| 100,
+  votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
+  votingTicker: process.env.VOTING_TICKER || 'WCT',
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
   minioHost: process.env.MINIO_HOST || '104.248.101.178',
   minioPort: process.env.MINIO_PORT || 9000,

@@ -1,18 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import JWT from 'jsonwebtoken';
 
-export default class JWTUtil {
+export default class JWTHelper {
   constructor(config) {
     this._config = config;
   }
 
-  generateToken(user) {
-    const u = {
-      user: user.email,
-    };
-
-    const token = JWT.sign(u, this._config.jwtSecret, {
-      expiresIn: 60 * 60 * this._config.jwtExpires,
+  generateToken(payload, lifetime) {
+    const token = JWT.sign(payload, this._config.jwtSecret, {
+      expiresIn: 60 * lifetime
     });
 
     return token;

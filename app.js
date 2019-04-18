@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
 morgan.token('id', req => req.id);
 app.use(morgan(':id :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', { stream: logger.stream }));
 app.use('/api/v1', router);
-app.all('/admin/api/v1/*', expressJwt({
+const exprJwt = expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -40,7 +40,9 @@ app.all('/admin/api/v1/*', expressJwt({
     }
     return null;
   },
-}).unless({ path: ['/admin/api/v1/auth'] }));
+}).unless({ path: ['/admin/api/v1/auth'] });
+app.put('/api/v1/project/:project_id/votes/*', exprJwt);
+app.all('/admin/api/v1/*', exprJwt);
 app.use('/admin/api/v1', adminRouter);
 app.use(errorHandler.handleError({ logger }));
 

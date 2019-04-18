@@ -5,9 +5,10 @@ import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';
 
 export default class ProjectsController extends BaseController {
-  constructor(logger, config, wavesHelper) {
+  constructor(logger, config, wavesHelper, jwtHelper) {
     super(logger, config);
     this._wavesHelper = wavesHelper;
+    this._jwtHelper = jwtHelper;
   }
 
   async all(req, res, next) {
@@ -129,10 +130,15 @@ export default class ProjectsController extends BaseController {
             'date': new Date(),
             'status': VoteStatus.Init
           }
-          if (stake >= this._config.votingLimit) {
+          if (stake >= this._config.votingStakeLimit) {
             project.votes.push(vote);
             await project.save();
-            res.status(HttpCodes.CREATED).json(JSON.stringify(vote));
+            res.status(HttpCodes.CREATED).json(
+              JSON.stringify(
+                {
+                  ...vote, 
+                  ...{ 'JWT': this._jwtHelper.generateToken({ 'waves_address': walletAddress }, this._config.jwtAdminExpires) }
+                }));
           }
         }
       }
