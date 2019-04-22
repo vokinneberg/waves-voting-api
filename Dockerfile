@@ -33,13 +33,13 @@ COPY --from=build /app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/build /var/www/trustamust-mvp
 COPY --from=build /app/package-lock.json /var/www/trustamust-mvp/package-lock.json
 COPY --from=build /app/package.json /var/www/trustamust-mvp/package.json
-COPY --from=build /app/wait-for.sh /var/www/trustamust-mvp/wait-for.sh
-COPY --from=build /app/start.sh /var/www/trustamust-mvp/start.sh
+# COPY --from=build /app/wait-for.sh /var/www/trustamust-mvp/wait-for.sh
+# COPY --from=build /app/start.sh /var/www/trustamust-mvp/start.sh
 
-RUN chmod +x /var/www/trustamust-mvp/wait-for.sh
-RUN chmod +x /var/www/trustamust-mvp/start.sh
+# RUN chmod +x /var/www/trustamust-mvp/wait-for.sh
+# RUN chmod +x /var/www/trustamust-mvp/start.sh
 
 RUN npm install
 
 EXPOSE 80
-CMD [ "./start.sh" ]
+ENTRYPOINT [ "node", "./app.js" ]
