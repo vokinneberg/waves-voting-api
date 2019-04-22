@@ -22,7 +22,7 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Request body should not be empty.', 'body');
       }
 
-      const project = await Folder.findOneAndUpdate(
+      const project = await ProjectModel.findOneAndUpdate(
         { 'project_id': projectId, 'votes' : [{'waves_address': wavesAddress }]},
         { 
             '$set': {

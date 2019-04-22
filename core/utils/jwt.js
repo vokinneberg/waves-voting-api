@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import JWT from 'jsonwebtoken';
 
 export default class JWTHelper {

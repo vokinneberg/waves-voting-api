@@ -6,6 +6,7 @@ import expressJwt from 'express-jwt';
 import morgan from 'morgan';
 import uuidv4 from 'uuid';
 import { createLightship } from 'lightship';
+import { CronJob } from 'cron';
 
 import routes from './routes';
 import adminRoutes from './routes/admin';
@@ -13,6 +14,7 @@ import logger from './core/logger';
 import config from './core/config';
 import ConnectionStringBuilder from './core/utils/db';
 import errorHandler from './core/middleware/errorHandler';
+import SnapshotJob from './cron-jobs/snapshotJob';
 
 const app = express();
 const router = express.Router();
@@ -61,9 +63,10 @@ mongoose.connect(mongoConnString, {
 });
 
 const snapshotJob = new SnapshotJob(logger, config);
-cron.schedule(`*/${config.timeCheckBlockchain} * * * *`, () => {
+const job = new CronJob(config.snapshotCronPattern, () => {
   snapshotJob.run();
-})
+});
+job.start();
 
 const port = config.serverPort;
 const server = app.listen(port, () => logger.info(`App listening on port ${port}!`));

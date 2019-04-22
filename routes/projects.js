@@ -2,7 +2,7 @@ import logger from '../core/logger';
 import config from '../core/config';
 import ProjectsController from '../controllers/projectsController';
 import WavesHelper from '../core/utils/waves';
-import JWTHelper from '../../core/utils/jwt';
+import JWTHelper from '../core/utils/jwt';
 
 const jwtHelper = new JWTHelper(config);
 const wavesHelper = new WavesHelper(logger, config);

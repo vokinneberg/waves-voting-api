@@ -25,11 +25,14 @@ export default class SnapshotJob {
                     const currentVoteRank = Math.log(stake);
                     switch(vote.status) {
                         case VoteStatus.Init:
+                            if (!vote.transaction_id) {
+                                break;
+                            }
                             const transaction = this._wavesHelper.checkTransaction(vote.transaction_id);
                             if (!transaction) {
-                                
+                                this._logger.info(`Transaction not foind in blockchain.`);
+                                break;
                             }
-
                             if (stake < this._config.votingMinumumStake) {
                                 this._logger.info(`Not enough funds to confirm vote.`);
                                 vote.status = VoteStatus.NoFunds;

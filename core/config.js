@@ -16,6 +16,7 @@ const config = {
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK|| 100,
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
   votingTicker: process.env.VOTING_TICKER || 'WCT',
+  snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '* 5 * * *',
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
   minioHost: process.env.MINIO_HOST || '104.248.101.178',
   minioPort: process.env.MINIO_PORT || 9000,
