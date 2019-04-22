@@ -6,9 +6,9 @@ import UnauthorizedError from '../../core/errors/unauthorizedError';
 import ObjectNotFoundError from '../../core/errors/objectNotFoundError';
 
 export default class AdminAuthController extends BaseController {
-  constructor(logger, config, jwtUtils) {
+  constructor(logger, config, jwtHelper) {
     super(logger, config);
-    this._jwtUtils = jwtUtils;
+    this.jwtHelper = jwtHelper;
   }
 
   async auth(req, res, next) {
@@ -53,7 +53,7 @@ export default class AdminAuthController extends BaseController {
 
         if (!match) throw new UnauthorizedError('Wrong password!');
 
-        const token = this._jwtUtils.generateToken(user);
+        const token = this.jwtHelper.generateToken({ email: user.email }, this._config.jwtExpires);
         res.status(HttpCodes.OK).json({ JWT: token });
       }
     } catch (err) {

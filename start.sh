@@ -1,4 +1,4 @@
 #!/bin/sh
 nginx
-node ./app.js
+./wait_for.sh mongo_db:27017 -t 20 -- node ./app.js
 

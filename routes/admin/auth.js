@@ -1,10 +1,10 @@
 import logger from '../../core/logger';
 import config from '../../core/config';
 import AdminAuthController from '../../controllers/admin/adminAuthController';
-import JWTUtil from '../../core/utils/jwt';
+import JWTHelper from '../../core/utils/jwt';
 
-const jwtUtils = new JWTUtil(config);
-const adminAuthController = new AdminAuthController(logger, config, jwtUtils);
+const jwtHelper = new JWTHelper(config);
+const adminAuthController = new AdminAuthController(logger, config, jwtHelper);
 
 export default (adminRouter) => {
   adminRouter
