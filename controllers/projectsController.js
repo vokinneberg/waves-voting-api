@@ -1,5 +1,7 @@
 import HttpCodes from 'http-status-codes';
-import { ProjectModel, ProjectVerificationStatus, StartingProjectRank, VoteStatus } from '../models/project';
+import {
+  ProjectModel, ProjectVerificationStatus, StartingProjectRank, VoteStatus,
+} from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';
@@ -107,12 +109,11 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      const project = await ProjectModel.findOne({ 'project_id': id }).where('verification_status')
-      .in([ProjectVerificationStatus.Described])
-      .exec();
+      const project = await ProjectModel.findOne({ project_id: id }).where('verification_status')
+        .in([ProjectVerificationStatus.Described])
+        .exec();
 
-      if (!project)
-        throw new ObjectNotFoundError(`Project ${id} does not exists or in incorrect state.`);
+      if (!project) throw new ObjectNotFoundError(`Project ${id} does not exists or in incorrect state.`);
 
       const valid = this._wavesHelper.checkValidity(req.url);
       if (valid) {
@@ -125,20 +126,25 @@ export default class ProjectsController extends BaseController {
         if (validWallet) {
           const stake = this._wavesHelper.checkAssetStake(walletAddress, this._config.votingTicker);
           const vote = {
-            'waves_address': walletAddress,
-            'stake': stake,
-            'date': new Date(),
-            'status': VoteStatus.Init
-          }
+            waves_address: walletAddress,
+            stake,
+            date: new Date(),
+            status: VoteStatus.Init,
+          };
           if (stake >= this._config.votingStakeLimit) {
             project.votes.push(vote);
             await project.save();
             res.status(HttpCodes.CREATED).json(
               JSON.stringify(
                 {
-                  ...vote, 
-                  ...{ 'JWT': this._jwtHelper.generateToken({ 'waves_address': walletAddress }, this._config.jwtAdminExpires) }
-                }));
+                  ...vote,
+                  ...{
+                    JWT: this._jwtHelper.generateToken({ waves_address: walletAddress },
+                      this._config.jwtAdminExpires),
+                  },
+                },
+              ),
+            );
           }
         }
       }

@@ -22,10 +22,10 @@ const TokenMonetizationType = {
 };
 
 const VoteStatus = {
-  'Init': 'Init',
-  'NoFunds': 'No Funds',
-  'Settled': 'Settled'
-}
+  Init: 'Init',
+  NoFunds: 'No Funds',
+  Settled: 'Settled',
+};
 
 const StartingProjectRank = 0;
 
@@ -57,7 +57,13 @@ const ProjectSchema = new mongoose.Schema({
   },
   monetization_type: [{
     type: String,
-    enum: ['ICO', 'Grant', 'Private Investors', 'Venture Investments', 'TrustAmust DAOICO'],
+    enum: [
+      'ICO',
+      'Grant',
+      'Private Investors',
+      'Venture Investments',
+      'TrustAmust DAOICO',
+    ],
   }],
   social_links: [
     {
@@ -94,8 +100,8 @@ const ProjectSchema = new mongoose.Schema({
       status: {
         type: String,
         enum: [VoteStatus.Init, VoteStatus.NoFunds, VoteStatus.Settled],
-        default: VoteStatus.Init
-      }
+        default: VoteStatus.Init,
+      },
     },
   ],
   owner: {
@@ -107,8 +113,12 @@ const ProjectSchema = new mongoose.Schema({
   rank: Number,
   verification_status: {
     type: String,
-    enum: [ProjectVerificationStatus.Unknown, ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified],
-    default: ProjectVerificationStatus.Unknown
+    enum: [
+      ProjectVerificationStatus.Unknown,
+      ProjectVerificationStatus.Described,
+      ProjectVerificationStatus.Verified,
+    ],
+    default: ProjectVerificationStatus.Unknown,
   },
 },
 { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
@@ -129,5 +139,5 @@ export {
   ProjectVerificationStatus,
   StartingProjectRank,
   TokenMonetizationType,
-  VoteStatus
+  VoteStatus,
 };

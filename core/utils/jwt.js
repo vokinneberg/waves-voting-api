@@ -7,7 +7,7 @@ export default class JWTHelper {
 
   generateToken(payload, lifetime) {
     const token = JWT.sign(payload, this._config.jwtSecret, {
-      expiresIn: 60 * lifetime
+      expiresIn: 60 * lifetime,
     });
 
     return token;

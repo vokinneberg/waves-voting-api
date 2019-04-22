@@ -13,7 +13,7 @@ const config = {
   jwtAdminExpires: process.env.JWT_ADMIN_EXPIRES || 60 * 24, // 24 hour
   jwtVoteExpires: process.env.JWT_VOTE_EXPIRES || 5, // 5 minutes
   saltRounds: process.env.SALT_ROUNDS || 10,
-  votingMaximumRank: process.env.VOTING_MAXIMUM_RANK|| 100,
+  votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 100,
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
   votingTicker: process.env.VOTING_TICKER || 'WCT',
   snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '* 5 * * *',

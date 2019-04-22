@@ -1,15 +1,10 @@
 import HttpCodes from 'http-status-codes';
 import { ProjectModel } from '../models/project';
 import BaseController from './baseController';
-import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';
 
 export default class ProjectsController extends BaseController {
-  constructor(logger, config) {
-    super(logger, config);
-  }
-
-  update(req, res, next) {
+  async update(req, res, next) {
     try {
       const { projectId, wavesAddress } = req.params;
       if (!projectId) {
@@ -22,13 +17,14 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Request body should not be empty.', 'body');
       }
 
+      this._logger.info(`Updating project ${projectId} vote with vaves address ${wavesAddress}.`);
       const project = await ProjectModel.findOneAndUpdate(
-        { 'project_id': projectId, 'votes' : [{'waves_address': wavesAddress }]},
-        { 
-            '$set': {
-                'transaction_id': body.transaction_id
-            }
-        }
+        { project_id: projectId, votes: [{ waves_address: wavesAddress }] },
+        {
+          $set: {
+            transaction_id: req.body.transaction_id,
+          },
+        },
       );
       res.status(HttpCodes.OK).json(project.toJSON());
     } catch (err) {
