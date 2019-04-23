@@ -27,7 +27,7 @@ export default class SnapshotJob {
           switch (vote.status) {
             case VoteStatus.Init:
               if (vote.transaction_id) {
-                const transaction = this._wavesHelper.checkTransaction(vote.transaction_id);
+                const transaction = await this._wavesHelper.checkTransaction(vote.transaction_id);
                 if (!transaction) {
                   throw new ObjectNotFoundError(`Transaction ${vote.transaction_id} not found in blockchain.'`);
                 }

@@ -23,12 +23,12 @@ export default class WavesHelper {
     ]);
   }
 
-  async checkAssetStake(wavesAddress, ticker) {
-    await this._waves.API.Node.addresses.balance(wavesAddress, ticker);
+  async checkAssetStake(wavesAddress, assetId) {
+    await this._waves.API.Node.assets.balance(wavesAddress, assetId);
   }
 
-  checkTransaction(transactionId) {
-    return this._waves.API.Node.blocks.get(transactionId);
+  async checkTransaction(transactionId) {
+    return await this._waves.API.Node.blocks.get(transactionId);
   }
 
   checkValidity(url) {
@@ -37,7 +37,7 @@ export default class WavesHelper {
       host: this._config.serverHost,
       data: this._config.authData,
     };
-    this._logger.info(`Signed data ${signedData}`);
+    this._logger.info(`Signed data ${JSON.stringify(signedData)}`);
 
     const parsedUrl = URL.parse(url, true);
 

@@ -130,7 +130,7 @@ export default class ProjectsController extends BaseController {
 
       if (validWallet) {
         const stake = await this._wavesHelper.checkAssetStake(walletAddress,
-          this._config.votingTicker);
+          this._config.votingAssetId);
         this._logger.info(`Waves wallet ${walletAddress} ${this._config.votingTicker} stake ${stake}.`);
         if (stake < this._config.votingStakeLimit) {
           throw new RequestValidationError(`Wallet ${walletAddress} 
