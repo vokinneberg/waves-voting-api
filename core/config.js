@@ -1,6 +1,5 @@
 const config = {
-  serverHttpHost: process.env.SERVER_HTTP_METHOD || 'https',
-  serverHttpMethod: process.env.SERVER_HTTP_HOST || 'stage.trustamust.com/dashboard',
+  serverHost: process.env.SERVER_HTTP_HOST || 'stage.trustamust.com',
   authData: process.env.AUTH_DATA || 'IAmVoting',
   nodeEnv: process.env.NODE_ENV || 'development',
   logLevel: process.env.LOG_LEVEL || 'debug',
