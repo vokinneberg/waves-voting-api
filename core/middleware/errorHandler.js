@@ -18,7 +18,7 @@ export default class ErrorHandler {
         if (err.name === 'S3Error') {
           error = new ObjectNotFoundError(err.message);
         }
-        if(err.name === 'WavesRequestError' || err.name === 'WavesError') {
+        if (err.name === 'WavesRequestError' || err.name === 'WavesError') {
           error = new BlockchainError(err.message);
         }
         if (error.status) {

@@ -24,11 +24,11 @@ export default class WavesHelper {
   }
 
   async checkAssetStake(wavesAddress, assetId) {
-    await this._waves.API.Node.assets.balance(wavesAddress, assetId);
+    return this._waves.API.Node.assets.balance(wavesAddress, assetId);
   }
 
   async checkTransaction(transactionId) {
-    return await this._waves.API.Node.blocks.get(transactionId);
+    return this._waves.API.Node.blocks.get(transactionId);
   }
 
   checkValidity(url) {
