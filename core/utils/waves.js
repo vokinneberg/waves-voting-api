@@ -24,11 +24,12 @@ export default class WavesHelper {
   }
 
   async checkAssetStake(wavesAddress, assetId) {
-    return this._waves.API.Node.assets.balance(wavesAddress, assetId);
+    const assetInfo = await this._waves.API.Node.assets.balance(wavesAddress, assetId);
+    return assetInfo.balance;
   }
 
   async checkTransaction(transactionId) {
-    return this._waves.API.Node.blocks.get(transactionId);
+    return this._waves.API.Node.transactions.get(transactionId);
   }
 
   checkValidity(url) {
@@ -59,8 +60,7 @@ export default class WavesHelper {
   }
 
   addressValidate(publicKey, address) {
-    const publicKeyBytes = this._base58.decode(publicKey);
-    const addressFromPublicKey = this._crypto.buildRawAddress(publicKeyBytes);
+    const addressFromPublicKey = this._waves.tools.getAddressFromPublicKey(publicKey);
     return (addressFromPublicKey === address);
   }
 
