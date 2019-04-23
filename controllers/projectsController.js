@@ -1,4 +1,5 @@
 import HttpCodes from 'http-status-codes';
+import parse from 'url-parse';
 import {
   ProjectModel, ProjectVerificationStatus, StartingProjectRank, VoteStatus,
 } from '../models/project';
@@ -120,35 +121,38 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError(`Invalid signature.`);
       }
 
-      this._logger.info('Waves wallet is valid.');
-      const parsedUrl = URL.parse(req.url, true);
+      const parsedUrl = parse(req.url, true);
       const publicKey = parsedUrl.query.p;
       const walletAddress = parsedUrl.query.a;
 
       const validWallet = this._wavesHelper.addressValidate(publicKey, walletAddress);
+      this._logger.info(`Waves wallet ${walletAddress} is valid.`);
+
       if (validWallet) {
-        const stake = this._wavesHelper.checkAssetStake(walletAddress, this._config.votingTicker);
+        const stake = await this._wavesHelper.checkAssetStake(walletAddress, this._config.votingTicker);
+        this._logger.info(`Waves wallet ${walletAddress} ${this._config.votingTicker} stake ${stake}.`);
+        if (stake < this._config.votingStakeLimit) {
+          throw new RequestValidationError(`Wallet ${walletAddress} ${this._config.votingTicker} stake less than ${this._config.votingStakeLimit}.`); 
+        }
         const vote = {
           waves_address: walletAddress,
           stake,
           date: new Date(),
           status: VoteStatus.Init,
         };
-        if (stake >= this._config.votingStakeLimit) {
-          project.votes.push(vote);
-          await project.save();
-          res.status(HttpCodes.CREATED).json(
-            JSON.stringify(
-              {
-                ...vote,
-                ...{
-                  JWT: this._jwtHelper.generateToken({ waves_address: walletAddress },
-                    this._config.jwtAdminExpires),
-                },
+        project.votes.push(vote);
+        await project.save();
+        res.status(HttpCodes.CREATED).json(
+          JSON.stringify(
+            {
+              ...vote,
+              ...{
+                JWT: this._jwtHelper.generateToken({ waves_address: walletAddress },
+                  this._config.jwtAdminExpires),
               },
-            ),
-          );
-        }
+            },
+          ),
+        );
       }
     } catch (err) {
       next(err);

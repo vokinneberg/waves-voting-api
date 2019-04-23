@@ -23,8 +23,8 @@ export default class WavesHelper {
     ]);
   }
 
-  checkAssetStake(wavesAddress, ticker) {
-    return this._waves.balance(wavesAddress, ticker);
+  async checkAssetStake(wavesAddress, ticker) {
+    await this._waves.API.Node.addresses.balance(wavesAddress, ticker);
   }
 
   checkTransaction(transactionId) {
