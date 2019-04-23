@@ -28,7 +28,7 @@ export default class WavesHelper {
   }
 
   checkTransaction(transactionId) {
-    return this._waves.get(transactionId);
+    return this._waves.API.Node.blocks.get(transactionId);
   }
 
   checkValidity(url) {

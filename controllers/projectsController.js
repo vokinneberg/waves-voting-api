@@ -118,7 +118,7 @@ export default class ProjectsController extends BaseController {
 
       const valid = this._wavesHelper.checkValidity(req.url);
       if (!valid) {
-        throw new RequestValidationError(`Invalid signature.`);
+        throw new RequestValidationError('Invalid signature.');
       }
 
       const parsedUrl = parse(req.url, true);
@@ -129,10 +129,12 @@ export default class ProjectsController extends BaseController {
       this._logger.info(`Waves wallet ${walletAddress} is valid.`);
 
       if (validWallet) {
-        const stake = await this._wavesHelper.checkAssetStake(walletAddress, this._config.votingTicker);
+        const stake = await this._wavesHelper.checkAssetStake(walletAddress,
+          this._config.votingTicker);
         this._logger.info(`Waves wallet ${walletAddress} ${this._config.votingTicker} stake ${stake}.`);
         if (stake < this._config.votingStakeLimit) {
-          throw new RequestValidationError(`Wallet ${walletAddress} ${this._config.votingTicker} stake less than ${this._config.votingStakeLimit}.`); 
+          throw new RequestValidationError(`Wallet ${walletAddress} 
+            ${this._config.votingTicker} stake less than ${this._config.votingStakeLimit}.`);
         }
         const vote = {
           waves_address: walletAddress,
