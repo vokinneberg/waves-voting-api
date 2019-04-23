@@ -1,16 +1,16 @@
 version: '3'
 services:
-  web:
-    image: waves-voting-api:latest
-    ports:
-    - "443:443"
-    - "80:80"
-    links:
-    - mongo-db
-    environment:
-      DB_NAME: waves-voting
-      DB_USER: waves-voting
-      DB_PASSWORD: example
+  # web:
+  #   image: waves-voting-api:latest
+  #   ports:
+  #   - "443:443"
+  #   - "80:80"
+  #   links:
+  #   - mongo-db
+  #   environment:
+  #     DB_NAME: waves-voting
+  #     DB_USER: waves-voting
+  #     DB_PASSWORD: example
   mongo-db:
     image: mongo:latest
     restart: always

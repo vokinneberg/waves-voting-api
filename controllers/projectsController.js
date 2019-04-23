@@ -60,7 +60,7 @@ export default class ProjectsController extends BaseController {
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
-        this._logger.info(`Project ${id} fiund.`);
+        this._logger.info(`Project ${id} found.`);
         res.status(HttpCodes.OK).json(project.toJSON());
       }
     } catch (err) {

@@ -53,7 +53,10 @@ export default class AdminAuthController extends BaseController {
 
         if (!match) throw new UnauthorizedError('Wrong password!');
 
-        const token = this.jwtHelper.generateToken({ email: user.email }, this._config.jwtExpires);
+        const token = this.jwtHelper.generateToken(
+          { email: user.email },
+          this._config.jwtAdminExpires,
+        );
         res.status(HttpCodes.OK).json({ JWT: token });
       }
     } catch (err) {
