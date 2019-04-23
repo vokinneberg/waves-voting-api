@@ -58,7 +58,13 @@ export default class WavesHelper {
     }
   }
 
-  authValidate(data, sign, publicKey) {
+  addressValidate(publicKey, address) {
+    const publicKeyBytes = this._base58.decode(publicKey);
+    const addressFromPublicKey = this._crypto.buildRawAddress(publicKeyBytes);
+    return (addressFromPublicKey === address);
+  }
+
+  _authValidate(data, sign, publicKey) {
     const prefix = 'WavesWalletAuthentication';
 
     const byteGen = new this._generator({
@@ -69,11 +75,5 @@ export default class WavesHelper {
 
     return byteGen.getBytes()
       .then(bytes => this._crypto.isValidSignature(bytes, sign, publicKey));
-  }
-
-  addressValidate(publicKey, address) {
-    const publicKeyBytes = this._base58.decode(publicKey);
-    const addressFromPublicKey = this._crypto.buildRawAddress(publicKeyBytes);
-    return (addressFromPublicKey === address);
   }
 }
