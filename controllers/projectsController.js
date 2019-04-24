@@ -127,10 +127,10 @@ export default class ProjectsController extends BaseController {
 
       const validWallet = this._wavesHelper.addressValidate(publicKey, walletAddress);
       if (!validWallet) {
-        throw new RequestValidationError(`Waves wallet ${walletAddress} is not valid.`); 
+        throw new RequestValidationError(`Waves wallet ${walletAddress} is not valid.`);
       }
       this._logger.info(`Waves wallet ${walletAddress} is valid.`);
-      const stake = await this._wavesHelper.checkAssetStake(walletAddress, 
+      const stake = await this._wavesHelper.checkAssetStake(walletAddress,
         this._config.votingAssetId);
       this._logger.info(`Waves wallet ${walletAddress} ${this._config.votingTicker} stake ${stake}.`);
       if (stake < this._config.votingStakeLimit) {
