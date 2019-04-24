@@ -32,7 +32,6 @@ app.use((err, req, res, next) => {
 });
 morgan.token('id', req => req.id);
 app.use(morgan(':id :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', { stream: logger.stream }));
-app.use('/api/v1', router);
 const exprJwt = expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
@@ -43,7 +42,8 @@ const exprJwt = expressJwt({
     return null;
   },
 }).unless({ path: ['/admin/api/v1/auth'] });
-app.put('/api/v1/project/:project_id/votes/*', exprJwt);
+app.put('/api/v1/projects/:project_id/votes/*', exprJwt);
+app.use('/api/v1', router);
 app.all('/admin/api/v1/*', exprJwt);
 app.use('/admin/api/v1', adminRouter);
 app.use(errorHandler.handleError({ logger }));
