@@ -15,6 +15,7 @@ lint:
   allow_failure: false
   script: 
     - npm i eslint
+    - npm run prettier
     - npm run lint
 
 build_job:
