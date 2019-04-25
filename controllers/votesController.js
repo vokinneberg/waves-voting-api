@@ -21,7 +21,7 @@ export default class ProjectsController extends BaseController {
 
       this._logger.info(`Updating project ${projectId} vote with vaves address ${wavesAddress}.`);
 
-      const project = await ProjectModel.findOne({ projectId });
+      const project = await ProjectModel.findOne({ 'project_id': projectId });
       if (!project) {
         throw new ObjectNotFoundError(`Project ${projectId} not found.`);
       }
