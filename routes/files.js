@@ -13,12 +13,13 @@ const minioClient = new Client({
 });
 const filesContoller = new FilesController(minioClient, logger, config);
 
-export default (router) => {
-  router
-    .route('/files/:name')
-    .get(filesContoller.get.bind(filesContoller));
+export default router => {
+  router.route('/files/:name').get(filesContoller.get.bind(filesContoller));
 
   router
     .route('/files')
-    .post(Multer({ storage: Multer.memoryStorage() }).single('file-upload'), filesContoller.upload.bind(filesContoller));
+    .post(
+      Multer({ storage: Multer.memoryStorage() }).single('file-upload'),
+      filesContoller.upload.bind(filesContoller)
+    );
 };

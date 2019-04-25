@@ -99,3 +99,4 @@ Note that you will need mongodb instance running localy or remotely.
 ## API Reference
 
 `GET /api/health` - health check endpoint. Returns HTTP OK 200 if service works smoothly.
+`POST

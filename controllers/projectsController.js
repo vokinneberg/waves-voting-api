@@ -1,7 +1,10 @@
 import HttpCodes from 'http-status-codes';
 import parse from 'url-parse';
 import {
-  ProjectModel, ProjectVerificationStatus, StartingProjectRank, VoteStatus,
+  ProjectModel,
+  ProjectVerificationStatus,
+  StartingProjectRank,
+  VoteStatus,
 } from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
@@ -17,12 +20,15 @@ export default class ProjectsController extends BaseController {
   async all(req, res, next) {
     try {
       const projects = await ProjectModel.where('verification_status')
-        .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
+        .in([
+          ProjectVerificationStatus.Described,
+          ProjectVerificationStatus.Verified,
+        ])
         .exec();
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
-        projects: projects.map((project) => {
+        projects: projects.map(project => {
           this._logger.info(typeof project);
           return {
             name: project.name,
@@ -53,7 +59,10 @@ export default class ProjectsController extends BaseController {
       const { id } = req.params;
 
       if (!id) {
-        throw new RequestValidationError('Project id should not be empty.', 'id');
+        throw new RequestValidationError(
+          'Project id should not be empty.',
+          'id'
+        );
       }
 
       const project = await ProjectModel.findOne({ project_id: id });
@@ -72,11 +81,22 @@ export default class ProjectsController extends BaseController {
   async create(req, res, next) {
     try {
       if (!req.body || req.body === '') {
-        throw new RequestValidationError('Request body should not be empty.', 'body');
+        throw new RequestValidationError(
+          'Request body should not be empty.',
+          'body'
+        );
       }
 
       // Generate project id.
-      const projectId = req.body.name.split(' ').map(str => str.split(/(?=[A-Z])/).join('-').toLowerCase()).join('-');
+      const projectId = req.body.name
+        .split(' ')
+        .map(str =>
+          str
+            .split(/(?=[A-Z])/)
+            .join('-')
+            .toLowerCase()
+        )
+        .join('-');
 
       const proj = new ProjectModel({
         name: req.body.name,
@@ -107,14 +127,21 @@ export default class ProjectsController extends BaseController {
     try {
       const { id } = req.params;
       if (!id) {
-        throw new RequestValidationError('Project id should not be empty.', 'id');
+        throw new RequestValidationError(
+          'Project id should not be empty.',
+          'id'
+        );
       }
 
-      const project = await ProjectModel.findOne({ project_id: id }).where('verification_status')
+      const project = await ProjectModel.findOne({ project_id: id })
+        .where('verification_status')
         .in([ProjectVerificationStatus.Described])
         .exec();
 
-      if (!project) throw new ObjectNotFoundError(`Project ${id} does not exists or in incorrect state.`);
+      if (!project)
+        throw new ObjectNotFoundError(
+          `Project ${id} does not exists or in incorrect state.`
+        );
 
       const valid = this._wavesHelper.checkValidity(req.url);
       if (!valid) {
@@ -125,17 +152,30 @@ export default class ProjectsController extends BaseController {
       const publicKey = parsedUrl.query.p;
       const walletAddress = parsedUrl.query.a;
 
-      const validWallet = this._wavesHelper.addressValidate(publicKey, walletAddress);
+      const validWallet = this._wavesHelper.addressValidate(
+        publicKey,
+        walletAddress
+      );
       if (!validWallet) {
-        throw new RequestValidationError(`Waves wallet ${walletAddress} is not valid.`);
+        throw new RequestValidationError(
+          `Waves wallet ${walletAddress} is not valid.`
+        );
       }
       this._logger.info(`Waves wallet ${walletAddress} is valid.`);
-      const stake = await this._wavesHelper.checkAssetStake(walletAddress,
-        this._config.votingAssetId);
-      this._logger.info(`Waves wallet ${walletAddress} ${this._config.votingTicker} stake ${stake}.`);
+      const stake = await this._wavesHelper.checkAssetStake(
+        walletAddress,
+        this._config.votingAssetId
+      );
+      this._logger.info(
+        `Waves wallet ${walletAddress} ${
+          this._config.votingTicker
+        } stake ${stake}.`
+      );
       if (stake < this._config.votingStakeLimit) {
         throw new RequestValidationError(`Wallet ${walletAddress} 
-          ${this._config.votingTicker} stake less than ${this._config.votingStakeLimit}.`);
+          ${this._config.votingTicker} stake less than ${
+          this._config.votingStakeLimit
+        }.`);
       }
       const vote = {
         waves_address: walletAddress,
@@ -146,15 +186,15 @@ export default class ProjectsController extends BaseController {
       project.votes.push(vote);
       await project.save();
       res.status(HttpCodes.CREATED).json(
-        JSON.stringify(
-          {
-            ...vote,
-            ...{
-              JWT: this._jwtHelper.generateToken({ waves_address: walletAddress },
-                this._config.jwtAdminExpires),
-            },
+        JSON.stringify({
+          ...vote,
+          ...{
+            JWT: this._jwtHelper.generateToken(
+              { waves_address: walletAddress },
+              this._config.jwtAdminExpires
+            ),
           },
-        ),
+        })
       );
     } catch (err) {
       next(err);

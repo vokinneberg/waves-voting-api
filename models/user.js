@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema(
     },
     hashedPassword: String,
   },
-  { timestamps: { createdAt: 'created_at' } },
+  { timestamps: { createdAt: 'created_at' } }
 );
 
 const UserModel = mongoose.model('User', UserSchema);

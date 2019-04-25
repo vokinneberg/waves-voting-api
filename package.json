@@ -7,7 +7,8 @@
     "clean": "rm -rf build && mkdir build",
     "start": "nodemon --exec babel-node --presets es2015,stage-2 app.js",
     "build": "babel . -d build --presets es2015,stage-2 --ignore node_modules,build",
-    "lint": "eslint --fix --ignore-pattern '/node_modules/' ."
+    "lint": "eslint --fix --ignore-pattern '/node_modules/' .",
+    "prettier": "prettier --check ./**/*.js"
   },
   "author": "Trustamust.com",
   "license": "ISC",
@@ -58,8 +59,10 @@
     "babel-preset-stage-0": "^6.24.1",
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-react": "^7.11.1"
+    "eslint-plugin-react": "^7.11.1",
+    "prettier": "1.17.0"
   }
 }

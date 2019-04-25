@@ -6,12 +6,15 @@ import JWTHelper from '../core/utils/jwt';
 
 const jwtHelper = new JWTHelper(config);
 const wavesHelper = new WavesHelper(logger, config);
-const projectsContoller = new ProjectsController(logger, config, wavesHelper, jwtHelper);
+const projectsContoller = new ProjectsController(
+  logger,
+  config,
+  wavesHelper,
+  jwtHelper
+);
 
-export default (router) => {
-  router
-    .route('/projects')
-    .get(projectsContoller.all.bind(projectsContoller));
+export default router => {
+  router.route('/projects').get(projectsContoller.all.bind(projectsContoller));
 
   router
     .route('/projects/:id')
