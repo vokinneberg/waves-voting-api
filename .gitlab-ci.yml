@@ -8,7 +8,7 @@ variables:
 
 test_job:
   stage: test
-  image: node:latest
+  image: node:10.15.3-alpine
   only:
     refs:
       - tags
@@ -21,7 +21,7 @@ test_job:
 
 lint_job:
   stage: lint
-  image: node:latest
+  image: node:10.15.3-alpine
   only:
     refs:
       - tags
