@@ -22,3 +22,6 @@ yarn-error.log*
 
 # vscode workcspace
 *.code-workspace
+
+# nyc output
+/.nyc_output

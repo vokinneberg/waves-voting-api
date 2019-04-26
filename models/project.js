@@ -96,7 +96,10 @@ const ProjectSchema = new mongoose.Schema(
         ],
         votes: [
             {
-                waves_address: String,
+                waves_address: {
+                    type: String,
+                    tags: { type: [String], index: true },
+                },
                 stake: mongoose.Decimal128,
                 date: Date,
                 transaction_id: String,
