@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import uuidv4 from 'uuid';
 import { createLightship } from 'lightship';
 import { CronJob } from 'cron';
+import "@babel/polyfill";
 
 import routes from './routes';
 import adminRoutes from './routes/admin';

@@ -8,7 +8,9 @@
     [
       "@babel/plugin-transform-runtime",
       {
-        "corejs": 2
+        "corejs": 2,
+        "helpers": true,
+        "regenerator": true
       }
     ],
     "@babel/plugin-syntax-dynamic-import",
