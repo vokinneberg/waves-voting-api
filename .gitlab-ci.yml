@@ -19,6 +19,7 @@ test_job:
     - apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
     - npm i mocha
     - npm i chai
+    - npm i @babel/plugin-transform-runtime
     - npm test
 
 lint_job:
