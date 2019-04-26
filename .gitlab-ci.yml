@@ -29,9 +29,11 @@ lint_job:
   allow_failure: false
   script: 
     - apk update
-    - apk add python
+    - apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
     - npm i eslint
+    - npm i prettier
     - npm run lint
+    - npm run prettier
 
 build_job:
   stage: build
