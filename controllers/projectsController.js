@@ -180,11 +180,11 @@ export default class ProjectsController extends BaseController {
 
             const votedProj = await ProjectModel.findOne({
                 votes: {
-                    $elemMatch : {
-                        waves_address : walletAddress
-                    }
-                }
-            });
+                    $elemMatch: {
+                        waves_address: walletAddress,
+                    },
+                },
+            })
             if (votedProj) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
                 has already voted for project ${votedProj.project_id}.`)
