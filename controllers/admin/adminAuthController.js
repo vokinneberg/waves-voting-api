@@ -21,8 +21,7 @@ export default class AdminAuthController extends BaseController {
         });
       }
 
-      const { email } = req.body;
-      const { password } = req.body;
+      const { email, password } = req.body;
 
       if (!email) {
         res.status(HttpCodes.BAD_REQUEST).json({

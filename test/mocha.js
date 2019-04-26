@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){const c=typeof require==="function"&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);const a=new Error(`Cannot find module '${i}'`);throw a.code="MODULE_NOT_FOUND",a}const p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){const n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=typeof require==="function"&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (process,global){
 'use strict';
 
@@ -11,7 +11,7 @@
 
 process.stdout = require('browser-stdout')({label: false});
 
-var Mocha = require('./lib/mocha');
+const Mocha = require('./lib/mocha');
 
 /**
  * Create a Mocha instance.
@@ -19,21 +19,21 @@ var Mocha = require('./lib/mocha');
  * @return {undefined}
  */
 
-var mocha = new Mocha({reporter: 'html'});
+const mocha = new Mocha({reporter: 'html'});
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
  */
 
-var Date = global.Date;
-var setTimeout = global.setTimeout;
-var setInterval = global.setInterval;
-var clearTimeout = global.clearTimeout;
-var clearInterval = global.clearInterval;
+const {Date} = global;
+const {setTimeout} = global;
+const {setInterval} = global;
+const {clearTimeout} = global;
+const {clearInterval} = global;
 
-var uncaughtExceptionHandlers = [];
+const uncaughtExceptionHandlers = [];
 
-var originalOnerrorHandler = global.onerror;
+const originalOnerrorHandler = global.onerror;
 
 /**
  * Remove uncaughtException listener.
@@ -47,7 +47,7 @@ process.removeListener = function(e, fn) {
     } else {
       global.onerror = function() {};
     }
-    var i = uncaughtExceptionHandlers.indexOf(fn);
+    const i = uncaughtExceptionHandlers.indexOf(fn);
     if (i !== -1) {
       uncaughtExceptionHandlers.splice(i, 1);
     }
@@ -61,7 +61,7 @@ process.removeListener = function(e, fn) {
 process.on = function(e, fn) {
   if (e === 'uncaughtException') {
     global.onerror = function(err, url, line) {
-      fn(new Error(err + ' (' + url + ':' + line + ')'));
+      fn(new Error(`${err  } (${  url  }:${  line  })`));
       return !mocha.allowUncaught;
     };
     uncaughtExceptionHandlers.push(fn);
@@ -73,11 +73,11 @@ process.on = function(e, fn) {
 // Ensure that this default UI does not expose its methods to the global scope.
 mocha.suite.removeAllListeners('pre-require');
 
-var immediateQueue = [];
-var immediateTimeout;
+const immediateQueue = [];
+let immediateTimeout;
 
 function timeslice() {
-  var immediateStart = new Date().getTime();
+  const immediateStart = new Date().getTime();
   while (immediateQueue.length && new Date().getTime() - immediateStart < 100) {
     immediateQueue.shift()();
   }
@@ -130,7 +130,7 @@ mocha.setup = function(opts) {
   if (typeof opts === 'string') {
     opts = {ui: opts};
   }
-  for (var opt in opts) {
+  for (const opt in opts) {
     if (opts.hasOwnProperty(opt)) {
       this[opt](opts[opt]);
     }
@@ -143,10 +143,10 @@ mocha.setup = function(opts) {
  */
 
 mocha.run = function(fn) {
-  var options = mocha.options;
+  const {options} = mocha;
   mocha.globals('location');
 
-  var query = Mocha.utils.parseQuery(global.location.search || '');
+  const query = Mocha.utils.parseQuery(global.location.search || '');
   if (query.grep) {
     mocha.grep(query.grep);
   }
@@ -159,7 +159,7 @@ mocha.run = function(fn) {
 
   return Mocha.prototype.run.call(mocha, function(err) {
     // The DOM Document is not available in Web Workers.
-    var document = global.document;
+    const {document} = global;
     if (
       document &&
       document.getElementById('mocha') &&
@@ -205,9 +205,9 @@ module.exports = global;
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
  */
-var Date = global.Date;
-var setTimeout = global.setTimeout;
-var EVENT_RUN_END = require('../runner').constants.EVENT_RUN_END;
+const {Date} = global;
+const {setTimeout} = global;
+const {EVENT_RUN_END} = require('../runner').constants;
 
 /**
  * Checks if browser notification support exists.
@@ -220,8 +220,8 @@ var EVENT_RUN_END = require('../runner').constants.EVENT_RUN_END;
  * @return {boolean} whether browser notification support exists
  */
 exports.isCapable = function() {
-  var hasNotificationSupport = 'Notification' in window;
-  var hasPromiseSupport = typeof Promise === 'function';
+  const hasNotificationSupport = 'Notification' in window;
+  const hasPromiseSupport = typeof Promise === 'function';
   return process.browser && hasNotificationSupport && hasPromiseSupport;
 };
 
@@ -236,12 +236,12 @@ exports.isCapable = function() {
  * @param {Runner} runner - Runner instance.
  */
 exports.notify = function(runner) {
-  var promise = isPermitted();
+  const promise = isPermitted();
 
   /**
    * Attempt notification.
    */
-  var sendNotification = function() {
+  const sendNotification = function() {
     // If user hasn't responded yet... "No notification for you!" (Seinfeld)
     Promise.race([promise, Promise.resolve(undefined)])
       .then(canNotify)
@@ -265,7 +265,7 @@ exports.notify = function(runner) {
  *     permissible when fulfilled.
  */
 function isPermitted() {
-  var permitted = {
+  const permitted = {
     granted: function allow() {
       return Promise.resolve(true);
     },
@@ -302,8 +302,8 @@ function isPermitted() {
  */
 function canNotify(value) {
   if (!value) {
-    var why = value === false ? 'blocked' : 'unacknowledged';
-    var reason = 'not permitted by user (' + why + ')';
+    const why = value === false ? 'blocked' : 'unacknowledged';
+    const reason = `not permitted by user (${  why  })`;
     return Promise.reject(new Error(reason));
   }
   return Promise.resolve();
@@ -316,28 +316,28 @@ function canNotify(value) {
  * @param {Runner} runner - Runner instance.
  */
 function display(runner) {
-  var stats = runner.stats;
-  var symbol = {
+  const {stats} = runner;
+  const symbol = {
     cross: '\u274C',
     tick: '\u2705'
   };
-  var logo = require('../../package').notifyLogo;
-  var _message;
-  var message;
-  var title;
+  const logo = require('../../package').notifyLogo;
+  let _message;
+  let message;
+  let title;
 
   if (stats.failures) {
-    _message = stats.failures + ' of ' + stats.tests + ' tests failed';
-    message = symbol.cross + ' ' + _message;
+    _message = `${stats.failures  } of ${  stats.tests  } tests failed`;
+    message = `${symbol.cross  } ${  _message}`;
     title = 'Failed';
   } else {
-    _message = stats.passes + ' tests passed in ' + stats.duration + 'ms';
-    message = symbol.tick + ' ' + _message;
+    _message = `${stats.passes  } tests passed in ${  stats.duration  }ms`;
+    message = `${symbol.tick  } ${  _message}`;
     title = 'Passed';
   }
 
   // Send notification
-  var options = {
+  const options = {
     badge: logo,
     body: message,
     dir: 'ltr',
@@ -347,10 +347,10 @@ function display(runner) {
     requireInteraction: false,
     timestamp: Date.now()
   };
-  var notification = new Notification(title, options);
+  const notification = new Notification(title, options);
 
   // Autoclose after brief delay (makes various browsers act same)
-  var FORCE_DURATION = 4000;
+  const FORCE_DURATION = 4000;
   setTimeout(notification.close.bind(notification), FORCE_DURATION);
 }
 
@@ -450,17 +450,17 @@ Progress.prototype.update = function(n) {
  */
 Progress.prototype.draw = function(ctx) {
   try {
-    var percent = Math.min(this.percent, 100);
-    var size = this._size;
-    var half = size / 2;
-    var x = half;
-    var y = half;
-    var rad = half - 1;
-    var fontSize = this._fontSize;
+    const percent = Math.min(this.percent, 100);
+    const size = this._size;
+    const half = size / 2;
+    const x = half;
+    const y = half;
+    const rad = half - 1;
+    const fontSize = this._fontSize;
 
-    ctx.font = fontSize + 'px ' + this._font;
+    ctx.font = `${fontSize  }px ${  this._font}`;
 
-    var angle = Math.PI * 2 * (percent / 100);
+    const angle = Math.PI * 2 * (percent / 100);
     ctx.clearRect(0, 0, size, size);
 
     // outer circle
@@ -476,8 +476,8 @@ Progress.prototype.draw = function(ctx) {
     ctx.stroke();
 
     // text
-    var text = this._text || (percent | 0) + '%';
-    var w = ctx.measureText(text).width;
+    const text = this._text || `${percent | 0  }%`;
+    const w = ctx.measureText(text).width;
 
     ctx.fillText(text, x - w / 2 + 1, y + fontSize / 2 - 1);
   } catch (ignore) {
@@ -505,6 +505,7 @@ exports.getWindowSize = function getWindowSize() {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],5:[function(require,module,exports){
 'use strict';
+
 /**
  * @module Context
  */
@@ -608,6 +609,7 @@ Context.prototype.retries = function(n) {
 
 },{}],6:[function(require,module,exports){
 'use strict';
+
 /**
  * @module Errors
  */
@@ -624,7 +626,7 @@ Context.prototype.retries = function(n) {
  * @returns {Error} instance detailing the error condition
  */
 function createNoFilesMatchPatternError(message, pattern) {
-  var err = new Error(message);
+  const err = new Error(message);
   err.code = 'ERR_MOCHA_NO_FILES_MATCH_PATTERN';
   err.pattern = pattern;
   return err;
@@ -639,7 +641,7 @@ function createNoFilesMatchPatternError(message, pattern) {
  * @returns {Error} instance detailing the error condition
  */
 function createInvalidReporterError(message, reporter) {
-  var err = new TypeError(message);
+  const err = new TypeError(message);
   err.code = 'ERR_MOCHA_INVALID_REPORTER';
   err.reporter = reporter;
   return err;
@@ -654,7 +656,7 @@ function createInvalidReporterError(message, reporter) {
  * @returns {Error} instance detailing the error condition
  */
 function createInvalidInterfaceError(message, ui) {
-  var err = new Error(message);
+  const err = new Error(message);
   err.code = 'ERR_MOCHA_INVALID_INTERFACE';
   err.interface = ui;
   return err;
@@ -668,7 +670,7 @@ function createInvalidInterfaceError(message, ui) {
  * @returns {Error} instance detailing the error condition
  */
 function createUnsupportedError(message) {
-  var err = new Error(message);
+  const err = new Error(message);
   err.code = 'ERR_MOCHA_UNSUPPORTED';
   return err;
 }
@@ -696,7 +698,7 @@ function createMissingArgumentError(message, argument, expected) {
  * @returns {Error} instance detailing the error condition
  */
 function createInvalidArgumentTypeError(message, argument, expected) {
-  var err = new TypeError(message);
+  const err = new TypeError(message);
   err.code = 'ERR_MOCHA_INVALID_ARG_TYPE';
   err.argument = argument;
   err.expected = expected;
@@ -715,7 +717,7 @@ function createInvalidArgumentTypeError(message, argument, expected) {
  * @returns {Error} instance detailing the error condition
  */
 function createInvalidArgumentValueError(message, argument, value, reason) {
-  var err = new TypeError(message);
+  const err = new TypeError(message);
   err.code = 'ERR_MOCHA_INVALID_ARG_VALUE';
   err.argument = argument;
   err.value = value;
@@ -731,7 +733,7 @@ function createInvalidArgumentValueError(message, argument, value, reason) {
  * @returns {Error} instance detailing the error condition
  */
 function createInvalidExceptionError(message, value) {
-  var err = new Error(message);
+  const err = new Error(message);
   err.code = 'ERR_MOCHA_INVALID_EXCEPTION';
   err.valueType = typeof value;
   err.value = value;
@@ -739,21 +741,21 @@ function createInvalidExceptionError(message, value) {
 }
 
 module.exports = {
-  createInvalidArgumentTypeError: createInvalidArgumentTypeError,
-  createInvalidArgumentValueError: createInvalidArgumentValueError,
-  createInvalidExceptionError: createInvalidExceptionError,
-  createInvalidInterfaceError: createInvalidInterfaceError,
-  createInvalidReporterError: createInvalidReporterError,
-  createMissingArgumentError: createMissingArgumentError,
-  createNoFilesMatchPatternError: createNoFilesMatchPatternError,
-  createUnsupportedError: createUnsupportedError
+  createInvalidArgumentTypeError,
+  createInvalidArgumentValueError,
+  createInvalidExceptionError,
+  createInvalidInterfaceError,
+  createInvalidReporterError,
+  createMissingArgumentError,
+  createNoFilesMatchPatternError,
+  createUnsupportedError
 };
 
 },{}],7:[function(require,module,exports){
 'use strict';
 
-var Runnable = require('./runnable');
-var inherits = require('./utils').inherits;
+const Runnable = require('./runnable');
+const {inherits} = require('./utils');
 
 /**
  * Expose `Hook`.
@@ -800,9 +802,8 @@ Hook.prototype.error = function(err) {
 },{"./runnable":33,"./utils":38}],8:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
-var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
-  .EVENT_FILE_PRE_REQUIRE;
+const Test = require('../test');
+const {EVENT_FILE_PRE_REQUIRE} = require('../suite').constants;
 
 /**
  * BDD-style interface:
@@ -822,10 +823,10 @@ var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
  * @param {Suite} suite Root suite.
  */
 module.exports = function bddInterface(suite) {
-  var suites = [suite];
+  const suites = [suite];
 
   suite.on(EVENT_FILE_PRE_REQUIRE, function(context, file, mocha) {
-    var common = require('./common')(suites, context, mocha);
+    const common = require('./common')(suites, context, mocha);
 
     context.before = common.before;
     context.after = common.after;
@@ -840,9 +841,9 @@ module.exports = function bddInterface(suite) {
 
     context.describe = context.context = function(title, fn) {
       return common.suite.create({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -855,9 +856,9 @@ module.exports = function bddInterface(suite) {
       fn
     ) {
       return common.suite.skip({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -867,9 +868,9 @@ module.exports = function bddInterface(suite) {
 
     context.describe.only = function(title, fn) {
       return common.suite.only({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -880,11 +881,11 @@ module.exports = function bddInterface(suite) {
      */
 
     context.it = context.specify = function(title, fn) {
-      var suite = suites[0];
+      const suite = suites[0];
       if (suite.isPending()) {
         fn = null;
       }
-      var test = new Test(title, fn);
+      const test = new Test(title, fn);
       test.file = file;
       suite.addTest(test);
       return test;
@@ -920,9 +921,9 @@ module.exports.description = 'BDD or RSpec style [default]';
 },{"../suite":36,"../test":37,"./common":9}],9:[function(require,module,exports){
 'use strict';
 
-var Suite = require('../suite');
-var errors = require('../errors');
-var createMissingArgumentError = errors.createMissingArgumentError;
+const Suite = require('../suite');
+const errors = require('../errors');
+const {createMissingArgumentError} = errors;
 
 /**
  * Functions common to more than one interface.
@@ -969,7 +970,7 @@ module.exports = function(suites, context, mocha) {
      * @param {string} name
      * @param {Function} fn
      */
-    before: function(name, fn) {
+    before(name, fn) {
       suites[0].beforeAll(name, fn);
     },
 
@@ -979,7 +980,7 @@ module.exports = function(suites, context, mocha) {
      * @param {string} name
      * @param {Function} fn
      */
-    after: function(name, fn) {
+    after(name, fn) {
       suites[0].afterAll(name, fn);
     },
 
@@ -989,7 +990,7 @@ module.exports = function(suites, context, mocha) {
      * @param {string} name
      * @param {Function} fn
      */
-    beforeEach: function(name, fn) {
+    beforeEach(name, fn) {
       suites[0].beforeEach(name, fn);
     },
 
@@ -999,7 +1000,7 @@ module.exports = function(suites, context, mocha) {
      * @param {string} name
      * @param {Function} fn
      */
-    afterEach: function(name, fn) {
+    afterEach(name, fn) {
       suites[0].afterEach(name, fn);
     },
 
@@ -1040,7 +1041,7 @@ module.exports = function(suites, context, mocha) {
        * @returns {Suite}
        */
       create: function create(opts) {
-        var suite = Suite.create(suites[0], opts.title);
+        const suite = Suite.create(suites[0], opts.title);
         suite.pending = Boolean(opts.pending);
         suite.file = opts.file;
         suites.unshift(suite);
@@ -1061,10 +1062,10 @@ module.exports = function(suites, context, mocha) {
           suites.shift();
         } else if (typeof opts.fn === 'undefined' && !suite.pending) {
           throw createMissingArgumentError(
-            'Suite "' +
-              suite.fullTitle() +
-              '" was defined but no callback was supplied. ' +
-              'Supply a callback or explicitly skip the suite.',
+            `Suite "${ 
+              suite.fullTitle() 
+              }" was defined but no callback was supplied. ` +
+              `Supply a callback or explicitly skip the suite.`,
             'callback',
             'function'
           );
@@ -1084,7 +1085,7 @@ module.exports = function(suites, context, mocha) {
        * @param {Function} test
        * @returns {*}
        */
-      only: function(mocha, test) {
+      only(mocha, test) {
         test.parent.appendOnlyTest(test);
         return test;
       },
@@ -1094,7 +1095,7 @@ module.exports = function(suites, context, mocha) {
        *
        * @param {string} title
        */
-      skip: function(title) {
+      skip(title) {
         context.test(title);
       },
 
@@ -1103,7 +1104,7 @@ module.exports = function(suites, context, mocha) {
        *
        * @param {number} n
        */
-      retries: function(n) {
+      retries(n) {
         context.retries(n);
       }
     }
@@ -1112,8 +1113,9 @@ module.exports = function(suites, context, mocha) {
 
 },{"../errors":6,"../suite":36}],10:[function(require,module,exports){
 'use strict';
-var Suite = require('../suite');
-var Test = require('../test');
+
+const Suite = require('../suite');
+const Test = require('../test');
 
 /**
  * Exports-style (as Node.js module) interface:
@@ -1133,15 +1135,15 @@ var Test = require('../test');
  * @param {Suite} suite Root suite.
  */
 module.exports = function(suite) {
-  var suites = [suite];
+  const suites = [suite];
 
   suite.on(Suite.constants.EVENT_FILE_REQUIRE, visit);
 
   function visit(obj, file) {
-    var suite;
-    for (var key in obj) {
+    let suite;
+    for (const key in obj) {
       if (typeof obj[key] === 'function') {
-        var fn = obj[key];
+        const fn = obj[key];
         switch (key) {
           case 'before':
             suites[0].beforeAll(fn);
@@ -1183,9 +1185,8 @@ exports.exports = require('./exports');
 },{"./bdd":8,"./exports":10,"./qunit":12,"./tdd":13}],12:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
-var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
-  .EVENT_FILE_PRE_REQUIRE;
+const Test = require('../test');
+const {EVENT_FILE_PRE_REQUIRE} = require('../suite').constants;
 
 /**
  * QUnit-style interface:
@@ -1213,10 +1214,10 @@ var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
  * @param {Suite} suite Root suite.
  */
 module.exports = function qUnitInterface(suite) {
-  var suites = [suite];
+  const suites = [suite];
 
   suite.on(EVENT_FILE_PRE_REQUIRE, function(context, file, mocha) {
-    var common = require('./common')(suites, context, mocha);
+    const common = require('./common')(suites, context, mocha);
 
     context.before = common.before;
     context.after = common.after;
@@ -1232,8 +1233,8 @@ module.exports = function qUnitInterface(suite) {
         suites.shift();
       }
       return common.suite.create({
-        title: title,
-        file: file,
+        title,
+        file,
         fn: false
       });
     };
@@ -1247,8 +1248,8 @@ module.exports = function qUnitInterface(suite) {
         suites.shift();
       }
       return common.suite.only({
-        title: title,
-        file: file,
+        title,
+        file,
         fn: false
       });
     };
@@ -1260,7 +1261,7 @@ module.exports = function qUnitInterface(suite) {
      */
 
     context.test = function(title, fn) {
-      var test = new Test(title, fn);
+      const test = new Test(title, fn);
       test.file = file;
       suites[0].addTest(test);
       return test;
@@ -1284,9 +1285,8 @@ module.exports.description = 'QUnit style';
 },{"../suite":36,"../test":37,"./common":9}],13:[function(require,module,exports){
 'use strict';
 
-var Test = require('../test');
-var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
-  .EVENT_FILE_PRE_REQUIRE;
+const Test = require('../test');
+const {EVENT_FILE_PRE_REQUIRE} = require('../suite').constants;
 
 /**
  * TDD-style interface:
@@ -1314,10 +1314,10 @@ var EVENT_FILE_PRE_REQUIRE = require('../suite').constants
  * @param {Suite} suite Root suite.
  */
 module.exports = function(suite) {
-  var suites = [suite];
+  const suites = [suite];
 
   suite.on(EVENT_FILE_PRE_REQUIRE, function(context, file, mocha) {
-    var common = require('./common')(suites, context, mocha);
+    const common = require('./common')(suites, context, mocha);
 
     context.setup = common.beforeEach;
     context.teardown = common.afterEach;
@@ -1331,9 +1331,9 @@ module.exports = function(suite) {
      */
     context.suite = function(title, fn) {
       return common.suite.create({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -1342,9 +1342,9 @@ module.exports = function(suite) {
      */
     context.suite.skip = function(title, fn) {
       return common.suite.skip({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -1353,9 +1353,9 @@ module.exports = function(suite) {
      */
     context.suite.only = function(title, fn) {
       return common.suite.only({
-        title: title,
-        file: file,
-        fn: fn
+        title,
+        file,
+        fn
       });
     };
 
@@ -1364,11 +1364,11 @@ module.exports = function(suite) {
      * callback `fn` acting as a thunk.
      */
     context.test = function(title, fn) {
-      var suite = suites[0];
+      const suite = suites[0];
       if (suite.isPending()) {
         fn = null;
       }
-      var test = new Test(title, fn);
+      const test = new Test(title, fn);
       test.file = file;
       suite.addTest(test);
       return test;
@@ -1400,21 +1400,21 @@ module.exports.description =
  * MIT Licensed
  */
 
-var escapeRe = require('escape-string-regexp');
-var path = require('path');
-var builtinReporters = require('./reporters');
-var growl = require('./growl');
-var utils = require('./utils');
-var mocharc = require('./mocharc.json');
-var errors = require('./errors');
-var Suite = require('./suite');
-var createStatsCollector = require('./stats-collector');
-var createInvalidReporterError = errors.createInvalidReporterError;
-var createInvalidInterfaceError = errors.createInvalidInterfaceError;
-var EVENT_FILE_PRE_REQUIRE = Suite.constants.EVENT_FILE_PRE_REQUIRE;
-var EVENT_FILE_POST_REQUIRE = Suite.constants.EVENT_FILE_POST_REQUIRE;
-var EVENT_FILE_REQUIRE = Suite.constants.EVENT_FILE_REQUIRE;
-var sQuote = utils.sQuote;
+const escapeRe = require('escape-string-regexp');
+const path = require('path');
+const builtinReporters = require('./reporters');
+const growl = require('./growl');
+const utils = require('./utils');
+const mocharc = require('./mocharc.json');
+const errors = require('./errors');
+const Suite = require('./suite');
+const createStatsCollector = require('./stats-collector');
+const {createInvalidReporterError} = errors;
+const {createInvalidInterfaceError} = errors;
+const {EVENT_FILE_PRE_REQUIRE} = Suite.constants;
+const {EVENT_FILE_POST_REQUIRE} = Suite.constants;
+const {EVENT_FILE_REQUIRE} = Suite.constants;
+const {sQuote} = utils;
 
 exports = module.exports = Mocha;
 
@@ -1423,7 +1423,7 @@ exports = module.exports = Mocha;
  */
 
 if (!process.browser) {
-  var cwd = process.cwd();
+  const cwd = process.cwd();
   module.paths.push(cwd, path.join(cwd, 'node_modules'));
 }
 
@@ -1605,7 +1605,7 @@ Mocha.prototype.reporter = function(reporter, reporterOptions) {
     this._reporter = reporter;
   } else {
     reporter = reporter || 'spec';
-    var _reporter;
+    let _reporter;
     // Try to load a built-in reporter.
     if (builtinReporters[reporter]) {
       _reporter = builtinReporters[reporter];
@@ -1625,23 +1625,23 @@ Mocha.prototype.reporter = function(reporter, reporterOptions) {
           } catch (_err) {
             _err.code !== 'MODULE_NOT_FOUND' ||
             _err.message.indexOf('Cannot find module') !== -1
-              ? console.warn(sQuote(reporter) + ' reporter not found')
+              ? console.warn(`${sQuote(reporter)  } reporter not found`)
               : console.warn(
-                  sQuote(reporter) +
-                    ' reporter blew up with error:\n' +
-                    err.stack
+                  `${sQuote(reporter) 
+                    } reporter blew up with error:\n${ 
+                    err.stack}`
                 );
           }
         } else {
           console.warn(
-            sQuote(reporter) + ' reporter blew up with error:\n' + err.stack
+            `${sQuote(reporter)  } reporter blew up with error:\n${  err.stack}`
           );
         }
       }
     }
     if (!_reporter) {
       throw createInvalidReporterError(
-        'invalid reporter ' + sQuote(reporter),
+        `invalid reporter ${  sQuote(reporter)}`,
         reporter
       );
     }
@@ -1663,7 +1663,7 @@ Mocha.prototype.reporter = function(reporter, reporterOptions) {
  * @throws {Error} if requested interface cannot be loaded
  */
 Mocha.prototype.ui = function(ui) {
-  var bindInterface;
+  let bindInterface;
   if (typeof ui === 'function') {
     bindInterface = ui;
   } else {
@@ -1674,7 +1674,7 @@ Mocha.prototype.ui = function(ui) {
         bindInterface = require(ui);
       } catch (err) {
         throw createInvalidInterfaceError(
-          'invalid interface ' + sQuote(ui),
+          `invalid interface ${  sQuote(ui)}`,
           ui
         );
       }
@@ -1716,8 +1716,8 @@ Mocha.prototype.ui = function(ui) {
  * @param {Function} [fn] - Callback invoked upon completion.
  */
 Mocha.prototype.loadFiles = function(fn) {
-  var self = this;
-  var suite = this.suite;
+  const self = this;
+  const {suite} = this;
   this.files.forEach(function(file) {
     file = path.resolve(file);
     suite.emit(EVENT_FILE_PRE_REQUIRE, global, file, self);
@@ -1817,7 +1817,7 @@ Mocha.prototype.fgrep = function(str) {
 Mocha.prototype.grep = function(re) {
   if (utils.isString(re)) {
     // extract args if it's regex-like, i.e: [string, pattern, flag]
-    var arg = re.match(/^\/(.*)\/(g|i|)$|.*/);
+    const arg = re.match(/^\/(.*)\/(g|i|)$|.*/);
     this.options.grep = new RegExp(arg[1] || arg[0], arg[2]);
   } else {
     this.options.grep = re;
@@ -1898,10 +1898,10 @@ Mocha.prototype.fullTrace = function() {
 Mocha.prototype.growl = function() {
   this.options.growl = this.isGrowlCapable();
   if (!this.options.growl) {
-    var detail = process.browser
+    const detail = process.browser
       ? 'notification support not available in this browser...'
       : 'notification support prerequisites not installed...';
-    console.error(detail + ' cannot enable!');
+    console.error(`${detail  } cannot enable!`);
   }
   return this;
 };
@@ -2197,12 +2197,12 @@ Mocha.prototype.run = function(fn) {
   if (this.files.length) {
     this.loadFiles();
   }
-  var suite = this.suite;
-  var options = this.options;
+  const {suite} = this;
+  const {options} = this;
   options.files = this.files;
-  var runner = new exports.Runner(suite, options.delay);
+  const runner = new exports.Runner(suite, options.delay);
   createStatsCollector(runner);
-  var reporter = new this._reporter(runner, options);
+  const reporter = new this._reporter(runner, options);
   runner.ignoreLeaks = options.ignoreLeaks !== false;
   runner.fullStackTrace = options.fullStackTrace;
   runner.asyncOnly = options.asyncOnly;
@@ -2266,6 +2266,7 @@ function Pending(message) {
 },{}],17:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Base
  */
@@ -2273,14 +2274,14 @@ function Pending(message) {
  * Module dependencies.
  */
 
-var tty = require('tty');
-var diff = require('diff');
-var milliseconds = require('ms');
-var utils = require('../utils');
-var supportsColor = process.browser ? null : require('supports-color');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
+const tty = require('tty');
+const diff = require('diff');
+const milliseconds = require('ms');
+const utils = require('../utils');
+const supportsColor = process.browser ? null : require('supports-color');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
 
 /**
  * Expose `Base`.
@@ -2292,7 +2293,7 @@ exports = module.exports = Base;
  * Check if both stdio streams are associated with a tty.
  */
 
-var isatty = tty.isatty(1) && tty.isatty(2);
+const isatty = tty.isatty(1) && tty.isatty(2);
 
 /**
  * Enable coloring by default, except in the browser interface.
@@ -2364,11 +2365,11 @@ if (process.platform === 'win32') {
  * @param {string} str
  * @return {string}
  */
-var color = (exports.color = function(type, str) {
+const color = (exports.color = function(type, str) {
   if (!exports.useColors) {
     return String(str);
   }
-  return '\u001b[' + exports.colors[type] + 'm' + str + '\u001b[0m';
+  return `\u001b[${  exports.colors[type]  }m${  str  }\u001b[0m`;
 });
 
 /**
@@ -2390,23 +2391,23 @@ if (isatty) {
  */
 
 exports.cursor = {
-  hide: function() {
+  hide() {
     isatty && process.stdout.write('\u001b[?25l');
   },
 
-  show: function() {
+  show() {
     isatty && process.stdout.write('\u001b[?25h');
   },
 
-  deleteLine: function() {
+  deleteLine() {
     isatty && process.stdout.write('\u001b[2K');
   },
 
-  beginningOfLine: function() {
+  beginningOfLine() {
     isatty && process.stdout.write('\u001b[0G');
   },
 
-  CR: function() {
+  CR() {
     if (isatty) {
       exports.cursor.deleteLine();
       exports.cursor.beginningOfLine();
@@ -2443,7 +2444,7 @@ function stringifyDiffObjs(err) {
  * @param {string} expected
  * @return {string} Diff
  */
-var generateDiff = (exports.generateDiff = function(actual, expected) {
+const generateDiff = (exports.generateDiff = function(actual, expected) {
   return exports.inlineDiffs
     ? inlineDiff(actual, expected)
     : unifiedDiff(actual, expected);
@@ -2462,24 +2463,24 @@ exports.list = function(failures) {
   console.log();
   failures.forEach(function(test, i) {
     // format
-    var fmt =
+    let fmt =
       color('error title', '  %s) %s:\n') +
       color('error message', '     %s') +
       color('error stack', '\n%s\n');
 
     // msg
-    var msg;
-    var err = test.err;
-    var message;
+    let msg;
+    const {err} = test;
+    let message;
     if (err.message && typeof err.message.toString === 'function') {
-      message = err.message + '';
+      message = `${err.message  }`;
     } else if (typeof err.inspect === 'function') {
-      message = err.inspect() + '';
+      message = `${err.inspect()  }`;
     } else {
       message = '';
     }
-    var stack = err.stack || message;
-    var index = message ? stack.indexOf(message) : -1;
+    let stack = err.stack || message;
+    let index = message ? stack.indexOf(message) : -1;
 
     if (index === -1) {
       msg = message;
@@ -2492,15 +2493,15 @@ exports.list = function(failures) {
 
     // uncaught
     if (err.uncaught) {
-      msg = 'Uncaught ' + msg;
+      msg = `Uncaught ${  msg}`;
     }
     // explicitly show diff
     if (!exports.hideDiff && showDiff(err)) {
       stringifyDiffObjs(err);
       fmt =
         color('error title', '  %s) %s:\n%s') + color('error stack', '\n%s\n');
-      var match = message.match(/^([^:]+): expected/);
-      msg = '\n      ' + color('error message', match ? match[1] : msg);
+      const match = message.match(/^([^:]+): expected/);
+      msg = `\n      ${  color('error message', match ? match[1] : msg)}`;
 
       msg += generateDiff(err.actual, err.expected);
     }
@@ -2509,12 +2510,12 @@ exports.list = function(failures) {
     stack = stack.replace(/^/gm, '  ');
 
     // indented test title
-    var testTitle = '';
+    let testTitle = '';
     test.titlePath().forEach(function(str, index) {
       if (index !== 0) {
         testTitle += '\n     ';
       }
-      for (var i = 0; i < index; i++) {
+      for (let i = 0; i < index; i++) {
         testTitle += '  ';
       }
       testTitle += str;
@@ -2537,7 +2538,7 @@ exports.list = function(failures) {
  * @param {Object} [options] - runner options
  */
 function Base(runner, options) {
-  var failures = (this.failures = []);
+  const failures = (this.failures = []);
 
   if (!runner) {
     throw new TypeError('Missing runner argument');
@@ -2572,8 +2573,8 @@ function Base(runner, options) {
  * @memberof Mocha.reporters.Base
  */
 Base.prototype.epilogue = function() {
-  var stats = this.stats;
-  var fmt;
+  const {stats} = this;
+  let fmt;
 
   console.log();
 
@@ -2627,28 +2628,28 @@ function pad(str, len) {
  * @return {string} Diff
  */
 function inlineDiff(actual, expected) {
-  var msg = errorDiff(actual, expected);
+  let msg = errorDiff(actual, expected);
 
   // linenos
-  var lines = msg.split('\n');
+  const lines = msg.split('\n');
   if (lines.length > 4) {
-    var width = String(lines.length).length;
+    const width = String(lines.length).length;
     msg = lines
       .map(function(str, i) {
-        return pad(++i, width) + ' |' + ' ' + str;
+        return `${pad(++i, width)  } |` + ` ${  str}`;
       })
       .join('\n');
   }
 
   // legend
   msg =
-    '\n' +
-    color('diff removed', 'actual') +
-    ' ' +
-    color('diff added', 'expected') +
-    '\n\n' +
-    msg +
-    '\n';
+    `\n${ 
+    color('diff removed', 'actual') 
+    } ${ 
+    color('diff added', 'expected') 
+    }\n\n${ 
+    msg 
+    }\n`;
 
   // indent
   msg = msg.replace(/^/gm, '      ');
@@ -2664,7 +2665,7 @@ function inlineDiff(actual, expected) {
  * @return {string} The diff.
  */
 function unifiedDiff(actual, expected) {
-  var indent = '      ';
+  const indent = '      ';
   function cleanUp(line) {
     if (line[0] === '+') {
       return indent + colorLines('diff added', line);
@@ -2683,18 +2684,18 @@ function unifiedDiff(actual, expected) {
   function notBlank(line) {
     return typeof line !== 'undefined' && line !== null;
   }
-  var msg = diff.createPatch('string', actual, expected);
-  var lines = msg.split('\n').splice(5);
+  const msg = diff.createPatch('string', actual, expected);
+  const lines = msg.split('\n').splice(5);
   return (
-    '\n      ' +
-    colorLines('diff added', '+ expected') +
-    ' ' +
-    colorLines('diff removed', '- actual') +
-    '\n\n' +
+    `\n      ${ 
+    colorLines('diff added', '+ expected') 
+    } ${ 
+    colorLines('diff removed', '- actual') 
+    }\n\n${ 
     lines
       .map(cleanUp)
       .filter(notBlank)
-      .join('\n')
+      .join('\n')}`
   );
 }
 
@@ -2741,7 +2742,7 @@ function colorLines(name, str) {
 /**
  * Object#toString reference.
  */
-var objToString = Object.prototype.toString;
+const objToString = Object.prototype.toString;
 
 /**
  * Checks that a / b have the same type.
@@ -2760,6 +2761,7 @@ Base.abstract = true;
 }).call(this,require('_process'))
 },{"../runner":34,"../utils":38,"_process":69,"diff":48,"ms":60,"supports-color":42,"tty":4}],18:[function(require,module,exports){
 'use strict';
+
 /**
  * @module Doc
  */
@@ -2767,13 +2769,13 @@ Base.abstract = true;
  * Module dependencies.
  */
 
-var Base = require('./base');
-var utils = require('../utils');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
-var EVENT_SUITE_END = constants.EVENT_SUITE_END;
+const Base = require('./base');
+const utils = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_SUITE_BEGIN} = constants;
+const {EVENT_SUITE_END} = constants;
 
 /**
  * Expose `Doc`.
@@ -2794,7 +2796,7 @@ exports = module.exports = Doc;
 function Doc(runner, options) {
   Base.call(this, runner, options);
 
-  var indents = 2;
+  let indents = 2;
 
   function indent() {
     return Array(indents).join('  ');
@@ -2823,7 +2825,7 @@ function Doc(runner, options) {
 
   runner.on(EVENT_TEST_PASS, function(test) {
     console.log('%s  <dt>%s</dt>', indent(), utils.escape(test.title));
-    var code = utils.escape(utils.clean(test.body));
+    const code = utils.escape(utils.clean(test.body));
     console.log('%s  <dd><pre><code>%s</code></pre></dd>', indent(), code);
   });
 
@@ -2833,7 +2835,7 @@ function Doc(runner, options) {
       indent(),
       utils.escape(test.title)
     );
-    var code = utils.escape(utils.clean(test.body));
+    const code = utils.escape(utils.clean(test.body));
     console.log(
       '%s  <dd class="error"><pre><code>%s</code></pre></dd>',
       indent(),
@@ -2848,6 +2850,7 @@ Doc.description = 'HTML documentation';
 },{"../runner":34,"../utils":38,"./base":17}],19:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Dot
  */
@@ -2855,14 +2858,14 @@ Doc.description = 'HTML documentation';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var inherits = require('../utils').inherits;
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
+const Base = require('./base');
+const {inherits} = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {EVENT_RUN_END} = constants;
 
 /**
  * Expose `Dot`.
@@ -2883,9 +2886,9 @@ exports = module.exports = Dot;
 function Dot(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var width = (Base.window.width * 0.75) | 0;
-  var n = -1;
+  const self = this;
+  const width = (Base.window.width * 0.75) | 0;
+  let n = -1;
 
   runner.on(EVENT_RUN_BEGIN, function() {
     process.stdout.write('\n');
@@ -2942,23 +2945,23 @@ Dot.description = 'dot matrix representation';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var utils = require('../utils');
-var Progress = require('../browser/progress');
-var escapeRe = require('escape-string-regexp');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
-var EVENT_SUITE_END = constants.EVENT_SUITE_END;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var escape = utils.escape;
+const Base = require('./base');
+const utils = require('../utils');
+const Progress = require('../browser/progress');
+const escapeRe = require('escape-string-regexp');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_SUITE_BEGIN} = constants;
+const {EVENT_SUITE_END} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {escape} = utils;
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
  */
 
-var Date = global.Date;
+const {Date} = global;
 
 /**
  * Expose `HTML`.
@@ -2970,7 +2973,7 @@ exports = module.exports = HTML;
  * Stats template.
  */
 
-var statsTemplate =
+const statsTemplate =
   '<ul id="mocha-stats">' +
   '<li class="progress"><canvas width="40" height="40"></canvas></li>' +
   '<li class="passes"><a href="javascript:void(0);">passes:</a> <em>0</em></li>' +
@@ -2978,7 +2981,7 @@ var statsTemplate =
   '<li class="duration">duration: <em>0</em>s</li>' +
   '</ul>';
 
-var playIcon = '&#x2023;';
+const playIcon = '&#x2023;';
 
 /**
  * Constructs a new `HTML` reporter instance.
@@ -2993,24 +2996,24 @@ var playIcon = '&#x2023;';
 function HTML(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var stats = this.stats;
-  var stat = fragment(statsTemplate);
-  var items = stat.getElementsByTagName('li');
-  var passes = items[1].getElementsByTagName('em')[0];
-  var passesLink = items[1].getElementsByTagName('a')[0];
-  var failures = items[2].getElementsByTagName('em')[0];
-  var failuresLink = items[2].getElementsByTagName('a')[0];
-  var duration = items[3].getElementsByTagName('em')[0];
-  var canvas = stat.getElementsByTagName('canvas')[0];
-  var report = fragment('<ul id="mocha-report"></ul>');
-  var stack = [report];
-  var progress;
-  var ctx;
-  var root = document.getElementById('mocha');
+  const self = this;
+  const {stats} = this;
+  const stat = fragment(statsTemplate);
+  const items = stat.getElementsByTagName('li');
+  const passes = items[1].getElementsByTagName('em')[0];
+  const passesLink = items[1].getElementsByTagName('a')[0];
+  const failures = items[2].getElementsByTagName('em')[0];
+  const failuresLink = items[2].getElementsByTagName('a')[0];
+  const duration = items[3].getElementsByTagName('em')[0];
+  const canvas = stat.getElementsByTagName('canvas')[0];
+  const report = fragment('<ul id="mocha-report"></ul>');
+  const stack = [report];
+  let progress;
+  let ctx;
+  const root = document.getElementById('mocha');
 
   if (canvas.getContext) {
-    var ratio = window.devicePixelRatio || 1;
+    const ratio = window.devicePixelRatio || 1;
     canvas.style.width = canvas.width;
     canvas.style.height = canvas.height;
     canvas.width *= ratio;
@@ -3028,7 +3031,7 @@ function HTML(runner, options) {
   on(passesLink, 'click', function(evt) {
     evt.preventDefault();
     unhide();
-    var name = /pass/.test(report.className) ? '' : ' pass';
+    const name = /pass/.test(report.className) ? '' : ' pass';
     report.className = report.className.replace(/fail|pass/g, '') + name;
     if (report.className.trim()) {
       hideSuitesWithout('test pass');
@@ -3039,7 +3042,7 @@ function HTML(runner, options) {
   on(failuresLink, 'click', function(evt) {
     evt.preventDefault();
     unhide();
-    var name = /fail/.test(report.className) ? '' : ' fail';
+    const name = /fail/.test(report.className) ? '' : ' fail';
     report.className = report.className.replace(/fail|pass/g, '') + name;
     if (report.className.trim()) {
       hideSuitesWithout('test fail');
@@ -3059,8 +3062,8 @@ function HTML(runner, options) {
     }
 
     // suite
-    var url = self.suiteURL(suite);
-    var el = fragment(
+    const url = self.suiteURL(suite);
+    const el = fragment(
       '<li class="suite"><h1><a href="%s">%s</a></h1></li>',
       url,
       escape(suite.title)
@@ -3081,28 +3084,28 @@ function HTML(runner, options) {
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
-    var url = self.testURL(test);
-    var markup =
-      '<li class="test pass %e"><h2>%e<span class="duration">%ems</span> ' +
-      '<a href="%s" class="replay">' +
-      playIcon +
-      '</a></h2></li>';
-    var el = fragment(markup, test.speed, test.title, test.duration, url);
+    const url = self.testURL(test);
+    const markup =
+      `${'<li class="test pass %e"><h2>%e<span class="duration">%ems</span> ' +
+      '<a href="%s" class="replay">'}${ 
+      playIcon 
+      }</a></h2></li>`;
+    const el = fragment(markup, test.speed, test.title, test.duration, url);
     self.addCodeToggle(el, test.body);
     appendToStack(el);
     updateStats();
   });
 
   runner.on(EVENT_TEST_FAIL, function(test) {
-    var el = fragment(
-      '<li class="test fail"><h2>%e <a href="%e" class="replay">' +
-        playIcon +
-        '</a></h2></li>',
+    const el = fragment(
+      `<li class="test fail"><h2>%e <a href="%e" class="replay">${ 
+        playIcon 
+        }</a></h2></li>`,
       test.title,
       self.testURL(test)
     );
-    var stackString; // Note: Includes leading newline
-    var message = test.err.toString();
+    let stackString; // Note: Includes leading newline
+    let message = test.err.toString();
 
     // <=IE7 stringifies to [Object Error]. Since it can be overloaded, we
     // check for the result of the stringifying.
@@ -3111,7 +3114,7 @@ function HTML(runner, options) {
     }
 
     if (test.err.stack) {
-      var indexOfMessage = test.err.stack.indexOf(test.err.message);
+      const indexOfMessage = test.err.stack.indexOf(test.err.message);
       if (indexOfMessage === -1) {
         stackString = test.err.stack;
       } else {
@@ -3121,7 +3124,7 @@ function HTML(runner, options) {
       }
     } else if (test.err.sourceURL && test.err.line !== undefined) {
       // Safari doesn't give you a stack. Let's at least provide a source line.
-      stackString = '\n(' + test.err.sourceURL + ':' + test.err.line + ')';
+      stackString = `\n(${  test.err.sourceURL  }:${  test.err.line  })`;
     }
 
     stackString = stackString || '';
@@ -3150,7 +3153,7 @@ function HTML(runner, options) {
   });
 
   runner.on(EVENT_TEST_PENDING, function(test) {
-    var el = fragment(
+    const el = fragment(
       '<li class="test pass pending"><h2>%e</h2></li>',
       test.title
     );
@@ -3167,13 +3170,13 @@ function HTML(runner, options) {
 
   function updateStats() {
     // TODO: add to stats
-    var percent = ((stats.tests / runner.total) * 100) | 0;
+    const percent = ((stats.tests / runner.total) * 100) | 0;
     if (progress) {
       progress.update(percent).draw(ctx);
     }
 
     // update stats
-    var ms = new Date() - stats.start;
+    const ms = new Date() - stats.start;
     text(passes, stats.passes);
     text(failures, stats.failures);
     text(duration, (ms / 1000).toFixed(2));
@@ -3187,7 +3190,7 @@ function HTML(runner, options) {
  * @return {string} A new URL.
  */
 function makeUrl(s) {
-  var search = window.location.search;
+  let {search} = window.location;
 
   // Remove previous grep query parameter if present
   if (search) {
@@ -3195,10 +3198,10 @@ function makeUrl(s) {
   }
 
   return (
-    window.location.pathname +
-    (search ? search + '&' : '?') +
-    'grep=' +
-    encodeURIComponent(escapeRe(s))
+    `${window.location.pathname +
+    (search ? `${search  }&` : '?') 
+    }grep=${ 
+    encodeURIComponent(escapeRe(s))}`
   );
 }
 
@@ -3227,7 +3230,7 @@ HTML.prototype.testURL = function(test) {
  * @param {string} contents
  */
 HTML.prototype.addCodeToggle = function(el, contents) {
-  var h2 = el.getElementsByTagName('h2')[0];
+  const h2 = el.getElementsByTagName('h2')[0];
 
   on(h2, 'click', function() {
     pre.style.display = pre.style.display === 'none' ? 'block' : 'none';
@@ -3253,9 +3256,9 @@ function error(msg) {
  * @param {string} html
  */
 function fragment(html) {
-  var args = arguments;
-  var div = document.createElement('div');
-  var i = 1;
+  const args = arguments;
+  const div = document.createElement('div');
+  let i = 1;
 
   div.innerHTML = html.replace(/%([se])/g, function(_, type) {
     switch (type) {
@@ -3277,9 +3280,9 @@ function fragment(html) {
  * @param {text} classname
  */
 function hideSuitesWithout(classname) {
-  var suites = document.getElementsByClassName('suite');
-  for (var i = 0; i < suites.length; i++) {
-    var els = suites[i].getElementsByClassName(classname);
+  const suites = document.getElementsByClassName('suite');
+  for (let i = 0; i < suites.length; i++) {
+    const els = suites[i].getElementsByClassName(classname);
     if (!els.length) {
       suites[i].className += ' hidden';
     }
@@ -3290,8 +3293,8 @@ function hideSuitesWithout(classname) {
  * Unhide .hidden suites.
  */
 function unhide() {
-  var els = document.getElementsByClassName('suite hidden');
-  for (var i = 0; i < els.length; ++i) {
+  const els = document.getElementsByClassName('suite hidden');
+  for (let i = 0; i < els.length; ++i) {
     els[i].className = els[i].className.replace('suite hidden', 'suite');
   }
 }
@@ -3317,7 +3320,7 @@ function on(el, event, fn) {
   if (el.addEventListener) {
     el.addEventListener(event, fn, false);
   } else {
-    el.attachEvent('on' + event, fn);
+    el.attachEvent(`on${  event}`, fn);
   }
 }
 
@@ -3348,6 +3351,7 @@ exports.JSONStream = exports['json-stream'] = require('./json-stream');
 },{"./base":17,"./doc":18,"./dot":19,"./html":20,"./json":23,"./json-stream":22,"./landing":24,"./list":25,"./markdown":26,"./min":27,"./nyan":28,"./progress":29,"./spec":30,"./tap":31,"./xunit":32}],22:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module JSONStream
  */
@@ -3355,12 +3359,12 @@ exports.JSONStream = exports['json-stream'] = require('./json-stream');
  * Module dependencies.
  */
 
-var Base = require('./base');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
+const Base = require('./base');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_RUN_END} = constants;
 
 /**
  * Expose `JSONStream`.
@@ -3381,11 +3385,11 @@ exports = module.exports = JSONStream;
 function JSONStream(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var total = runner.total;
+  const self = this;
+  const {total} = runner;
 
   runner.once(EVENT_RUN_BEGIN, function() {
-    writeEvent(['start', {total: total}]);
+    writeEvent(['start', {total}]);
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
@@ -3416,7 +3420,7 @@ function JSONStream(runner, options) {
  * @param {JSONStream~MochaEvent} event - Mocha event to be output.
  */
 function writeEvent(event) {
-  process.stdout.write(JSON.stringify(event) + '\n');
+  process.stdout.write(`${JSON.stringify(event)  }\n`);
 }
 
 /**
@@ -3442,6 +3446,7 @@ JSONStream.description = 'newline delimited JSON events';
 },{"../runner":34,"./base":17,"_process":69}],23:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module JSON
  */
@@ -3449,13 +3454,13 @@ JSONStream.description = 'newline delimited JSON events';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_TEST_END = constants.EVENT_TEST_END;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
+const Base = require('./base');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_TEST_END} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_PENDING} = constants;
 
 /**
  * Expose `JSON`.
@@ -3476,11 +3481,11 @@ exports = module.exports = JSONReporter;
 function JSONReporter(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var tests = [];
-  var pending = [];
-  var failures = [];
-  var passes = [];
+  const self = this;
+  const tests = [];
+  const pending = [];
+  const failures = [];
+  const passes = [];
 
   runner.on(EVENT_TEST_END, function(test) {
     tests.push(test);
@@ -3499,7 +3504,7 @@ function JSONReporter(runner, options) {
   });
 
   runner.once(EVENT_RUN_END, function() {
-    var obj = {
+    const obj = {
       stats: self.stats,
       tests: tests.map(clean),
       pending: pending.map(clean),
@@ -3522,7 +3527,7 @@ function JSONReporter(runner, options) {
  * @return {Object}
  */
 function clean(test) {
-  var err = test.err || {};
+  let err = test.err || {};
   if (err instanceof Error) {
     err = errorJSON(err);
   }
@@ -3544,13 +3549,13 @@ function clean(test) {
  * @return {Object}
  */
 function cleanCycles(obj) {
-  var cache = [];
+  const cache = [];
   return JSON.parse(
     JSON.stringify(obj, function(key, value) {
       if (typeof value === 'object' && value !== null) {
         if (cache.indexOf(value) !== -1) {
           // Instead of going in a circle, we'll print [object Object]
-          return '' + value;
+          return `${  value}`;
         }
         cache.push(value);
       }
@@ -3568,7 +3573,7 @@ function cleanCycles(obj) {
  * @return {Object}
  */
 function errorJSON(err) {
-  var res = {};
+  const res = {};
   Object.getOwnPropertyNames(err).forEach(function(key) {
     res[key] = err[key];
   }, err);
@@ -3581,6 +3586,7 @@ JSONReporter.description = 'single JSON object';
 },{"../runner":34,"./base":17,"_process":69}],24:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Landing
  */
@@ -3588,16 +3594,16 @@ JSONReporter.description = 'single JSON object';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var inherits = require('../utils').inherits;
-var constants = require('../runner').constants;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_END = constants.EVENT_TEST_END;
-var STATE_FAILED = require('../runnable').constants.STATE_FAILED;
+const Base = require('./base');
+const {inherits} = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_END} = constants;
+const {STATE_FAILED} = require('../runnable').constants;
 
-var cursor = Base.cursor;
-var color = Base.color;
+const {cursor} = Base;
+const {color} = Base;
 
 /**
  * Expose `Landing`.
@@ -3636,17 +3642,17 @@ Base.colors.runway = 90;
 function Landing(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var width = (Base.window.width * 0.75) | 0;
-  var total = runner.total;
-  var stream = process.stdout;
-  var plane = color('plane', '✈');
-  var crashed = -1;
-  var n = 0;
+  const self = this;
+  const width = (Base.window.width * 0.75) | 0;
+  const {total} = runner;
+  const stream = process.stdout;
+  let plane = color('plane', '✈');
+  let crashed = -1;
+  let n = 0;
 
   function runway() {
-    var buf = Array(width).join('-');
-    return '  ' + color('runway', buf);
+    const buf = Array(width).join('-');
+    return `  ${  color('runway', buf)}`;
   }
 
   runner.on(EVENT_RUN_BEGIN, function() {
@@ -3656,7 +3662,7 @@ function Landing(runner, options) {
 
   runner.on(EVENT_TEST_END, function(test) {
     // check if the plane crashed
-    var col = crashed === -1 ? ((width * ++n) / total) | 0 : crashed;
+    const col = crashed === -1 ? ((width * ++n) / total) | 0 : crashed;
 
     // show the crash
     if (test.state === STATE_FAILED) {
@@ -3665,12 +3671,12 @@ function Landing(runner, options) {
     }
 
     // render landing strip
-    stream.write('\u001b[' + (width + 1) + 'D\u001b[2A');
+    stream.write(`\u001b[${  width + 1  }D\u001b[2A`);
     stream.write(runway());
     stream.write('\n  ');
     stream.write(color('runway', Array(col).join('⋅')));
     stream.write(plane);
-    stream.write(color('runway', Array(width - col).join('⋅') + '\n'));
+    stream.write(color('runway', `${Array(width - col).join('⋅')  }\n`));
     stream.write(runway());
     stream.write('\u001b[0m');
   });
@@ -3693,6 +3699,7 @@ Landing.description = 'Unicode landing strip';
 },{"../runnable":33,"../runner":34,"../utils":38,"./base":17,"_process":69}],25:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module List
  */
@@ -3700,17 +3707,17 @@ Landing.description = 'Unicode landing strip';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var inherits = require('../utils').inherits;
-var constants = require('../runner').constants;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_BEGIN = constants.EVENT_TEST_BEGIN;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var color = Base.color;
-var cursor = Base.cursor;
+const Base = require('./base');
+const {inherits} = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_BEGIN} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {color} = Base;
+const {cursor} = Base;
 
 /**
  * Expose `List`.
@@ -3731,25 +3738,25 @@ exports = module.exports = List;
 function List(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var n = 0;
+  const self = this;
+  let n = 0;
 
   runner.on(EVENT_RUN_BEGIN, function() {
     console.log();
   });
 
   runner.on(EVENT_TEST_BEGIN, function(test) {
-    process.stdout.write(color('pass', '    ' + test.fullTitle() + ': '));
+    process.stdout.write(color('pass', `    ${  test.fullTitle()  }: `));
   });
 
   runner.on(EVENT_TEST_PENDING, function(test) {
-    var fmt = color('checkmark', '  -') + color('pending', ' %s');
+    const fmt = color('checkmark', '  -') + color('pending', ' %s');
     console.log(fmt, test.fullTitle());
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
-    var fmt =
-      color('checkmark', '  ' + Base.symbols.ok) +
+    const fmt =
+      color('checkmark', `  ${  Base.symbols.ok}`) +
       color('pass', ' %s: ') +
       color(test.speed, '%dms');
     cursor.CR();
@@ -3775,6 +3782,7 @@ List.description = 'like "spec" reporter but flat';
 },{"../runner":34,"../utils":38,"./base":17,"_process":69}],26:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Markdown
  */
@@ -3782,19 +3790,19 @@ List.description = 'like "spec" reporter but flat';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var utils = require('../utils');
-var constants = require('../runner').constants;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
-var EVENT_SUITE_END = constants.EVENT_SUITE_END;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
+const Base = require('./base');
+const utils = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_RUN_END} = constants;
+const {EVENT_SUITE_BEGIN} = constants;
+const {EVENT_SUITE_END} = constants;
+const {EVENT_TEST_PASS} = constants;
 
 /**
  * Constants
  */
 
-var SUITE_PREFIX = '$';
+const SUITE_PREFIX = '$';
 
 /**
  * Expose `Markdown`.
@@ -3815,18 +3823,18 @@ exports = module.exports = Markdown;
 function Markdown(runner, options) {
   Base.call(this, runner, options);
 
-  var level = 0;
-  var buf = '';
+  let level = 0;
+  let buf = '';
 
   function title(str) {
-    return Array(level).join('#') + ' ' + str;
+    return `${Array(level).join('#')  } ${  str}`;
   }
 
   function mapTOC(suite, obj) {
-    var ret = obj;
-    var key = SUITE_PREFIX + suite.title;
+    const ret = obj;
+    const key = SUITE_PREFIX + suite.title;
 
-    obj = obj[key] = obj[key] || {suite: suite};
+    obj = obj[key] = obj[key] || {suite};
     suite.suites.forEach(function(suite) {
       mapTOC(suite, obj);
     });
@@ -3836,15 +3844,15 @@ function Markdown(runner, options) {
 
   function stringifyTOC(obj, level) {
     ++level;
-    var buf = '';
-    var link;
-    for (var key in obj) {
+    let buf = '';
+    let link;
+    for (const key in obj) {
       if (key === 'suite') {
         continue;
       }
       if (key !== SUITE_PREFIX) {
-        link = ' - [' + key.substring(1) + ']';
-        link += '(#' + utils.slug(obj[key].suite.fullTitle()) + ')\n';
+        link = ` - [${  key.substring(1)  }]`;
+        link += `(#${  utils.slug(obj[key].suite.fullTitle())  })\n`;
         buf += Array(level).join('  ') + link;
       }
       buf += stringifyTOC(obj[key], level);
@@ -3853,7 +3861,7 @@ function Markdown(runner, options) {
   }
 
   function generateTOC(suite) {
-    var obj = mapTOC(suite, {});
+    const obj = mapTOC(suite, {});
     return stringifyTOC(obj, 0);
   }
 
@@ -3861,9 +3869,9 @@ function Markdown(runner, options) {
 
   runner.on(EVENT_SUITE_BEGIN, function(suite) {
     ++level;
-    var slug = utils.slug(suite.fullTitle());
-    buf += '<a name="' + slug + '"></a>' + '\n';
-    buf += title(suite.title) + '\n';
+    const slug = utils.slug(suite.fullTitle());
+    buf += `<a name="${  slug  }"></a>` + `\n`;
+    buf += `${title(suite.title)  }\n`;
   });
 
   runner.on(EVENT_SUITE_END, function() {
@@ -3871,10 +3879,10 @@ function Markdown(runner, options) {
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
-    var code = utils.clean(test.body);
-    buf += test.title + '.\n';
+    const code = utils.clean(test.body);
+    buf += `${test.title  }.\n`;
     buf += '\n```js\n';
-    buf += code + '\n';
+    buf += `${code  }\n`;
     buf += '```\n\n';
   });
 
@@ -3891,6 +3899,7 @@ Markdown.description = 'GitHub Flavored Markdown';
 },{"../runner":34,"../utils":38,"./base":17,"_process":69}],27:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Min
  */
@@ -3898,11 +3907,11 @@ Markdown.description = 'GitHub Flavored Markdown';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var inherits = require('../utils').inherits;
-var constants = require('../runner').constants;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
+const Base = require('./base');
+const {inherits} = require('../utils');
+const {constants} = require('../runner');
+const {EVENT_RUN_END} = constants;
+const {EVENT_RUN_BEGIN} = constants;
 
 /**
  * Expose `Min`.
@@ -3947,6 +3956,7 @@ Min.description = 'essentially just a summary';
 },{"../runner":34,"../utils":38,"./base":17,"_process":69}],28:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Nyan
  */
@@ -3954,14 +3964,14 @@ Min.description = 'essentially just a summary';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var constants = require('../runner').constants;
-var inherits = require('../utils').inherits;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
+const Base = require('./base');
+const {constants} = require('../runner');
+const {inherits} = require('../utils');
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_FAIL} = constants;
 
 /**
  * Expose `Dot`.
@@ -3982,9 +3992,9 @@ exports = module.exports = NyanCat;
 function NyanCat(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var width = (Base.window.width * 0.75) | 0;
-  var nyanCatWidth = (this.nyanCatWidth = 11);
+  const self = this;
+  const width = (Base.window.width * 0.75) | 0;
+  const nyanCatWidth = (this.nyanCatWidth = 11);
 
   this.colorIndex = 0;
   this.numberOfLines = 4;
@@ -4013,7 +4023,7 @@ function NyanCat(runner, options) {
 
   runner.once(EVENT_RUN_END, function() {
     Base.cursor.show();
-    for (var i = 0; i < self.numberOfLines; i++) {
+    for (let i = 0; i < self.numberOfLines; i++) {
       write('\n');
     }
     self.epilogue();
@@ -4047,7 +4057,7 @@ NyanCat.prototype.draw = function() {
  */
 
 NyanCat.prototype.drawScoreboard = function() {
-  var stats = this.stats;
+  const {stats} = this;
 
   function draw(type, n) {
     write(' ');
@@ -4070,11 +4080,11 @@ NyanCat.prototype.drawScoreboard = function() {
  */
 
 NyanCat.prototype.appendRainbow = function() {
-  var segment = this.tick ? '_' : '-';
-  var rainbowified = this.rainbowify(segment);
+  const segment = this.tick ? '_' : '-';
+  const rainbowified = this.rainbowify(segment);
 
-  for (var index = 0; index < this.numberOfLines; index++) {
-    var trajectory = this.trajectories[index];
+  for (let index = 0; index < this.numberOfLines; index++) {
+    const trajectory = this.trajectories[index];
     if (trajectory.length >= this.trajectoryWidthMax) {
       trajectory.shift();
     }
@@ -4089,10 +4099,10 @@ NyanCat.prototype.appendRainbow = function() {
  */
 
 NyanCat.prototype.drawRainbow = function() {
-  var self = this;
+  const self = this;
 
   this.trajectories.forEach(function(line) {
-    write('\u001b[' + self.scoreboardWidth + 'C');
+    write(`\u001b[${  self.scoreboardWidth  }C`);
     write(line.join(''));
     write('\n');
   });
@@ -4106,10 +4116,10 @@ NyanCat.prototype.drawRainbow = function() {
  * @private
  */
 NyanCat.prototype.drawNyanCat = function() {
-  var self = this;
-  var startWidth = this.scoreboardWidth + this.trajectories[0].length;
-  var dist = '\u001b[' + startWidth + 'C';
-  var padding = '';
+  const self = this;
+  const startWidth = this.scoreboardWidth + this.trajectories[0].length;
+  const dist = `\u001b[${  startWidth  }C`;
+  let padding = '';
 
   write(dist);
   write('_,------,');
@@ -4117,18 +4127,18 @@ NyanCat.prototype.drawNyanCat = function() {
 
   write(dist);
   padding = self.tick ? '  ' : '   ';
-  write('_|' + padding + '/\\_/\\ ');
+  write(`_|${  padding  }/\\_/\\ `);
   write('\n');
 
   write(dist);
   padding = self.tick ? '_' : '__';
-  var tail = self.tick ? '~' : '^';
-  write(tail + '|' + padding + this.face() + ' ');
+  const tail = self.tick ? '~' : '^';
+  write(`${tail  }|${  padding  }${this.face()  } `);
   write('\n');
 
   write(dist);
   padding = self.tick ? ' ' : '  ';
-  write(padding + '""  "" ');
+  write(`${padding  }""  "" `);
   write('\n');
 
   this.cursorUp(this.numberOfLines);
@@ -4142,12 +4152,12 @@ NyanCat.prototype.drawNyanCat = function() {
  */
 
 NyanCat.prototype.face = function() {
-  var stats = this.stats;
+  const {stats} = this;
   if (stats.failures) {
     return '( x .x)';
-  } else if (stats.pending) {
+  } if (stats.pending) {
     return '( o .o)';
-  } else if (stats.passes) {
+  } if (stats.passes) {
     return '( ^ .^)';
   }
   return '( - .-)';
@@ -4161,7 +4171,7 @@ NyanCat.prototype.face = function() {
  */
 
 NyanCat.prototype.cursorUp = function(n) {
-  write('\u001b[' + n + 'A');
+  write(`\u001b[${  n  }A`);
 };
 
 /**
@@ -4172,7 +4182,7 @@ NyanCat.prototype.cursorUp = function(n) {
  */
 
 NyanCat.prototype.cursorDown = function(n) {
-  write('\u001b[' + n + 'B');
+  write(`\u001b[${  n  }B`);
 };
 
 /**
@@ -4182,14 +4192,14 @@ NyanCat.prototype.cursorDown = function(n) {
  * @return {Array}
  */
 NyanCat.prototype.generateColors = function() {
-  var colors = [];
+  const colors = [];
 
-  for (var i = 0; i < 6 * 7; i++) {
-    var pi3 = Math.floor(Math.PI / 3);
-    var n = i * (1.0 / 6);
-    var r = Math.floor(3 * Math.sin(n) + 3);
-    var g = Math.floor(3 * Math.sin(n + 2 * pi3) + 3);
-    var b = Math.floor(3 * Math.sin(n + 4 * pi3) + 3);
+  for (let i = 0; i < 6 * 7; i++) {
+    const pi3 = Math.floor(Math.PI / 3);
+    const n = i * (1.0 / 6);
+    const r = Math.floor(3 * Math.sin(n) + 3);
+    const g = Math.floor(3 * Math.sin(n + 2 * pi3) + 3);
+    const b = Math.floor(3 * Math.sin(n + 4 * pi3) + 3);
     colors.push(36 * r + 6 * g + b + 16);
   }
 
@@ -4207,9 +4217,9 @@ NyanCat.prototype.rainbowify = function(str) {
   if (!Base.useColors) {
     return str;
   }
-  var color = this.rainbowColors[this.colorIndex % this.rainbowColors.length];
+  const color = this.rainbowColors[this.colorIndex % this.rainbowColors.length];
   this.colorIndex += 1;
-  return '\u001b[38;5;' + color + 'm' + str + '\u001b[0m';
+  return `\u001b[38;5;${  color  }m${  str  }\u001b[0m`;
 };
 
 /**
@@ -4227,6 +4237,7 @@ NyanCat.description = '"nyan cat"';
 },{"../runner":34,"../utils":38,"./base":17,"_process":69}],29:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module Progress
  */
@@ -4234,14 +4245,14 @@ NyanCat.description = '"nyan cat"';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var constants = require('../runner').constants;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_TEST_END = constants.EVENT_TEST_END;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var inherits = require('../utils').inherits;
-var color = Base.color;
-var cursor = Base.cursor;
+const Base = require('./base');
+const {constants} = require('../runner');
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_TEST_END} = constants;
+const {EVENT_RUN_END} = constants;
+const {inherits} = require('../utils');
+const {color} = Base;
+const {cursor} = Base;
 
 /**
  * Expose `Progress`.
@@ -4268,15 +4279,15 @@ Base.colors.progress = 90;
 function Progress(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var width = (Base.window.width * 0.5) | 0;
-  var total = runner.total;
-  var complete = 0;
-  var lastN = -1;
+  const self = this;
+  const width = (Base.window.width * 0.5) | 0;
+  const {total} = runner;
+  let complete = 0;
+  let lastN = -1;
 
   // default chars
   options = options || {};
-  var reporterOptions = options.reporterOptions || {};
+  const reporterOptions = options.reporterOptions || {};
 
   options.open = reporterOptions.open || '[';
   options.complete = reporterOptions.complete || '▬';
@@ -4294,9 +4305,9 @@ function Progress(runner, options) {
   runner.on(EVENT_TEST_END, function() {
     complete++;
 
-    var percent = complete / total;
-    var n = (width * percent) | 0;
-    var i = width - n;
+    const percent = complete / total;
+    const n = (width * percent) | 0;
+    const i = width - n;
 
     if (n === lastN && !options.verbose) {
       // Don't re-render the line if it hasn't changed
@@ -4306,12 +4317,12 @@ function Progress(runner, options) {
 
     cursor.CR();
     process.stdout.write('\u001b[J');
-    process.stdout.write(color('progress', '  ' + options.open));
+    process.stdout.write(color('progress', `  ${  options.open}`));
     process.stdout.write(Array(n).join(options.complete));
     process.stdout.write(Array(i).join(options.incomplete));
     process.stdout.write(color('progress', options.close));
     if (options.verbose) {
-      process.stdout.write(color('progress', ' ' + complete + ' of ' + total));
+      process.stdout.write(color('progress', ` ${  complete  } of ${  total}`));
     }
   });
 
@@ -4334,6 +4345,7 @@ Progress.description = 'a progress bar';
 }).call(this,require('_process'))
 },{"../runner":34,"../utils":38,"./base":17,"_process":69}],30:[function(require,module,exports){
 'use strict';
+
 /**
  * @module Spec
  */
@@ -4341,17 +4353,17 @@ Progress.description = 'a progress bar';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var constants = require('../runner').constants;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
-var EVENT_SUITE_END = constants.EVENT_SUITE_END;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var inherits = require('../utils').inherits;
-var color = Base.color;
+const Base = require('./base');
+const {constants} = require('../runner');
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_SUITE_BEGIN} = constants;
+const {EVENT_SUITE_END} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {inherits} = require('../utils');
+const {color} = Base;
 
 /**
  * Expose `Spec`.
@@ -4372,9 +4384,9 @@ exports = module.exports = Spec;
 function Spec(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var indents = 0;
-  var n = 0;
+  const self = this;
+  let indents = 0;
+  let n = 0;
 
   function indent() {
     return Array(indents).join('  ');
@@ -4397,22 +4409,22 @@ function Spec(runner, options) {
   });
 
   runner.on(EVENT_TEST_PENDING, function(test) {
-    var fmt = indent() + color('pending', '  - %s');
+    const fmt = indent() + color('pending', '  - %s');
     console.log(fmt, test.title);
   });
 
   runner.on(EVENT_TEST_PASS, function(test) {
-    var fmt;
+    let fmt;
     if (test.speed === 'fast') {
       fmt =
         indent() +
-        color('checkmark', '  ' + Base.symbols.ok) +
+        color('checkmark', `  ${  Base.symbols.ok}`) +
         color('pass', ' %s');
       console.log(fmt, test.title);
     } else {
       fmt =
         indent() +
-        color('checkmark', '  ' + Base.symbols.ok) +
+        color('checkmark', `  ${  Base.symbols.ok}`) +
         color('pass', ' %s') +
         color(test.speed, ' (%dms)');
       console.log(fmt, test.title, test.duration);
@@ -4436,6 +4448,7 @@ Spec.description = 'hierarchical & verbose [default]';
 },{"../runner":34,"../utils":38,"./base":17}],31:[function(require,module,exports){
 (function (process){
 'use strict';
+
 /**
  * @module TAP
  */
@@ -4443,17 +4456,17 @@ Spec.description = 'hierarchical & verbose [default]';
  * Module dependencies.
  */
 
-var util = require('util');
-var Base = require('./base');
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var EVENT_TEST_END = constants.EVENT_TEST_END;
-var inherits = require('../utils').inherits;
-var sprintf = util.format;
+const util = require('util');
+const Base = require('./base');
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {EVENT_TEST_END} = constants;
+const {inherits} = require('../utils');
+const sprintf = util.format;
 
 /**
  * Expose `TAP`.
@@ -4474,10 +4487,10 @@ exports = module.exports = TAP;
 function TAP(runner, options) {
   Base.call(this, runner, options);
 
-  var self = this;
-  var n = 1;
+  const self = this;
+  let n = 1;
 
-  var tapVersion = '12';
+  let tapVersion = '12';
   if (options && options.reporterOptions) {
     if (options.reporterOptions.tapVersion) {
       tapVersion = options.reporterOptions.tapVersion.toString();
@@ -4487,7 +4500,7 @@ function TAP(runner, options) {
   this._producer = createProducer(tapVersion);
 
   runner.once(EVENT_RUN_BEGIN, function() {
-    var ntests = runner.grepTotal(runner.suite);
+    const ntests = runner.grepTotal(runner.suite);
     self._producer.writeVersion();
     self._producer.writePlan(ntests);
   });
@@ -4537,7 +4550,7 @@ function title(test) {
  * @param {...*} [varArgs] - Format string arguments
  */
 function println(format, varArgs) {
-  var vargs = Array.from(arguments);
+  const vargs = Array.from(arguments);
   vargs[0] += '\n';
   process.stdout.write(sprintf.apply(null, vargs));
 }
@@ -4551,15 +4564,15 @@ function println(format, varArgs) {
  * @throws {Error} if specification version has no associated producer.
  */
 function createProducer(tapVersion) {
-  var producers = {
+  const producers = {
     '12': new TAP12Producer(),
     '13': new TAP13Producer()
   };
-  var producer = producers[tapVersion];
+  const producer = producers[tapVersion];
 
   if (!producer) {
     throw new Error(
-      'invalid or unsupported TAP version: ' + JSON.stringify(tapVersion)
+      `invalid or unsupported TAP version: ${  JSON.stringify(tapVersion)}`
     );
   }
 
@@ -4637,10 +4650,10 @@ TAPProducer.prototype.writeFail = function(n, test, err) {
  */
 TAPProducer.prototype.writeEpilogue = function(stats) {
   // :TBD: Why is this not counting pending tests?
-  println('# tests ' + (stats.passes + stats.failures));
-  println('# pass ' + stats.passes);
+  println(`# tests ${  stats.passes + stats.failures}`);
+  println(`# pass ${  stats.passes}`);
   // :TBD: Why are we not showing pending results?
-  println('# fail ' + stats.failures);
+  println(`# fail ${  stats.failures}`);
 };
 
 /**
@@ -4703,18 +4716,18 @@ function TAP13Producer() {
    */
   this.writeFail = function(n, test, err) {
     TAPProducer.prototype.writeFail.call(this, n, test, err);
-    var emitYamlBlock = err.message != null || err.stack != null;
+    const emitYamlBlock = err.message != null || err.stack != null;
     if (emitYamlBlock) {
-      println(indent(1) + '---');
+      println(`${indent(1)  }---`);
       if (err.message) {
-        println(indent(2) + 'message: |-');
+        println(`${indent(2)  }message: |-`);
         println(err.message.replace(/^/gm, indent(3)));
       }
       if (err.stack) {
-        println(indent(2) + 'stack: |-');
+        println(`${indent(2)  }stack: |-`);
         println(err.stack.replace(/^/gm, indent(3)));
       }
-      println(indent(1) + '...');
+      println(`${indent(1)  }...`);
     }
   };
 
@@ -4734,6 +4747,7 @@ TAP.description = 'TAP-compatible output';
 },{"../runner":34,"../utils":38,"./base":17,"_process":69,"util":89}],32:[function(require,module,exports){
 (function (process,global){
 'use strict';
+
 /**
  * @module XUnit
  */
@@ -4741,26 +4755,26 @@ TAP.description = 'TAP-compatible output';
  * Module dependencies.
  */
 
-var Base = require('./base');
-var utils = require('../utils');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var path = require('path');
-var errors = require('../errors');
-var createUnsupportedError = errors.createUnsupportedError;
-var constants = require('../runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var STATE_FAILED = require('../runnable').constants.STATE_FAILED;
-var inherits = utils.inherits;
-var escape = utils.escape;
+const Base = require('./base');
+const utils = require('../utils');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const path = require('path');
+const errors = require('../errors');
+const {createUnsupportedError} = errors;
+const {constants} = require('../runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {STATE_FAILED} = require('../runnable').constants;
+const {inherits} = utils;
+const {escape} = utils;
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
  */
-var Date = global.Date;
+const {Date} = global;
 
 /**
  * Expose `XUnit`.
@@ -4781,15 +4795,15 @@ exports = module.exports = XUnit;
 function XUnit(runner, options) {
   Base.call(this, runner, options);
 
-  var stats = this.stats;
-  var tests = [];
-  var self = this;
+  const {stats} = this;
+  const tests = [];
+  const self = this;
 
   // the name of the test suite, as it will appear in the resulting XML file
-  var suiteName;
+  let suiteName;
 
   // the default name of the test suite if none is provided
-  var DEFAULT_SUITE_NAME = 'Mocha Tests';
+  const DEFAULT_SUITE_NAME = 'Mocha Tests';
 
   if (options && options.reporterOptions) {
     if (options.reporterOptions.output) {
@@ -4873,9 +4887,9 @@ XUnit.prototype.done = function(failures, fn) {
  */
 XUnit.prototype.write = function(line) {
   if (this.fileStream) {
-    this.fileStream.write(line + '\n');
+    this.fileStream.write(`${line  }\n`);
   } else if (typeof process === 'object' && process.stdout) {
-    process.stdout.write(line + '\n');
+    process.stdout.write(`${line  }\n`);
   } else {
     console.log(line);
   }
@@ -4889,18 +4903,18 @@ XUnit.prototype.write = function(line) {
 XUnit.prototype.test = function(test) {
   Base.useColors = false;
 
-  var attrs = {
+  const attrs = {
     classname: test.parent.fullTitle(),
     name: test.title,
     time: test.duration / 1000 || 0
   };
 
   if (test.state === STATE_FAILED) {
-    var err = test.err;
-    var diff =
+    const {err} = test;
+    const diff =
       Base.hideDiff || !err.actual || !err.expected
         ? ''
-        : '\n' + Base.generateDiff(err.actual, err.expected);
+        : `\n${  Base.generateDiff(err.actual, err.expected)}`;
     this.write(
       tag(
         'testcase',
@@ -4910,7 +4924,7 @@ XUnit.prototype.test = function(test) {
           'failure',
           {},
           false,
-          escape(err.message) + escape(diff) + '\n' + escape(err.stack)
+          `${escape(err.message) + escape(diff)  }\n${  escape(err.stack)}`
         )
       )
     );
@@ -4931,19 +4945,19 @@ XUnit.prototype.test = function(test) {
  * @return {string}
  */
 function tag(name, attrs, close, content) {
-  var end = close ? '/>' : '>';
-  var pairs = [];
-  var tag;
+  const end = close ? '/>' : '>';
+  const pairs = [];
+  let tag;
 
-  for (var key in attrs) {
+  for (const key in attrs) {
     if (Object.prototype.hasOwnProperty.call(attrs, key)) {
-      pairs.push(key + '="' + escape(attrs[key]) + '"');
+      pairs.push(`${key  }="${  escape(attrs[key])  }"`);
     }
   }
 
-  tag = '<' + name + (pairs.length ? ' ' + pairs.join(' ') : '') + end;
+  tag = `<${  name  }${pairs.length ? ` ${  pairs.join(' ')}` : ''  }${end}`;
   if (content) {
-    tag += content + '</' + name + end;
+    tag += `${content  }</${  name  }${end}`;
   }
   return tag;
 }
@@ -4955,21 +4969,20 @@ XUnit.description = 'XUnit-compatible XML output';
 (function (global){
 'use strict';
 
-var EventEmitter = require('events').EventEmitter;
-var Pending = require('./pending');
-var debug = require('debug')('mocha:runnable');
-var milliseconds = require('ms');
-var utils = require('./utils');
-var createInvalidExceptionError = require('./errors')
-  .createInvalidExceptionError;
+const {EventEmitter} = require('events');
+const Pending = require('./pending');
+const debug = require('debug')('mocha:runnable');
+const milliseconds = require('ms');
+const utils = require('./utils');
+const {createInvalidExceptionError} = require('./errors');
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
  */
-var Date = global.Date;
-var setTimeout = global.setTimeout;
-var clearTimeout = global.clearTimeout;
-var toString = Object.prototype.toString;
+const {Date} = global;
+const {setTimeout} = global;
+const {clearTimeout} = global;
+const {toString} = Object.prototype;
 
 module.exports = Runnable;
 
@@ -5032,8 +5045,8 @@ Runnable.prototype.timeout = function(ms) {
   }
 
   // Clamp to range
-  var INT_MAX = Math.pow(2, 31) - 1;
-  var range = [0, INT_MAX];
+  const INT_MAX = Math.pow(2, 31) - 1;
+  const range = [0, INT_MAX];
   ms = utils.clamp(ms, range);
 
   // see #1652 for reasoning
@@ -5207,8 +5220,8 @@ Runnable.prototype.inspect = function() {
  * @private
  */
 Runnable.prototype.resetTimeout = function() {
-  var self = this;
-  var ms = this.timeout() || 1e9;
+  const self = this;
+  const ms = this.timeout() || 1e9;
 
   if (!this._enableTimeouts) {
     return;
@@ -5243,11 +5256,11 @@ Runnable.prototype.globals = function(globals) {
  * @private
  */
 Runnable.prototype.run = function(fn) {
-  var self = this;
-  var start = new Date();
-  var ctx = this.ctx;
-  var finished;
-  var emitted;
+  const self = this;
+  const start = new Date();
+  const {ctx} = this;
+  let finished;
+  let emitted;
 
   // Sometimes the ctx exists, but it is not runnable
   if (ctx && ctx.runnable) {
@@ -5260,9 +5273,9 @@ Runnable.prototype.run = function(fn) {
       return;
     }
     emitted = true;
-    var msg = 'done() called multiple times';
+    const msg = 'done() called multiple times';
     if (err && err.message) {
-      err.message += " (and Mocha's " + msg + ')';
+      err.message += ` (and Mocha's ${  msg  })`;
       self.emit('error', err);
     } else {
       self.emit('error', new Error(msg));
@@ -5271,7 +5284,7 @@ Runnable.prototype.run = function(fn) {
 
   // finished
   function done(err) {
-    var ms = self.timeout();
+    const ms = self.timeout();
     if (self.timedOut) {
       return;
     }
@@ -5339,7 +5352,7 @@ Runnable.prototype.run = function(fn) {
   }
 
   function callFn(fn) {
-    var result = fn.call(ctx);
+    const result = fn.call(ctx);
     if (result && typeof result.then === 'function') {
       self.resetTimeout();
       result.then(
@@ -5374,10 +5387,10 @@ Runnable.prototype.run = function(fn) {
       if (err) {
         if (Object.prototype.toString.call(err) === '[object Object]') {
           return done(
-            new Error('done() invoked with non-Error: ' + JSON.stringify(err))
+            new Error(`done() invoked with non-Error: ${  JSON.stringify(err)}`)
           );
         }
-        return done(new Error('done() invoked with non-Error: ' + err));
+        return done(new Error(`done() invoked with non-Error: ${  err}`));
       }
       if (result && utils.isPromise(result)) {
         return done(
@@ -5400,12 +5413,12 @@ Runnable.prototype.run = function(fn) {
  * @private
  */
 Runnable.prototype._timeoutError = function(ms) {
-  var msg =
-    'Timeout of ' +
-    ms +
-    'ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves.';
+  let msg =
+    `Timeout of ${ 
+    ms 
+    }ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves.`;
   if (this.file) {
-    msg += ' (' + this.file + ')';
+    msg += ` (${  this.file  })`;
   }
   return new Error(msg);
 };
@@ -5458,35 +5471,34 @@ Runnable.constants = constants;
 /**
  * Module dependencies.
  */
-var util = require('util');
-var EventEmitter = require('events').EventEmitter;
-var Pending = require('./pending');
-var utils = require('./utils');
-var inherits = utils.inherits;
-var debug = require('debug')('mocha:runner');
-var Runnable = require('./runnable');
-var Suite = require('./suite');
-var HOOK_TYPE_BEFORE_EACH = Suite.constants.HOOK_TYPE_BEFORE_EACH;
-var HOOK_TYPE_AFTER_EACH = Suite.constants.HOOK_TYPE_AFTER_EACH;
-var HOOK_TYPE_AFTER_ALL = Suite.constants.HOOK_TYPE_AFTER_ALL;
-var HOOK_TYPE_BEFORE_ALL = Suite.constants.HOOK_TYPE_BEFORE_ALL;
-var EVENT_ROOT_SUITE_RUN = Suite.constants.EVENT_ROOT_SUITE_RUN;
-var STATE_FAILED = Runnable.constants.STATE_FAILED;
-var STATE_PASSED = Runnable.constants.STATE_PASSED;
-var dQuote = utils.dQuote;
-var ngettext = utils.ngettext;
-var sQuote = utils.sQuote;
-var stackFilter = utils.stackTraceFilter();
-var stringify = utils.stringify;
-var type = utils.type;
-var createInvalidExceptionError = require('./errors')
-  .createInvalidExceptionError;
+const util = require('util');
+const {EventEmitter} = require('events');
+const Pending = require('./pending');
+const utils = require('./utils');
+const {inherits} = utils;
+const debug = require('debug')('mocha:runner');
+const Runnable = require('./runnable');
+const Suite = require('./suite');
+const {HOOK_TYPE_BEFORE_EACH} = Suite.constants;
+const {HOOK_TYPE_AFTER_EACH} = Suite.constants;
+const {HOOK_TYPE_AFTER_ALL} = Suite.constants;
+const {HOOK_TYPE_BEFORE_ALL} = Suite.constants;
+const {EVENT_ROOT_SUITE_RUN} = Suite.constants;
+const {STATE_FAILED} = Runnable.constants;
+const {STATE_PASSED} = Runnable.constants;
+const {dQuote} = utils;
+const {ngettext} = utils;
+const {sQuote} = utils;
+const stackFilter = utils.stackTraceFilter();
+const {stringify} = utils;
+const {type} = utils;
+const {createInvalidExceptionError} = require('./errors');
 
 /**
  * Non-enumerable globals.
  * @readonly
  */
-var globals = [
+const globals = [
   'setTimeout',
   'clearTimeout',
   'setInterval',
@@ -5497,7 +5509,7 @@ var globals = [
   'clearImmediate'
 ];
 
-var constants = utils.defineConstants(
+const constants = utils.defineConstants(
   /**
    * {@link Runner}-related constants.
    * @public
@@ -5580,7 +5592,7 @@ module.exports = Runner;
  * until ready.
  */
 function Runner(suite, delay) {
-  var self = this;
+  const self = this;
   this._globals = [];
   this._abort = false;
   this._delay = delay;
@@ -5640,11 +5652,11 @@ Runner.prototype.grep = function(re, invert) {
  * @return {number}
  */
 Runner.prototype.grepTotal = function(suite) {
-  var self = this;
-  var total = 0;
+  const self = this;
+  let total = 0;
 
   suite.eachTest(function(test) {
-    var match = self._grep.test(test.fullTitle());
+    let match = self._grep.test(test.fullTitle());
     if (self._invert) {
       match = !match;
     }
@@ -5663,10 +5675,10 @@ Runner.prototype.grepTotal = function(suite) {
  * @private
  */
 Runner.prototype.globalProps = function() {
-  var props = Object.keys(global);
+  const props = Object.keys(global);
 
   // non-enumerables
-  for (var i = 0; i < globals.length; ++i) {
+  for (let i = 0; i < globals.length; ++i) {
     if (~props.indexOf(globals[i])) {
       continue;
     }
@@ -5702,10 +5714,10 @@ Runner.prototype.checkGlobals = function(test) {
   if (this.ignoreLeaks) {
     return;
   }
-  var ok = this._globals;
+  let ok = this._globals;
 
-  var globals = this.globalProps();
-  var leaks;
+  const globals = this.globalProps();
+  let leaks;
 
   if (test) {
     ok = ok.concat(test._allowedGlobals || []);
@@ -5720,12 +5732,12 @@ Runner.prototype.checkGlobals = function(test) {
   this._globals = this._globals.concat(leaks);
 
   if (leaks.length) {
-    var format = ngettext(
+    const format = ngettext(
       leaks.length,
       'global leak detected: %s',
       'global leaks detected: %s'
     );
-    var error = new Error(util.format(format, leaks.map(sQuote).join(', ')));
+    const error = new Error(util.format(format, leaks.map(sQuote).join(', ')));
     this.fail(test, error);
   }
 };
@@ -5784,15 +5796,15 @@ Runner.prototype.failHook = function(hook, err) {
   hook.originalTitle = hook.originalTitle || hook.title;
   if (hook.ctx && hook.ctx.currentTest) {
     hook.title =
-      hook.originalTitle + ' for ' + dQuote(hook.ctx.currentTest.title);
+      `${hook.originalTitle  } for ${  dQuote(hook.ctx.currentTest.title)}`;
   } else {
-    var parentTitle;
+    let parentTitle;
     if (hook.parent.title) {
       parentTitle = hook.parent.title;
     } else {
       parentTitle = hook.parent.root ? '{root}' : '';
     }
-    hook.title = hook.originalTitle + ' in ' + dQuote(parentTitle);
+    hook.title = `${hook.originalTitle  } in ${  dQuote(parentTitle)}`;
   }
 
   this.fail(hook, err);
@@ -5807,12 +5819,12 @@ Runner.prototype.failHook = function(hook, err) {
  */
 
 Runner.prototype.hook = function(name, fn) {
-  var suite = this.suite;
-  var hooks = suite.getHooks(name);
-  var self = this;
+  const {suite} = this;
+  const hooks = suite.getHooks(name);
+  const self = this;
 
   function next(i) {
-    var hook = hooks[i];
+    const hook = hooks[i];
     if (!hook) {
       return fn();
     }
@@ -5837,7 +5849,7 @@ Runner.prototype.hook = function(name, fn) {
     }
 
     hook.run(function(err) {
-      var testError = hook.error();
+      const testError = hook.error();
       if (testError) {
         self.fail(self.test, testError);
       }
@@ -5891,8 +5903,8 @@ Runner.prototype.hook = function(name, fn) {
  * @param {Function} fn
  */
 Runner.prototype.hooks = function(name, suites, fn) {
-  var self = this;
-  var orig = this.suite;
+  const self = this;
+  const orig = this.suite;
 
   function next(suite) {
     self.suite = suite;
@@ -5904,7 +5916,7 @@ Runner.prototype.hooks = function(name, suites, fn) {
 
     self.hook(name, function(err) {
       if (err) {
-        var errSuite = self.suite;
+        const errSuite = self.suite;
         self.suite = orig;
         return fn(err, errSuite);
       }
@@ -5924,7 +5936,7 @@ Runner.prototype.hooks = function(name, suites, fn) {
  * @private
  */
 Runner.prototype.hookUp = function(name, fn) {
-  var suites = [this.suite].concat(this.parents()).reverse();
+  const suites = [this.suite].concat(this.parents()).reverse();
   this.hooks(name, suites, fn);
 };
 
@@ -5936,7 +5948,7 @@ Runner.prototype.hookUp = function(name, fn) {
  * @private
  */
 Runner.prototype.hookDown = function(name, fn) {
-  var suites = [this.suite].concat(this.parents());
+  const suites = [this.suite].concat(this.parents());
   this.hooks(name, suites, fn);
 };
 
@@ -5948,8 +5960,8 @@ Runner.prototype.hookDown = function(name, fn) {
  * @private
  */
 Runner.prototype.parents = function() {
-  var suite = this.suite;
-  var suites = [];
+  let {suite} = this;
+  const suites = [];
   while (suite.parent) {
     suite = suite.parent;
     suites.push(suite);
@@ -5964,14 +5976,14 @@ Runner.prototype.parents = function() {
  * @private
  */
 Runner.prototype.runTest = function(fn) {
-  var self = this;
-  var test = this.test;
+  const self = this;
+  const {test} = this;
 
   if (!test) {
     return;
   }
 
-  var suite = this.parents().reverse()[0] || this.suite;
+  const suite = this.parents().reverse()[0] || this.suite;
   if (this.forbidOnly && suite.hasOnly()) {
     fn(new Error('`.only` forbidden'));
     return;
@@ -6001,13 +6013,13 @@ Runner.prototype.runTest = function(fn) {
  * @param {Function} fn
  */
 Runner.prototype.runTests = function(suite, fn) {
-  var self = this;
-  var tests = suite.tests.slice();
-  var test;
+  const self = this;
+  let tests = suite.tests.slice();
+  let test;
 
   function hookErr(_, errSuite, after) {
     // before/after Each hook for errSuite failed:
-    var orig = self.suite;
+    const orig = self.suite;
 
     // for failed 'after each' hook start from errSuite parent,
     // otherwise start from errSuite itself
@@ -6054,7 +6066,7 @@ Runner.prototype.runTests = function(suite, fn) {
     }
 
     // grep
-    var match = self._grep.test(test.fullTitle());
+    let match = self._grep.test(test.fullTitle());
     if (self._invert) {
       match = !match;
     }
@@ -6108,14 +6120,14 @@ Runner.prototype.runTests = function(suite, fn) {
       self.runTest(function(err) {
         test = self.test;
         if (err) {
-          var retry = test.currentRetry();
+          const retry = test.currentRetry();
           if (err instanceof Pending && self.forbidPending) {
             self.fail(test, new Error('Pending test forbidden'));
           } else if (err instanceof Pending) {
             test.pending = true;
             self.emit(constants.EVENT_TEST_PENDING, test);
           } else if (retry < test.retries()) {
-            var clonedTest = test.clone();
+            const clonedTest = test.clone();
             clonedTest.currentRetry(retry + 1);
             tests.unshift(clonedTest);
 
@@ -6161,10 +6173,10 @@ function alwaysFalse() {
  * @param {Function} fn
  */
 Runner.prototype.runSuite = function(suite, fn) {
-  var i = 0;
-  var self = this;
-  var total = this.grepTotal(suite);
-  var afterAllHookCalled = false;
+  let i = 0;
+  const self = this;
+  const total = this.grepTotal(suite);
+  let afterAllHookCalled = false;
 
   debug('run suite %s', suite.fullTitle());
 
@@ -6191,7 +6203,7 @@ Runner.prototype.runSuite = function(suite, fn) {
       return done();
     }
 
-    var curr = suite.suites[i++];
+    const curr = suite.suites[i++];
     if (!curr) {
       return done();
     }
@@ -6264,7 +6276,7 @@ Runner.prototype.uncaught = function(err) {
   }
   err.uncaught = true;
 
-  var runnable = this.currentRunnable;
+  let runnable = this.currentRunnable;
 
   if (!runnable) {
     runnable = new Runnable('Uncaught error outside test suite');
@@ -6291,7 +6303,7 @@ Runner.prototype.uncaught = function(err) {
   }
   // we cannot recover gracefully if a Runnable has already passed
   // then fails asynchronously
-  var alreadyPassed = runnable.isPassed();
+  const alreadyPassed = runnable.isPassed();
   // this will change the state to "failed" regardless of the current value
   this.fail(runnable, err);
   if (!alreadyPassed) {
@@ -6304,7 +6316,7 @@ Runner.prototype.uncaught = function(err) {
     debug(runnable);
 
     // recover from hooks
-    var errSuite = this.suite;
+    const errSuite = this.suite;
 
     // XXX how about a less awful way to determine this?
     // if hook failure is in afterEach block
@@ -6333,8 +6345,8 @@ Runner.prototype.uncaught = function(err) {
  * @return {Runner} Runner instance.
  */
 Runner.prototype.run = function(fn) {
-  var self = this;
-  var rootSuite = this.suite;
+  const self = this;
+  const rootSuite = this.suite;
 
   fn = fn || function() {};
 
@@ -6435,7 +6447,7 @@ function filterLeaks(ok, globals) {
       return false;
     }
 
-    var matched = ok.filter(function(ok) {
+    const matched = ok.filter(function(ok) {
       if (~ok.indexOf('*')) {
         return key.indexOf(ok.split('*')[0]) === 0;
       }
@@ -6467,7 +6479,7 @@ function isError(err) {
  */
 function thrown2Error(err) {
   return new Error(
-    'the ' + type(err) + ' ' + stringify(err) + ' was thrown, throw an Error :)'
+    `the ${  type(err)  } ${  stringify(err)  } was thrown, throw an Error :)`
   );
 }
 
@@ -6481,8 +6493,8 @@ function thrown2Error(err) {
  */
 function extraGlobals() {
   if (typeof process === 'object' && typeof process.version === 'string') {
-    var parts = process.version.split('.');
-    var nodeVersion = parts.reduce(function(a, v) {
+    const parts = process.version.split('.');
+    const nodeVersion = parts.reduce(function(a, v) {
       return (a << 8) | v;
     });
 
@@ -6513,14 +6525,14 @@ Runner.constants = constants;
  * @module
  */
 
-var constants = require('./runner').constants;
-var EVENT_TEST_PASS = constants.EVENT_TEST_PASS;
-var EVENT_TEST_FAIL = constants.EVENT_TEST_FAIL;
-var EVENT_SUITE_BEGIN = constants.EVENT_SUITE_BEGIN;
-var EVENT_RUN_BEGIN = constants.EVENT_RUN_BEGIN;
-var EVENT_TEST_PENDING = constants.EVENT_TEST_PENDING;
-var EVENT_RUN_END = constants.EVENT_RUN_END;
-var EVENT_TEST_END = constants.EVENT_TEST_END;
+const {constants} = require('./runner');
+const {EVENT_TEST_PASS} = constants;
+const {EVENT_TEST_FAIL} = constants;
+const {EVENT_SUITE_BEGIN} = constants;
+const {EVENT_RUN_BEGIN} = constants;
+const {EVENT_TEST_PENDING} = constants;
+const {EVENT_RUN_END} = constants;
+const {EVENT_TEST_END} = constants;
 
 /**
  * Test statistics collector.
@@ -6537,7 +6549,7 @@ var EVENT_TEST_END = constants.EVENT_TEST_END;
  * @property {number} duration - number of msecs that testing took.
  */
 
-var Date = global.Date;
+const {Date} = global;
 
 /**
  * Provides stats such as test duration, number of tests passed / failed etc., by listening for events emitted by `runner`.
@@ -6550,7 +6562,7 @@ function createStatsCollector(runner) {
   /**
    * @type StatsCollector
    */
-  var stats = {
+  const stats = {
     suites: 0,
     tests: 0,
     passes: 0,
@@ -6597,14 +6609,14 @@ module.exports = createStatsCollector;
 /**
  * Module dependencies.
  */
-var EventEmitter = require('events').EventEmitter;
-var Hook = require('./hook');
-var utils = require('./utils');
-var inherits = utils.inherits;
-var debug = require('debug')('mocha:suite');
-var milliseconds = require('ms');
-var errors = require('./errors');
-var createInvalidArgumentTypeError = errors.createInvalidArgumentTypeError;
+const {EventEmitter} = require('events');
+const Hook = require('./hook');
+const utils = require('./utils');
+const {inherits} = utils;
+const debug = require('debug')('mocha:suite');
+const milliseconds = require('ms');
+const errors = require('./errors');
+const {createInvalidArgumentTypeError} = errors;
 
 /**
  * Expose `Suite`.
@@ -6621,7 +6633,7 @@ exports = module.exports = Suite;
  * @return {Suite}
  */
 Suite.create = function(parent, title) {
-  var suite = new Suite(title, parent.ctx);
+  const suite = new Suite(title, parent.ctx);
   suite.parent = parent;
   title = suite.fullTitle();
   parent.addSuite(suite);
@@ -6642,9 +6654,9 @@ Suite.create = function(parent, title) {
 function Suite(title, parentContext, isRoot) {
   if (!utils.isString(title)) {
     throw createInvalidArgumentTypeError(
-      'Suite argument "title" must be a string. Received type "' +
-        typeof title +
-        '"',
+      `Suite argument "title" must be a string. Received type "${ 
+        typeof title 
+        }"`,
       'title',
       'string'
     );
@@ -6673,9 +6685,9 @@ function Suite(title, parentContext, isRoot) {
   this.on('newListener', function(event) {
     if (deprecatedEvents[event]) {
       utils.deprecate(
-        'Event "' +
-          event +
-          '" is deprecated.  Please let the Mocha team know about your use case: https://git.io/v6Lwm'
+        `Event "${ 
+          event 
+          }" is deprecated.  Please let the Mocha team know about your use case: https://git.io/v6Lwm`
       );
     }
   });
@@ -6693,7 +6705,7 @@ inherits(Suite, EventEmitter);
  * @return {Suite}
  */
 Suite.prototype.clone = function() {
-  var suite = new Suite(this.title);
+  const suite = new Suite(this.title);
   debug('clone');
   suite.ctx = this.ctx;
   suite.root = this.root;
@@ -6812,7 +6824,7 @@ Suite.prototype.isPending = function() {
  * @returns {Hook} A new hook
  */
 Suite.prototype._createHook = function(title, fn) {
-  var hook = new Hook(title, fn);
+  const hook = new Hook(title, fn);
   hook.parent = this;
   hook.timeout(this.timeout());
   hook.retries(this.retries());
@@ -6839,9 +6851,9 @@ Suite.prototype.beforeAll = function(title, fn) {
     fn = title;
     title = fn.name;
   }
-  title = '"before all" hook' + (title ? ': ' + title : '');
+  title = `"before all" hook${  title ? `: ${  title}` : ''}`;
 
-  var hook = this._createHook(title, fn);
+  const hook = this._createHook(title, fn);
   this._beforeAll.push(hook);
   this.emit(constants.EVENT_SUITE_ADD_HOOK_BEFORE_ALL, hook);
   return this;
@@ -6863,9 +6875,9 @@ Suite.prototype.afterAll = function(title, fn) {
     fn = title;
     title = fn.name;
   }
-  title = '"after all" hook' + (title ? ': ' + title : '');
+  title = `"after all" hook${  title ? `: ${  title}` : ''}`;
 
-  var hook = this._createHook(title, fn);
+  const hook = this._createHook(title, fn);
   this._afterAll.push(hook);
   this.emit(constants.EVENT_SUITE_ADD_HOOK_AFTER_ALL, hook);
   return this;
@@ -6887,9 +6899,9 @@ Suite.prototype.beforeEach = function(title, fn) {
     fn = title;
     title = fn.name;
   }
-  title = '"before each" hook' + (title ? ': ' + title : '');
+  title = `"before each" hook${  title ? `: ${  title}` : ''}`;
 
-  var hook = this._createHook(title, fn);
+  const hook = this._createHook(title, fn);
   this._beforeEach.push(hook);
   this.emit(constants.EVENT_SUITE_ADD_HOOK_BEFORE_EACH, hook);
   return this;
@@ -6911,9 +6923,9 @@ Suite.prototype.afterEach = function(title, fn) {
     fn = title;
     title = fn.name;
   }
-  title = '"after each" hook' + (title ? ': ' + title : '');
+  title = `"after each" hook${  title ? `: ${  title}` : ''}`;
 
-  var hook = this._createHook(title, fn);
+  const hook = this._createHook(title, fn);
   this._afterEach.push(hook);
   this.emit(constants.EVENT_SUITE_ADD_HOOK_AFTER_EACH, hook);
   return this;
@@ -6979,7 +6991,7 @@ Suite.prototype.fullTitle = function() {
  * @return {string}
  */
 Suite.prototype.titlePath = function() {
-  var result = [];
+  let result = [];
   if (this.parent) {
     result = result.concat(this.parent.titlePath());
   }
@@ -7068,7 +7080,7 @@ Suite.prototype.filterOnly = function filterOnly() {
       }
     });
     // Run the `only` suites, as well as any other suites that have `only` tests/suites as descendants.
-    var onlySuites = this._onlySuites;
+    const onlySuites = this._onlySuites;
     this.suites = this.suites.filter(function(childSuite) {
       return onlySuites.indexOf(childSuite) !== -1 || childSuite.filterOnly();
     });
@@ -7102,7 +7114,7 @@ Suite.prototype.appendOnlyTest = function(test) {
  * @private
  */
 Suite.prototype.getHooks = function getHooks(name) {
-  return this['_' + name];
+  return this[`_${  name}`];
 };
 
 /**
@@ -7117,7 +7129,7 @@ Suite.prototype.getHooks = function getHooks(name) {
  */
 Suite.prototype.cleanReferences = function cleanReferences() {
   function cleanArrReferences(arr) {
-    for (var i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
       delete arr[i].fn;
     }
   }
@@ -7138,7 +7150,7 @@ Suite.prototype.cleanReferences = function cleanReferences() {
     cleanArrReferences(this._afterEach);
   }
 
-  for (var i = 0; i < this.tests.length; i++) {
+  for (let i = 0; i < this.tests.length; i++) {
     delete this.tests[i].fn;
   }
 };
@@ -7237,11 +7249,12 @@ Suite.constants = constants;
 
 },{"./errors":6,"./hook":7,"./utils":38,"debug":45,"events":50,"ms":60}],37:[function(require,module,exports){
 'use strict';
-var Runnable = require('./runnable');
-var utils = require('./utils');
-var errors = require('./errors');
-var createInvalidArgumentTypeError = errors.createInvalidArgumentTypeError;
-var isString = utils.isString;
+
+const Runnable = require('./runnable');
+const utils = require('./utils');
+const errors = require('./errors');
+const {createInvalidArgumentTypeError} = errors;
+const {isString} = utils;
 
 module.exports = Test;
 
@@ -7257,9 +7270,9 @@ module.exports = Test;
 function Test(title, fn) {
   if (!isString(title)) {
     throw createInvalidArgumentTypeError(
-      'Test argument "title" should be a string. Received type "' +
-        typeof title +
-        '"',
+      `Test argument "title" should be a string. Received type "${ 
+        typeof title 
+        }"`,
       'title',
       'string'
     );
@@ -7275,7 +7288,7 @@ function Test(title, fn) {
 utils.inherits(Test, Runnable);
 
 Test.prototype.clone = function() {
-  var test = new Test(this.title, this.fn);
+  const test = new Test(this.title, this.fn);
   test.timeout(this.timeout());
   test.slow(this.slow());
   test.enableTimeouts(this.enableTimeouts());
@@ -7301,16 +7314,16 @@ Test.prototype.clone = function() {
  * Module dependencies.
  */
 
-var fs = require('fs');
-var path = require('path');
-var util = require('util');
-var glob = require('glob');
-var he = require('he');
-var errors = require('./errors');
-var createNoFilesMatchPatternError = errors.createNoFilesMatchPatternError;
-var createMissingArgumentError = errors.createMissingArgumentError;
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+const glob = require('glob');
+const he = require('he');
+const errors = require('./errors');
+const {createNoFilesMatchPatternError} = errors;
+const {createMissingArgumentError} = errors;
 
-var assign = (exports.assign = require('object.assign').getPolyfill());
+const assign = (exports.assign = require('object.assign').getPolyfill());
 
 /**
  * Inherit the prototype methods from one constructor into another.
@@ -7354,8 +7367,8 @@ exports.isString = function(obj) {
  * @param {Function} fn
  */
 exports.watch = function(files, fn) {
-  var options = {interval: 100};
-  var debug = require('debug')('mocha:watch');
+  const options = {interval: 100};
+  const debug = require('debug')('mocha:watch');
   files.forEach(function(file) {
     debug('file %s', file);
     fs.watchFile(file, options, function(curr, prev) {
@@ -7383,7 +7396,7 @@ exports.watch = function(files, fn) {
  * ['node_modules', 'test.js'].filter(considerFurther); // => ['test.js']
  */
 function considerFurther(pathname) {
-  var ignore = ['node_modules', '.git'];
+  const ignore = ['node_modules', '.git'];
 
   return !~ignore.indexOf(pathname);
 }
@@ -7408,7 +7421,7 @@ exports.files = function(dir, exts, ret) {
   fs.readdirSync(dir)
     .filter(considerFurther)
     .forEach(function(dirent) {
-      var pathname = path.join(dir, dirent);
+      const pathname = path.join(dir, dirent);
       if (fs.lstatSync(pathname).isDirectory()) {
         exports.files(pathname, exts, ret);
       } else if (hasMatchingExtname(pathname, exts)) {
@@ -7449,10 +7462,10 @@ exports.clean = function(str) {
       '$1$2$3'
     );
 
-  var spaces = str.match(/^\n?( *)/)[1].length;
-  var tabs = str.match(/^\n?(\t*)/)[1].length;
-  var re = new RegExp(
-    '^\n?' + (tabs ? '\t' : ' ') + '{' + (tabs || spaces) + '}',
+  const spaces = str.match(/^\n?( *)/)[1].length;
+  const tabs = str.match(/^\n?(\t*)/)[1].length;
+  const re = new RegExp(
+    `^\n?${  tabs ? '\t' : ' '  }{${  tabs || spaces  }}`,
     'gm'
   );
 
@@ -7473,9 +7486,9 @@ exports.parseQuery = function(qs) {
     .replace('?', '')
     .split('&')
     .reduce(function(obj, pair) {
-      var i = pair.indexOf('=');
-      var key = pair.slice(0, i);
-      var val = pair.slice(++i);
+      let i = pair.indexOf('=');
+      const key = pair.slice(0, i);
+      const val = pair.slice(++i);
 
       // Due to how the URLSearchParams API treats spaces
       obj[key] = decodeURIComponent(val.replace(/\+/g, '%20'));
@@ -7516,8 +7529,8 @@ function highlight(js) {
  * @param {string} name
  */
 exports.highlightTags = function(name) {
-  var code = document.getElementById('mocha').getElementsByTagName(name);
-  for (var i = 0, len = code.length; i < len; ++i) {
+  const code = document.getElementById('mocha').getElementsByTagName(name);
+  for (let i = 0, len = code.length; i < len; ++i) {
     code[i].innerHTML = highlight(code[i].innerHTML);
   }
 };
@@ -7570,12 +7583,12 @@ function emptyRepresentation(value, typeHint) {
  * type(global) // 'global'
  * type(new String('foo') // 'object'
  */
-var type = (exports.type = function type(value) {
+const type = (exports.type = function type(value) {
   if (value === undefined) {
     return 'undefined';
-  } else if (value === null) {
+  } if (value === null) {
     return 'null';
-  } else if (Buffer.isBuffer(value)) {
+  } if (Buffer.isBuffer(value)) {
     return 'buffer';
   }
   return Object.prototype.toString
@@ -7600,11 +7613,11 @@ var type = (exports.type = function type(value) {
  * @return {string}
  */
 exports.stringify = function(value) {
-  var typeHint = type(value);
+  let typeHint = type(value);
 
   if (!~['object', 'array', 'function'].indexOf(typeHint)) {
     if (typeHint === 'buffer') {
-      var json = Buffer.prototype.toJSON.call(value);
+      const json = Buffer.prototype.toJSON.call(value);
       // Based on the toJSON result
       return jsonStringify(
         json.data && json.type ? json.data : json,
@@ -7625,7 +7638,7 @@ exports.stringify = function(value) {
     }
   }
 
-  for (var prop in value) {
+  for (const prop in value) {
     if (Object.prototype.hasOwnProperty.call(value, prop)) {
       return jsonStringify(
         exports.canonicalize(value, null, typeHint),
@@ -7653,10 +7666,10 @@ function jsonStringify(object, spaces, depth) {
   }
 
   depth = depth || 1;
-  var space = spaces * depth;
-  var str = Array.isArray(object) ? '[' : '{';
-  var end = Array.isArray(object) ? ']' : '}';
-  var length =
+  let space = spaces * depth;
+  let str = Array.isArray(object) ? '[' : '{';
+  const end = Array.isArray(object) ? ']' : '}';
+  let length =
     typeof object.length === 'number'
       ? object.length
       : Object.keys(object).length;
@@ -7669,7 +7682,7 @@ function jsonStringify(object, spaces, depth) {
     switch (type(val)) {
       case 'null':
       case 'undefined':
-        val = '[' + val + ']';
+        val = `[${  val  }]`;
         break;
       case 'array':
       case 'object':
@@ -7686,13 +7699,13 @@ function jsonStringify(object, spaces, depth) {
         break;
       case 'date':
         var sDate = isNaN(val.getTime()) ? val.toString() : val.toISOString();
-        val = '[Date: ' + sDate + ']';
+        val = `[Date: ${  sDate  }]`;
         break;
       case 'buffer':
         var json = val.toJSON();
         // Based on the toJSON result
         json = json.data && json.type ? json.data : json;
-        val = '[Buffer: ' + jsonStringify(json, 2, depth + 1) + ']';
+        val = `[Buffer: ${  jsonStringify(json, 2, depth + 1)  }]`;
         break;
       default:
         val =
@@ -7703,23 +7716,23 @@ function jsonStringify(object, spaces, depth) {
     return val;
   }
 
-  for (var i in object) {
+  for (const i in object) {
     if (!Object.prototype.hasOwnProperty.call(object, i)) {
       continue; // not my business
     }
     --length;
     str +=
-      '\n ' +
-      repeat(' ', space) +
-      (Array.isArray(object) ? '' : '"' + i + '": ') + // key
-      _stringify(object[i]) + // value
-      (length ? ',' : ''); // comma
+      `\n ${ 
+      repeat(' ', space) 
+      }${Array.isArray(object) ? '' : `"${  i  }": `  // key
+      }${_stringify(object[i])  // value
+      }${length ? ',' : ''}`; // comma
   }
 
   return (
     str +
     // [], {}
-    (str.length !== 1 ? '\n' + repeat(' ', --space) + end : end)
+    (str.length !== 1 ? `\n${  repeat(' ', --space)  }${end}` : end)
   );
 }
 
@@ -7743,9 +7756,9 @@ function jsonStringify(object, spaces, depth) {
  * @return {(Object|Array|Function|string|undefined)}
  */
 exports.canonicalize = function canonicalize(value, stack, typeHint) {
-  var canonicalizedObj;
+  let canonicalizedObj;
   /* eslint-disable no-unused-vars */
-  var prop;
+  let prop;
   /* eslint-enable no-unused-vars */
   typeHint = typeHint || type(value);
   function withStack(value, fn) {
@@ -7803,7 +7816,7 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
       canonicalizedObj = value;
       break;
     default:
-      canonicalizedObj = value + '';
+      canonicalizedObj = `${value  }`;
   }
 
   return canonicalizedObj;
@@ -7820,7 +7833,7 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
  * hasMatchingExtname('foo.html', ['js', 'css']); // => false
  */
 function hasMatchingExtname(pathname, exts) {
-  var suffix = path.extname(pathname).slice(1);
+  const suffix = path.extname(pathname).slice(1);
   return exts.some(function(element) {
     return suffix === element;
   });
@@ -7863,18 +7876,18 @@ function isHiddenOnUnix(pathname) {
  * @throws {TypeError} if `filepath` is directory and `extensions` not provided.
  */
 exports.lookupFiles = function lookupFiles(filepath, extensions, recursive) {
-  var files = [];
-  var stat;
+  let files = [];
+  let stat;
 
   if (!fs.existsSync(filepath)) {
-    if (fs.existsSync(filepath + '.js')) {
+    if (fs.existsSync(`${filepath  }.js`)) {
       filepath += '.js';
     } else {
       // Handle glob
       files = glob.sync(filepath);
       if (!files.length) {
         throw createNoFilesMatchPatternError(
-          'Cannot find any files matching pattern ' + exports.dQuote(filepath),
+          `Cannot find any files matching pattern ${  exports.dQuote(filepath)}`,
           filepath
         );
       }
@@ -7895,8 +7908,8 @@ exports.lookupFiles = function lookupFiles(filepath, extensions, recursive) {
 
   // Handle directory
   fs.readdirSync(filepath).forEach(function(dirent) {
-    var pathname = path.join(filepath, dirent);
-    var stat;
+    const pathname = path.join(filepath, dirent);
+    let stat;
 
     try {
       stat = fs.statSync(pathname);
@@ -7945,7 +7958,7 @@ function emitWarning(msg, type) {
     process.emitWarning(msg, type);
   } else {
     process.nextTick(function() {
-      console.warn(type + ': ' + msg);
+      console.warn(`${type  }: ${  msg}`);
     });
   }
 }
@@ -7990,9 +8003,9 @@ exports.warn = function warn(msg) {
  */
 exports.stackTraceFilter = function() {
   // TODO: Replace with `process.browser`
-  var is = typeof document === 'undefined' ? {node: true} : {browser: true};
-  var slash = path.sep;
-  var cwd;
+  const is = typeof document === 'undefined' ? {node: true} : {browser: true};
+  let slash = path.sep;
+  let cwd;
   if (is.node) {
     cwd = process.cwd() + slash;
   } else {
@@ -8005,8 +8018,8 @@ exports.stackTraceFilter = function() {
 
   function isMochaInternal(line) {
     return (
-      ~line.indexOf('node_modules' + slash + 'mocha' + slash) ||
-      ~line.indexOf(slash + 'mocha.js')
+      ~line.indexOf(`node_modules${  slash  }mocha${  slash}`) ||
+      ~line.indexOf(`${slash  }mocha.js`)
     );
   }
 
@@ -8035,7 +8048,7 @@ exports.stackTraceFilter = function() {
 
       // Clean up cwd(absolute)
       if (/:\d+:\d+\)?$/.test(line)) {
-        line = line.replace('(' + cwd, '(');
+        line = line.replace(`(${  cwd}`, '(');
       }
 
       list.push(line);
@@ -8087,7 +8100,7 @@ exports.clamp = function clamp(value, range) {
  * sQuote('n') // => 'n'
  */
 exports.sQuote = function(str) {
-  return "'" + str + "'";
+  return `'${  str  }'`;
 };
 
 /**
@@ -8106,7 +8119,7 @@ exports.sQuote = function(str) {
  * dQuote('number') // => "number"
  */
 exports.dQuote = function(str) {
-  return '"' + str + '"';
+  return `"${  str  }"`;
 };
 
 /**
@@ -8196,12 +8209,12 @@ exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
 
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+const lookup = []
+const revLookup = []
+const Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
+const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (let i = 0, len = code.length; i < len; ++i) {
   lookup[i] = code[i]
   revLookup[code.charCodeAt(i)] = i
 }
@@ -8212,7 +8225,7 @@ revLookup['-'.charCodeAt(0)] = 62
 revLookup['_'.charCodeAt(0)] = 63
 
 function getLens (b64) {
-  var len = b64.length
+  const len = b64.length
 
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
@@ -8220,10 +8233,10 @@ function getLens (b64) {
 
   // Trim off extra bytes after placeholder bytes are found
   // See: https://github.com/beatgammit/base64-js/issues/42
-  var validLen = b64.indexOf('=')
+  let validLen = b64.indexOf('=')
   if (validLen === -1) validLen = len
 
-  var placeHoldersLen = validLen === len
+  const placeHoldersLen = validLen === len
     ? 0
     : 4 - (validLen % 4)
 
@@ -8232,9 +8245,9 @@ function getLens (b64) {
 
 // base64 is 4/3 + up to two characters of the original data
 function byteLength (b64) {
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
+  const lens = getLens(b64)
+  const validLen = lens[0]
+  const placeHoldersLen = lens[1]
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
@@ -8243,17 +8256,17 @@ function _byteLength (b64, validLen, placeHoldersLen) {
 }
 
 function toByteArray (b64) {
-  var tmp
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
+  let tmp
+  const lens = getLens(b64)
+  const validLen = lens[0]
+  const placeHoldersLen = lens[1]
 
-  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+  const arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
 
-  var curByte = 0
+  let curByte = 0
 
   // if there are placeholders, only get up to the last complete 4 chars
-  var len = placeHoldersLen > 0
+  const len = placeHoldersLen > 0
     ? validLen - 4
     : validLen
 
@@ -8295,9 +8308,9 @@ function tripletToBase64 (num) {
 }
 
 function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
+  let tmp
+  const output = []
+  for (let i = start; i < end; i += 3) {
     tmp =
       ((uint8[i] << 16) & 0xFF0000) +
       ((uint8[i + 1] << 8) & 0xFF00) +
@@ -8308,14 +8321,14 @@ function encodeChunk (uint8, start, end) {
 }
 
 function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
+  let tmp
+  const len = uint8.length
+  const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  const parts = []
+  const maxChunkLength = 16383 // must be multiple of 3
 
   // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+  for (let i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
     parts.push(encodeChunk(
       uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
     ))
@@ -8325,17 +8338,17 @@ function fromByteArray (uint8) {
   if (extraBytes === 1) {
     tmp = uint8[len - 1]
     parts.push(
-      lookup[tmp >> 2] +
-      lookup[(tmp << 4) & 0x3F] +
-      '=='
+      `${lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] 
+      }==`
     )
   } else if (extraBytes === 2) {
     tmp = (uint8[len - 2] << 8) + uint8[len - 1]
     parts.push(
-      lookup[tmp >> 10] +
+      `${lookup[tmp >> 10] +
       lookup[(tmp >> 4) & 0x3F] +
-      lookup[(tmp << 2) & 0x3F] +
-      '='
+      lookup[(tmp << 2) & 0x3F] 
+      }=`
     )
   }
 
@@ -8346,8 +8359,8 @@ function fromByteArray (uint8) {
 
 },{}],41:[function(require,module,exports){
 (function (process){
-var WritableStream = require('stream').Writable
-var inherits = require('util').inherits
+const WritableStream = require('stream').Writable
+const {inherits} = require('util')
 
 module.exports = BrowserStdout
 
@@ -8363,11 +8376,11 @@ function BrowserStdout(opts) {
 }
 
 BrowserStdout.prototype._write = function(chunks, encoding, cb) {
-  var output = chunks.toString ? chunks.toString() : chunks
+  const output = chunks.toString ? chunks.toString() : chunks
   if (this.label === false) {
     console.log(output)
   } else {
-    console.log(this.label+':', output)
+    console.log(`${this.label}:`, output)
   }
   process.nextTick(cb)
 }
@@ -8387,14 +8400,14 @@ arguments[4][40][0].apply(exports,arguments)
 
 'use strict'
 
-var base64 = require('base64-js')
-var ieee754 = require('ieee754')
+const base64 = require('base64-js')
+const ieee754 = require('ieee754')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
 
-var K_MAX_LENGTH = 0x7fffffff
+const K_MAX_LENGTH = 0x7fffffff
 exports.kMaxLength = K_MAX_LENGTH
 
 /**
@@ -8424,8 +8437,8 @@ if (!Buffer.TYPED_ARRAY_SUPPORT && typeof console !== 'undefined' &&
 function typedArraySupport () {
   // Can typed array instances can be augmented?
   try {
-    var arr = new Uint8Array(1)
-    arr.__proto__ = { __proto__: Uint8Array.prototype, foo: function () { return 42 } }
+    const arr = new Uint8Array(1)
+    arr.__proto__ = { __proto__: Uint8Array.prototype, foo () { return 42 } }
     return arr.foo() === 42
   } catch (e) {
     return false
@@ -8434,7 +8447,7 @@ function typedArraySupport () {
 
 Object.defineProperty(Buffer.prototype, 'parent', {
   enumerable: true,
-  get: function () {
+  get () {
     if (!Buffer.isBuffer(this)) return undefined
     return this.buffer
   }
@@ -8442,7 +8455,7 @@ Object.defineProperty(Buffer.prototype, 'parent', {
 
 Object.defineProperty(Buffer.prototype, 'offset', {
   enumerable: true,
-  get: function () {
+  get () {
     if (!Buffer.isBuffer(this)) return undefined
     return this.byteOffset
   }
@@ -8450,10 +8463,10 @@ Object.defineProperty(Buffer.prototype, 'offset', {
 
 function createBuffer (length) {
   if (length > K_MAX_LENGTH) {
-    throw new RangeError('The value "' + length + '" is invalid for option "size"')
+    throw new RangeError(`The value "${  length  }" is invalid for option "size"`)
   }
   // Return an augmented `Uint8Array` instance
-  var buf = new Uint8Array(length)
+  const buf = new Uint8Array(length)
   buf.__proto__ = Buffer.prototype
   return buf
 }
@@ -8505,8 +8518,8 @@ function from (value, encodingOrOffset, length) {
 
   if (value == null) {
     throw TypeError(
-      'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-      'or Array-like Object. Received type ' + (typeof value)
+      `${'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
+      'or Array-like Object. Received type '}${  typeof value}`
     )
   }
 
@@ -8521,12 +8534,12 @@ function from (value, encodingOrOffset, length) {
     )
   }
 
-  var valueOf = value.valueOf && value.valueOf()
+  const valueOf = value.valueOf && value.valueOf()
   if (valueOf != null && valueOf !== value) {
     return Buffer.from(valueOf, encodingOrOffset, length)
   }
 
-  var b = fromObject(value)
+  const b = fromObject(value)
   if (b) return b
 
   if (typeof Symbol !== 'undefined' && Symbol.toPrimitive != null &&
@@ -8537,8 +8550,8 @@ function from (value, encodingOrOffset, length) {
   }
 
   throw new TypeError(
-    'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-    'or Array-like Object. Received type ' + (typeof value)
+    `${'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
+    'or Array-like Object. Received type '}${  typeof value}`
   )
 }
 
@@ -8549,7 +8562,7 @@ function from (value, encodingOrOffset, length) {
  * Buffer.from(array)
  * Buffer.from(buffer)
  * Buffer.from(arrayBuffer[, byteOffset[, length]])
- **/
+ * */
 Buffer.from = function (value, encodingOrOffset, length) {
   return from(value, encodingOrOffset, length)
 }
@@ -8563,7 +8576,7 @@ function assertSize (size) {
   if (typeof size !== 'number') {
     throw new TypeError('"size" argument must be of type number')
   } else if (size < 0) {
-    throw new RangeError('The value "' + size + '" is invalid for option "size"')
+    throw new RangeError(`The value "${  size  }" is invalid for option "size"`)
   }
 }
 
@@ -8586,7 +8599,7 @@ function alloc (size, fill, encoding) {
 /**
  * Creates a new filled Buffer instance.
  * alloc(size[, fill[, encoding]])
- **/
+ * */
 Buffer.alloc = function (size, fill, encoding) {
   return alloc(size, fill, encoding)
 }
@@ -8615,13 +8628,13 @@ function fromString (string, encoding) {
   }
 
   if (!Buffer.isEncoding(encoding)) {
-    throw new TypeError('Unknown encoding: ' + encoding)
+    throw new TypeError(`Unknown encoding: ${  encoding}`)
   }
 
-  var length = byteLength(string, encoding) | 0
-  var buf = createBuffer(length)
+  const length = byteLength(string, encoding) | 0
+  let buf = createBuffer(length)
 
-  var actual = buf.write(string, encoding)
+  const actual = buf.write(string, encoding)
 
   if (actual !== length) {
     // Writing a hex string, for example, that contains invalid characters will
@@ -8634,9 +8647,9 @@ function fromString (string, encoding) {
 }
 
 function fromArrayLike (array) {
-  var length = array.length < 0 ? 0 : checked(array.length) | 0
-  var buf = createBuffer(length)
-  for (var i = 0; i < length; i += 1) {
+  const length = array.length < 0 ? 0 : checked(array.length) | 0
+  const buf = createBuffer(length)
+  for (let i = 0; i < length; i += 1) {
     buf[i] = array[i] & 255
   }
   return buf
@@ -8651,7 +8664,7 @@ function fromArrayBuffer (array, byteOffset, length) {
     throw new RangeError('"length" is outside of buffer bounds')
   }
 
-  var buf
+  let buf
   if (byteOffset === undefined && length === undefined) {
     buf = new Uint8Array(array)
   } else if (length === undefined) {
@@ -8667,8 +8680,8 @@ function fromArrayBuffer (array, byteOffset, length) {
 
 function fromObject (obj) {
   if (Buffer.isBuffer(obj)) {
-    var len = checked(obj.length) | 0
-    var buf = createBuffer(len)
+    const len = checked(obj.length) | 0
+    const buf = createBuffer(len)
 
     if (buf.length === 0) {
       return buf
@@ -8694,8 +8707,8 @@ function checked (length) {
   // Note: cannot use `length < K_MAX_LENGTH` here because that fails when
   // length is NaN (which is otherwise coerced to zero.)
   if (length >= K_MAX_LENGTH) {
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-                         'size: 0x' + K_MAX_LENGTH.toString(16) + ' bytes')
+    throw new RangeError(`${'Attempt to allocate Buffer larger than maximum ' +
+                         'size: 0x'}${  K_MAX_LENGTH.toString(16)  } bytes`)
   }
   return length | 0
 }
@@ -8723,10 +8736,10 @@ Buffer.compare = function compare (a, b) {
 
   if (a === b) return 0
 
-  var x = a.length
-  var y = b.length
+  let x = a.length
+  let y = b.length
 
-  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+  for (let i = 0, len = Math.min(x, y); i < len; ++i) {
     if (a[i] !== b[i]) {
       x = a[i]
       y = b[i]
@@ -8767,7 +8780,7 @@ Buffer.concat = function concat (list, length) {
     return Buffer.alloc(0)
   }
 
-  var i
+  let i
   if (length === undefined) {
     length = 0
     for (i = 0; i < list.length; ++i) {
@@ -8775,10 +8788,10 @@ Buffer.concat = function concat (list, length) {
     }
   }
 
-  var buffer = Buffer.allocUnsafe(length)
-  var pos = 0
+  const buffer = Buffer.allocUnsafe(length)
+  let pos = 0
   for (i = 0; i < list.length; ++i) {
-    var buf = list[i]
+    let buf = list[i]
     if (isInstance(buf, Uint8Array)) {
       buf = Buffer.from(buf)
     }
@@ -8800,17 +8813,17 @@ function byteLength (string, encoding) {
   }
   if (typeof string !== 'string') {
     throw new TypeError(
-      'The "string" argument must be one of type string, Buffer, or ArrayBuffer. ' +
-      'Received type ' + typeof string
+      `${'The "string" argument must be one of type string, Buffer, or ArrayBuffer. ' +
+      'Received type '}${  typeof string}`
     )
   }
 
-  var len = string.length
-  var mustMatch = (arguments.length > 2 && arguments[2] === true)
+  const len = string.length
+  const mustMatch = (arguments.length > 2 && arguments[2] === true)
   if (!mustMatch && len === 0) return 0
 
   // Use a for loop to avoid recursion
-  var loweredCase = false
+  let loweredCase = false
   for (;;) {
     switch (encoding) {
       case 'ascii':
@@ -8833,7 +8846,7 @@ function byteLength (string, encoding) {
         if (loweredCase) {
           return mustMatch ? -1 : utf8ToBytes(string).length // assume utf8
         }
-        encoding = ('' + encoding).toLowerCase()
+        encoding = (`${  encoding}`).toLowerCase()
         loweredCase = true
     }
   }
@@ -8841,7 +8854,7 @@ function byteLength (string, encoding) {
 Buffer.byteLength = byteLength
 
 function slowToString (encoding, start, end) {
-  var loweredCase = false
+  let loweredCase = false
 
   // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
   // property of a typed array.
@@ -8903,8 +8916,8 @@ function slowToString (encoding, start, end) {
         return utf16leSlice(this, start, end)
 
       default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
+        if (loweredCase) throw new TypeError(`Unknown encoding: ${  encoding}`)
+        encoding = (`${encoding  }`).toLowerCase()
         loweredCase = true
     }
   }
@@ -8919,28 +8932,28 @@ function slowToString (encoding, start, end) {
 Buffer.prototype._isBuffer = true
 
 function swap (b, n, m) {
-  var i = b[n]
+  const i = b[n]
   b[n] = b[m]
   b[m] = i
 }
 
 Buffer.prototype.swap16 = function swap16 () {
-  var len = this.length
+  const len = this.length
   if (len % 2 !== 0) {
     throw new RangeError('Buffer size must be a multiple of 16-bits')
   }
-  for (var i = 0; i < len; i += 2) {
+  for (let i = 0; i < len; i += 2) {
     swap(this, i, i + 1)
   }
   return this
 }
 
 Buffer.prototype.swap32 = function swap32 () {
-  var len = this.length
+  const len = this.length
   if (len % 4 !== 0) {
     throw new RangeError('Buffer size must be a multiple of 32-bits')
   }
-  for (var i = 0; i < len; i += 4) {
+  for (let i = 0; i < len; i += 4) {
     swap(this, i, i + 3)
     swap(this, i + 1, i + 2)
   }
@@ -8948,11 +8961,11 @@ Buffer.prototype.swap32 = function swap32 () {
 }
 
 Buffer.prototype.swap64 = function swap64 () {
-  var len = this.length
+  const len = this.length
   if (len % 8 !== 0) {
     throw new RangeError('Buffer size must be a multiple of 64-bits')
   }
-  for (var i = 0; i < len; i += 8) {
+  for (let i = 0; i < len; i += 8) {
     swap(this, i, i + 7)
     swap(this, i + 1, i + 6)
     swap(this, i + 2, i + 5)
@@ -8962,7 +8975,7 @@ Buffer.prototype.swap64 = function swap64 () {
 }
 
 Buffer.prototype.toString = function toString () {
-  var length = this.length
+  const {length} = this
   if (length === 0) return ''
   if (arguments.length === 0) return utf8Slice(this, 0, length)
   return slowToString.apply(this, arguments)
@@ -8977,11 +8990,11 @@ Buffer.prototype.equals = function equals (b) {
 }
 
 Buffer.prototype.inspect = function inspect () {
-  var str = ''
-  var max = exports.INSPECT_MAX_BYTES
+  let str = ''
+  const max = exports.INSPECT_MAX_BYTES
   str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
   if (this.length > max) str += ' ... '
-  return '<Buffer ' + str + '>'
+  return `<Buffer ${  str  }>`
 }
 
 Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
@@ -8990,8 +9003,8 @@ Buffer.prototype.compare = function compare (target, start, end, thisStart, this
   }
   if (!Buffer.isBuffer(target)) {
     throw new TypeError(
-      'The "target" argument must be one of type Buffer or Uint8Array. ' +
-      'Received type ' + (typeof target)
+      `${'The "target" argument must be one of type Buffer or Uint8Array. ' +
+      'Received type '}${  typeof target}`
     )
   }
 
@@ -9029,14 +9042,14 @@ Buffer.prototype.compare = function compare (target, start, end, thisStart, this
 
   if (this === target) return 0
 
-  var x = thisEnd - thisStart
-  var y = end - start
-  var len = Math.min(x, y)
+  let x = thisEnd - thisStart
+  let y = end - start
+  const len = Math.min(x, y)
 
-  var thisCopy = this.slice(thisStart, thisEnd)
-  var targetCopy = target.slice(start, end)
+  const thisCopy = this.slice(thisStart, thisEnd)
+  const targetCopy = target.slice(start, end)
 
-  for (var i = 0; i < len; ++i) {
+  for (let i = 0; i < len; ++i) {
     if (thisCopy[i] !== targetCopy[i]) {
       x = thisCopy[i]
       y = targetCopy[i]
@@ -9081,7 +9094,7 @@ function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
   if (byteOffset < 0) byteOffset = buffer.length + byteOffset
   if (byteOffset >= buffer.length) {
     if (dir) return -1
-    else byteOffset = buffer.length - 1
+    byteOffset = buffer.length - 1
   } else if (byteOffset < 0) {
     if (dir) byteOffset = 0
     else return -1
@@ -9099,14 +9112,14 @@ function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
       return -1
     }
     return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
-  } else if (typeof val === 'number') {
-    val = val & 0xFF // Search for a byte value [0-255]
+  } if (typeof val === 'number') {
+    val &= 0xFF // Search for a byte value [0-255]
     if (typeof Uint8Array.prototype.indexOf === 'function') {
       if (dir) {
         return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
-      } else {
+      } 
         return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
-      }
+      
     }
     return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
   }
@@ -9115,9 +9128,9 @@ function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
 }
 
 function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
-  var indexSize = 1
-  var arrLength = arr.length
-  var valLength = val.length
+  let indexSize = 1
+  let arrLength = arr.length
+  let valLength = val.length
 
   if (encoding !== undefined) {
     encoding = String(encoding).toLowerCase()
@@ -9136,14 +9149,14 @@ function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
   function read (buf, i) {
     if (indexSize === 1) {
       return buf[i]
-    } else {
+    } 
       return buf.readUInt16BE(i * indexSize)
-    }
+    
   }
 
-  var i
+  let i
   if (dir) {
-    var foundIndex = -1
+    let foundIndex = -1
     for (i = byteOffset; i < arrLength; i++) {
       if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
         if (foundIndex === -1) foundIndex = i
@@ -9156,8 +9169,8 @@ function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
   } else {
     if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
     for (i = byteOffset; i >= 0; i--) {
-      var found = true
-      for (var j = 0; j < valLength; j++) {
+      let found = true
+      for (let j = 0; j < valLength; j++) {
         if (read(arr, i + j) !== read(val, j)) {
           found = false
           break
@@ -9184,7 +9197,7 @@ Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) 
 
 function hexWrite (buf, string, offset, length) {
   offset = Number(offset) || 0
-  var remaining = buf.length - offset
+  const remaining = buf.length - offset
   if (!length) {
     length = remaining
   } else {
@@ -9194,13 +9207,13 @@ function hexWrite (buf, string, offset, length) {
     }
   }
 
-  var strLen = string.length
+  const strLen = string.length
 
   if (length > strLen / 2) {
     length = strLen / 2
   }
   for (var i = 0; i < length; ++i) {
-    var parsed = parseInt(string.substr(i * 2, 2), 16)
+    const parsed = parseInt(string.substr(i * 2, 2), 16)
     if (numberIsNaN(parsed)) return i
     buf[offset + i] = parsed
   }
@@ -9240,9 +9253,9 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
     offset = 0
   // Buffer#write(string, offset[, length][, encoding])
   } else if (isFinite(offset)) {
-    offset = offset >>> 0
+    offset >>>= 0
     if (isFinite(length)) {
-      length = length >>> 0
+      length >>>= 0
       if (encoding === undefined) encoding = 'utf8'
     } else {
       encoding = length
@@ -9254,7 +9267,7 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
     )
   }
 
-  var remaining = this.length - offset
+  const remaining = this.length - offset
   if (length === undefined || length > remaining) length = remaining
 
   if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
@@ -9263,7 +9276,7 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
 
   if (!encoding) encoding = 'utf8'
 
-  var loweredCase = false
+  let loweredCase = false
   for (;;) {
     switch (encoding) {
       case 'hex':
@@ -9291,8 +9304,8 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
         return ucs2Write(this, string, offset, length)
 
       default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = ('' + encoding).toLowerCase()
+        if (loweredCase) throw new TypeError(`Unknown encoding: ${  encoding}`)
+        encoding = (`${  encoding}`).toLowerCase()
         loweredCase = true
     }
   }
@@ -9308,26 +9321,26 @@ Buffer.prototype.toJSON = function toJSON () {
 function base64Slice (buf, start, end) {
   if (start === 0 && end === buf.length) {
     return base64.fromByteArray(buf)
-  } else {
+  } 
     return base64.fromByteArray(buf.slice(start, end))
-  }
+  
 }
 
 function utf8Slice (buf, start, end) {
   end = Math.min(buf.length, end)
-  var res = []
+  const res = []
 
-  var i = start
+  let i = start
   while (i < end) {
-    var firstByte = buf[i]
-    var codePoint = null
-    var bytesPerSequence = (firstByte > 0xEF) ? 4
+    const firstByte = buf[i]
+    let codePoint = null
+    let bytesPerSequence = (firstByte > 0xEF) ? 4
       : (firstByte > 0xDF) ? 3
         : (firstByte > 0xBF) ? 2
           : 1
 
     if (i + bytesPerSequence <= end) {
-      var secondByte, thirdByte, fourthByte, tempCodePoint
+      var secondByte; var thirdByte; var fourthByte; var tempCodePoint
 
       switch (bytesPerSequence) {
         case 1:
@@ -9389,17 +9402,17 @@ function utf8Slice (buf, start, end) {
 // Based on http://stackoverflow.com/a/22747272/680742, the browser with
 // the lowest limit is Chrome, with 0x10000 args.
 // We go 1 magnitude less, for safety
-var MAX_ARGUMENTS_LENGTH = 0x1000
+const MAX_ARGUMENTS_LENGTH = 0x1000
 
 function decodeCodePointsArray (codePoints) {
-  var len = codePoints.length
+  const len = codePoints.length
   if (len <= MAX_ARGUMENTS_LENGTH) {
     return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
   }
 
   // Decode in chunks to avoid "call stack size exceeded".
-  var res = ''
-  var i = 0
+  let res = ''
+  let i = 0
   while (i < len) {
     res += String.fromCharCode.apply(
       String,
@@ -9410,49 +9423,49 @@ function decodeCodePointsArray (codePoints) {
 }
 
 function asciiSlice (buf, start, end) {
-  var ret = ''
+  let ret = ''
   end = Math.min(buf.length, end)
 
-  for (var i = start; i < end; ++i) {
+  for (let i = start; i < end; ++i) {
     ret += String.fromCharCode(buf[i] & 0x7F)
   }
   return ret
 }
 
 function latin1Slice (buf, start, end) {
-  var ret = ''
+  let ret = ''
   end = Math.min(buf.length, end)
 
-  for (var i = start; i < end; ++i) {
+  for (let i = start; i < end; ++i) {
     ret += String.fromCharCode(buf[i])
   }
   return ret
 }
 
 function hexSlice (buf, start, end) {
-  var len = buf.length
+  const len = buf.length
 
   if (!start || start < 0) start = 0
   if (!end || end < 0 || end > len) end = len
 
-  var out = ''
-  for (var i = start; i < end; ++i) {
+  let out = ''
+  for (let i = start; i < end; ++i) {
     out += toHex(buf[i])
   }
   return out
 }
 
 function utf16leSlice (buf, start, end) {
-  var bytes = buf.slice(start, end)
-  var res = ''
-  for (var i = 0; i < bytes.length; i += 2) {
+  const bytes = buf.slice(start, end)
+  let res = ''
+  for (let i = 0; i < bytes.length; i += 2) {
     res += String.fromCharCode(bytes[i] + (bytes[i + 1] * 256))
   }
   return res
 }
 
 Buffer.prototype.slice = function slice (start, end) {
-  var len = this.length
+  const len = this.length
   start = ~~start
   end = end === undefined ? len : ~~end
 
@@ -9472,7 +9485,7 @@ Buffer.prototype.slice = function slice (start, end) {
 
   if (end < start) end = start
 
-  var newBuf = this.subarray(start, end)
+  const newBuf = this.subarray(start, end)
   // Return an augmented `Uint8Array` instance
   newBuf.__proto__ = Buffer.prototype
   return newBuf
@@ -9487,13 +9500,13 @@ function checkOffset (offset, ext, length) {
 }
 
 Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) checkOffset(offset, byteLength, this.length)
 
-  var val = this[offset]
-  var mul = 1
-  var i = 0
+  let val = this[offset]
+  let mul = 1
+  let i = 0
   while (++i < byteLength && (mul *= 0x100)) {
     val += this[offset + i] * mul
   }
@@ -9502,14 +9515,14 @@ Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert)
 }
 
 Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) {
     checkOffset(offset, byteLength, this.length)
   }
 
-  var val = this[offset + --byteLength]
-  var mul = 1
+  let val = this[offset + --byteLength]
+  let mul = 1
   while (byteLength > 0 && (mul *= 0x100)) {
     val += this[offset + --byteLength] * mul
   }
@@ -9518,25 +9531,25 @@ Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert)
 }
 
 Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 1, this.length)
   return this[offset]
 }
 
 Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 2, this.length)
   return this[offset] | (this[offset + 1] << 8)
 }
 
 Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 2, this.length)
   return (this[offset] << 8) | this[offset + 1]
 }
 
 Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
 
   return ((this[offset]) |
@@ -9546,7 +9559,7 @@ Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
 }
 
 Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset] * 0x1000000) +
@@ -9556,13 +9569,13 @@ Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
 }
 
 Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) checkOffset(offset, byteLength, this.length)
 
-  var val = this[offset]
-  var mul = 1
-  var i = 0
+  let val = this[offset]
+  let mul = 1
+  let i = 0
   while (++i < byteLength && (mul *= 0x100)) {
     val += this[offset + i] * mul
   }
@@ -9574,13 +9587,13 @@ Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
 }
 
 Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) checkOffset(offset, byteLength, this.length)
 
-  var i = byteLength
-  var mul = 1
-  var val = this[offset + --i]
+  let i = byteLength
+  let mul = 1
+  let val = this[offset + --i]
   while (i > 0 && (mul *= 0x100)) {
     val += this[offset + --i] * mul
   }
@@ -9592,28 +9605,28 @@ Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
 }
 
 Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 1, this.length)
   if (!(this[offset] & 0x80)) return (this[offset])
   return ((0xff - this[offset] + 1) * -1)
 }
 
 Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 2, this.length)
-  var val = this[offset] | (this[offset + 1] << 8)
+  const val = this[offset] | (this[offset + 1] << 8)
   return (val & 0x8000) ? val | 0xFFFF0000 : val
 }
 
 Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 2, this.length)
-  var val = this[offset + 1] | (this[offset] << 8)
+  const val = this[offset + 1] | (this[offset] << 8)
   return (val & 0x8000) ? val | 0xFFFF0000 : val
 }
 
 Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset]) |
@@ -9623,7 +9636,7 @@ Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
 }
 
 Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset] << 24) |
@@ -9633,25 +9646,25 @@ Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
 }
 
 Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
   return ieee754.read(this, offset, true, 23, 4)
 }
 
 Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 4, this.length)
   return ieee754.read(this, offset, false, 23, 4)
 }
 
 Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 8, this.length)
   return ieee754.read(this, offset, true, 52, 8)
 }
 
 Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkOffset(offset, 8, this.length)
   return ieee754.read(this, offset, false, 52, 8)
 }
@@ -9664,15 +9677,15 @@ function checkInt (buf, value, offset, ext, max, min) {
 
 Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
   value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) {
-    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    const maxBytes = Math.pow(2, 8 * byteLength) - 1
     checkInt(this, value, offset, byteLength, maxBytes, 0)
   }
 
-  var mul = 1
-  var i = 0
+  let mul = 1
+  let i = 0
   this[offset] = value & 0xFF
   while (++i < byteLength && (mul *= 0x100)) {
     this[offset + i] = (value / mul) & 0xFF
@@ -9683,15 +9696,15 @@ Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, 
 
 Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
   value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
+  offset >>>= 0
+  byteLength >>>= 0
   if (!noAssert) {
-    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    const maxBytes = Math.pow(2, 8 * byteLength) - 1
     checkInt(this, value, offset, byteLength, maxBytes, 0)
   }
 
-  var i = byteLength - 1
-  var mul = 1
+  let i = byteLength - 1
+  let mul = 1
   this[offset + i] = value & 0xFF
   while (--i >= 0 && (mul *= 0x100)) {
     this[offset + i] = (value / mul) & 0xFF
@@ -9702,7 +9715,7 @@ Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, 
 
 Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
   this[offset] = (value & 0xff)
   return offset + 1
@@ -9710,7 +9723,7 @@ Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
 
 Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   this[offset] = (value & 0xff)
   this[offset + 1] = (value >>> 8)
@@ -9719,7 +9732,7 @@ Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert
 
 Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   this[offset] = (value >>> 8)
   this[offset + 1] = (value & 0xff)
@@ -9728,7 +9741,7 @@ Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert
 
 Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
   this[offset + 3] = (value >>> 24)
   this[offset + 2] = (value >>> 16)
@@ -9739,7 +9752,7 @@ Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert
 
 Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
   this[offset] = (value >>> 24)
   this[offset + 1] = (value >>> 16)
@@ -9750,16 +9763,16 @@ Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert
 
 Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) {
-    var limit = Math.pow(2, (8 * byteLength) - 1)
+    const limit = Math.pow(2, (8 * byteLength) - 1)
 
     checkInt(this, value, offset, byteLength, limit - 1, -limit)
   }
 
-  var i = 0
-  var mul = 1
-  var sub = 0
+  let i = 0
+  let mul = 1
+  let sub = 0
   this[offset] = value & 0xFF
   while (++i < byteLength && (mul *= 0x100)) {
     if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
@@ -9773,16 +9786,16 @@ Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, no
 
 Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) {
-    var limit = Math.pow(2, (8 * byteLength) - 1)
+    const limit = Math.pow(2, (8 * byteLength) - 1)
 
     checkInt(this, value, offset, byteLength, limit - 1, -limit)
   }
 
-  var i = byteLength - 1
-  var mul = 1
-  var sub = 0
+  let i = byteLength - 1
+  let mul = 1
+  let sub = 0
   this[offset + i] = value & 0xFF
   while (--i >= 0 && (mul *= 0x100)) {
     if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
@@ -9796,7 +9809,7 @@ Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, no
 
 Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
   if (value < 0) value = 0xff + value + 1
   this[offset] = (value & 0xff)
@@ -9805,7 +9818,7 @@ Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
 
 Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   this[offset] = (value & 0xff)
   this[offset + 1] = (value >>> 8)
@@ -9814,7 +9827,7 @@ Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) 
 
 Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   this[offset] = (value >>> 8)
   this[offset + 1] = (value & 0xff)
@@ -9823,7 +9836,7 @@ Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) 
 
 Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
   this[offset] = (value & 0xff)
   this[offset + 1] = (value >>> 8)
@@ -9834,7 +9847,7 @@ Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) 
 
 Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
   if (value < 0) value = 0xffffffff + value + 1
   this[offset] = (value >>> 24)
@@ -9851,7 +9864,7 @@ function checkIEEE754 (buf, value, offset, ext, max, min) {
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) {
     checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
   }
@@ -9869,7 +9882,7 @@ Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) 
 
 function writeDouble (buf, value, offset, littleEndian, noAssert) {
   value = +value
-  offset = offset >>> 0
+  offset >>>= 0
   if (!noAssert) {
     checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
   }
@@ -9911,14 +9924,14 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
     end = target.length - targetStart + start
   }
 
-  var len = end - start
+  const len = end - start
 
   if (this === target && typeof Uint8Array.prototype.copyWithin === 'function') {
     // Use built-in when available, missing from IE11
     this.copyWithin(targetStart, start, end)
   } else if (this === target && start < targetStart && targetStart < end) {
     // descending copy from end
-    for (var i = len - 1; i >= 0; --i) {
+    for (let i = len - 1; i >= 0; --i) {
       target[i + targetStart] = this[i + start]
     }
   } else {
@@ -9951,10 +9964,10 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
       throw new TypeError('encoding must be a string')
     }
     if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
-      throw new TypeError('Unknown encoding: ' + encoding)
+      throw new TypeError(`Unknown encoding: ${  encoding}`)
     }
     if (val.length === 1) {
-      var code = val.charCodeAt(0)
+      const code = val.charCodeAt(0)
       if ((encoding === 'utf8' && code < 128) ||
           encoding === 'latin1') {
         // Fast path: If `val` fits into a single byte, use that numeric value.
@@ -9962,7 +9975,7 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
       }
     }
   } else if (typeof val === 'number') {
-    val = val & 255
+    val &= 255
   }
 
   // Invalid ranges are not set to a default, so can range check early.
@@ -9974,24 +9987,24 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
     return this
   }
 
-  start = start >>> 0
+  start >>>= 0
   end = end === undefined ? this.length : end >>> 0
 
   if (!val) val = 0
 
-  var i
+  let i
   if (typeof val === 'number') {
     for (i = start; i < end; ++i) {
       this[i] = val
     }
   } else {
-    var bytes = Buffer.isBuffer(val)
+    const bytes = Buffer.isBuffer(val)
       ? val
       : Buffer.from(val, encoding)
-    var len = bytes.length
+    const len = bytes.length
     if (len === 0) {
-      throw new TypeError('The value "' + val +
-        '" is invalid for argument "value"')
+      throw new TypeError(`The value "${  val 
+        }" is invalid for argument "value"`)
     }
     for (i = 0; i < end - start; ++i) {
       this[i + start] = bytes[i % len]
@@ -10004,7 +10017,7 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
 // HELPER FUNCTIONS
 // ================
 
-var INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
+const INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
 
 function base64clean (str) {
   // Node takes equal signs as end of the Base64 encoding
@@ -10015,24 +10028,24 @@ function base64clean (str) {
   if (str.length < 2) return ''
   // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
   while (str.length % 4 !== 0) {
-    str = str + '='
+    str += '='
   }
   return str
 }
 
 function toHex (n) {
-  if (n < 16) return '0' + n.toString(16)
+  if (n < 16) return `0${  n.toString(16)}`
   return n.toString(16)
 }
 
 function utf8ToBytes (string, units) {
   units = units || Infinity
-  var codePoint
-  var length = string.length
-  var leadSurrogate = null
-  var bytes = []
+  let codePoint
+  const {length} = string
+  let leadSurrogate = null
+  const bytes = []
 
-  for (var i = 0; i < length; ++i) {
+  for (let i = 0; i < length; ++i) {
     codePoint = string.charCodeAt(i)
 
     // is surrogate component
@@ -10106,8 +10119,8 @@ function utf8ToBytes (string, units) {
 }
 
 function asciiToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; ++i) {
+  const byteArray = []
+  for (let i = 0; i < str.length; ++i) {
     // Node's code seems to be doing this and not & 0x7F..
     byteArray.push(str.charCodeAt(i) & 0xFF)
   }
@@ -10115,9 +10128,9 @@ function asciiToBytes (str) {
 }
 
 function utf16leToBytes (str, units) {
-  var c, hi, lo
-  var byteArray = []
-  for (var i = 0; i < str.length; ++i) {
+  let c; let hi; let lo
+  const byteArray = []
+  for (let i = 0; i < str.length; ++i) {
     if ((units -= 2) < 0) break
 
     c = str.charCodeAt(i)
@@ -10327,19 +10340,19 @@ function useColors() {
 
 
 function formatArgs(args) {
-  args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
+  args[0] = `${(this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ')  }+${  module.exports.humanize(this.diff)}`;
 
   if (!this.useColors) {
     return;
   }
 
-  var c = 'color: ' + this.color;
+  const c = `color: ${  this.color}`;
   args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
   // arguments passed either before or after the %c, so we need to
   // figure out the correct index to insert the CSS into
 
-  var index = 0;
-  var lastC = 0;
+  let index = 0;
+  let lastC = 0;
   args[0].replace(/%[a-zA-Z%]/g, function (match) {
     if (match === '%%') {
       return;
@@ -10364,7 +10377,7 @@ function formatArgs(args) {
 
 
 function log() {
-  var _console;
+  let _console;
 
   // This hackery is required for IE8/9, where
   // the `console.log` function doesn't have 'apply'
@@ -10398,7 +10411,7 @@ function save(namespaces) {
 
 
 function load() {
-  var r;
+  let r;
 
   try {
     r = exports.storage.getItem('debug');
@@ -10436,7 +10449,7 @@ function localstorage() {
 }
 
 module.exports = require('./common')(exports);
-var formatters = module.exports.formatters;
+const {formatters} = module.exports;
 /**
  * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
  */
@@ -10445,7 +10458,7 @@ formatters.j = function (v) {
   try {
     return JSON.stringify(v);
   } catch (error) {
-    return '[UnexpectedJSONParseError]: ' + error.message;
+    return `[UnexpectedJSONParseError]: ${  error.message}`;
   }
 };
 
@@ -10495,9 +10508,9 @@ function setup(env) {
   */
 
   function selectColor(namespace) {
-    var hash = 0;
+    let hash = 0;
 
-    for (var i = 0; i < namespace.length; i++) {
+    for (let i = 0; i < namespace.length; i++) {
       hash = (hash << 5) - hash + namespace.charCodeAt(i);
       hash |= 0; // Convert to 32bit integer
     }
@@ -10515,7 +10528,7 @@ function setup(env) {
   */
 
   function createDebug(namespace) {
-    var prevTime;
+    let prevTime;
 
     function debug() {
       // Disabled?
@@ -10527,10 +10540,10 @@ function setup(env) {
         args[_key] = arguments[_key];
       }
 
-      var self = debug; // Set `diff` timestamp
+      const self = debug; // Set `diff` timestamp
 
-      var curr = Number(new Date());
-      var ms = curr - (prevTime || curr);
+      const curr = Number(new Date());
+      const ms = curr - (prevTime || curr);
       self.diff = ms;
       self.prev = prevTime;
       self.curr = curr;
@@ -10543,7 +10556,7 @@ function setup(env) {
       } // Apply any `formatters` transformations
 
 
-      var index = 0;
+      let index = 0;
       args[0] = args[0].replace(/%([a-zA-Z%])/g, function (match, format) {
         // If we encounter an escaped % then don't increase the array index
         if (match === '%%') {
@@ -10551,10 +10564,10 @@ function setup(env) {
         }
 
         index++;
-        var formatter = createDebug.formatters[format];
+        const formatter = createDebug.formatters[format];
 
         if (typeof formatter === 'function') {
-          var val = args[index];
+          const val = args[index];
           match = formatter.call(self, val); // Now we need to remove `args[index]` since it's inlined in the `format`
 
           args.splice(index, 1);
@@ -10565,7 +10578,7 @@ function setup(env) {
       }); // Apply env-specific formatting (colors, etc.)
 
       createDebug.formatArgs.call(self, args);
-      var logFn = self.log || createDebug.log;
+      const logFn = self.log || createDebug.log;
       logFn.apply(self, args);
     }
 
@@ -10587,7 +10600,7 @@ function setup(env) {
   }
 
   function destroy() {
-    var index = createDebug.instances.indexOf(this);
+    const index = createDebug.instances.indexOf(this);
 
     if (index !== -1) {
       createDebug.instances.splice(index, 1);
@@ -10613,9 +10626,9 @@ function setup(env) {
     createDebug.save(namespaces);
     createDebug.names = [];
     createDebug.skips = [];
-    var i;
-    var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-    var len = split.length;
+    let i;
+    const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+    const len = split.length;
 
     for (i = 0; i < len; i++) {
       if (!split[i]) {
@@ -10626,14 +10639,14 @@ function setup(env) {
       namespaces = split[i].replace(/\*/g, '.*?');
 
       if (namespaces[0] === '-') {
-        createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+        createDebug.skips.push(new RegExp(`^${  namespaces.substr(1)  }$`));
       } else {
-        createDebug.names.push(new RegExp('^' + namespaces + '$'));
+        createDebug.names.push(new RegExp(`^${  namespaces  }$`));
       }
     }
 
     for (i = 0; i < createDebug.instances.length; i++) {
-      var instance = createDebug.instances[i];
+      const instance = createDebug.instances[i];
       instance.enabled = createDebug.enabled(instance.namespace);
     }
   }
@@ -10661,8 +10674,8 @@ function setup(env) {
       return true;
     }
 
-    var i;
-    var len;
+    let i;
+    let len;
 
     for (i = 0, len = createDebug.skips.length; i < len; i++) {
       if (createDebug.skips[i].test(name)) {
@@ -10705,23 +10718,23 @@ module.exports = setup;
 },{"ms":60}],47:[function(require,module,exports){
 'use strict';
 
-var keys = require('object-keys');
-var hasSymbols = typeof Symbol === 'function' && typeof Symbol('foo') === 'symbol';
+const keys = require('object-keys');
+const hasSymbols = typeof Symbol === 'function' && typeof Symbol('foo') === 'symbol';
 
-var toStr = Object.prototype.toString;
-var concat = Array.prototype.concat;
-var origDefineProperty = Object.defineProperty;
+const toStr = Object.prototype.toString;
+const {concat} = Array.prototype;
+const origDefineProperty = Object.defineProperty;
 
-var isFunction = function (fn) {
+const isFunction = function (fn) {
 	return typeof fn === 'function' && toStr.call(fn) === '[object Function]';
 };
 
-var arePropertyDescriptorsSupported = function () {
-	var obj = {};
+const arePropertyDescriptorsSupported = function () {
+	const obj = {};
 	try {
 		origDefineProperty(obj, 'x', { enumerable: false, value: obj });
 		// eslint-disable-next-line no-unused-vars, no-restricted-syntax
-		for (var _ in obj) { // jscs:ignore disallowUnusedVariables
+		for (const _ in obj) { // jscs:ignore disallowUnusedVariables
 			return false;
 		}
 		return obj.x === obj;
@@ -10729,9 +10742,9 @@ var arePropertyDescriptorsSupported = function () {
 		return false;
 	}
 };
-var supportsDescriptors = origDefineProperty && arePropertyDescriptorsSupported();
+const supportsDescriptors = origDefineProperty && arePropertyDescriptorsSupported();
 
-var defineProperty = function (object, name, value, predicate) {
+const defineProperty = function (object, name, value, predicate) {
 	if (name in object && (!isFunction(predicate) || !predicate())) {
 		return;
 	}
@@ -10739,7 +10752,7 @@ var defineProperty = function (object, name, value, predicate) {
 		origDefineProperty(object, name, {
 			configurable: true,
 			enumerable: false,
-			value: value,
+			value,
 			writable: true
 		});
 	} else {
@@ -10747,13 +10760,13 @@ var defineProperty = function (object, name, value, predicate) {
 	}
 };
 
-var defineProperties = function (object, map) {
-	var predicates = arguments.length > 2 ? arguments[2] : {};
-	var props = keys(map);
+const defineProperties = function (object, map) {
+	const predicates = arguments.length > 2 ? arguments[2] : {};
+	let props = keys(map);
 	if (hasSymbols) {
 		props = concat.call(props, Object.getOwnPropertySymbols(map));
 	}
-	for (var i = 0; i < props.length; i += 1) {
+	for (let i = 0; i < props.length; i += 1) {
 		defineProperty(object, props[i], map[props[i]], predicates[props[i]]);
 	}
 };
@@ -10806,92 +10819,94 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	else if(false)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["JsDiff"] = factory();
+		exports.JsDiff = factory();
 	else
-		root["JsDiff"] = factory();
+		root.JsDiff = factory();
 })(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
+return /** *** */ (function(modules) { // webpackBootstrap
+/** *** */ 	// The module cache
+/** *** */ 	const installedModules = {};
 
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/** *** */ 	// The require function
+/** *** */ 	function __webpack_require__(moduleId) {
 
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+/** *** */ 		// Check if module is in cache
+/** *** */ 		if(installedModules[moduleId])
+/** *** */ 			return installedModules[moduleId].exports;
 
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
+/** *** */ 		// Create a new module (and put it into the cache)
+/** *** */ 		const module = installedModules[moduleId] = {
+/** *** */ 			exports: {},
+/** *** */ 			id: moduleId,
+/** *** */ 			loaded: false
+/** *** */ 		};
 
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/** *** */ 		// Execute the module function
+/** *** */ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
+/** *** */ 		// Flag the module as loaded
+/** *** */ 		module.loaded = true;
 
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
+/** *** */ 		// Return the exports of the module
+/** *** */ 		return module.exports;
+/** *** */ 	}
 
 
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
+/** *** */ 	// expose the modules object (__webpack_modules__)
+/** *** */ 	__webpack_require__.m = modules;
 
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
+/** *** */ 	// expose the module cache
+/** *** */ 	__webpack_require__.c = installedModules;
 
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/** *** */ 	// __webpack_public_path__
+/** *** */ 	__webpack_require__.p = "";
 
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
+/** *** */ 	// Load entry module and return exports
+/** *** */ 	return __webpack_require__(0);
+/** *** */ })
+/** ********************************************************************* */
+/** *** */ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.canonicalize = exports.convertChangesToXML = exports.convertChangesToDMP = exports.merge = exports.parsePatch = exports.applyPatches = exports.applyPatch = exports.createPatch = exports.createTwoFilesPatch = exports.structuredPatch = exports.diffArrays = exports.diffJson = exports.diffCss = exports.diffSentences = exports.diffTrimmedLines = exports.diffLines = exports.diffWordsWithSpace = exports.diffWords = exports.diffChars = exports.Diff = undefined;
 
-	/*istanbul ignore end*/var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	/* istanbul ignore end */const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
-	/*istanbul ignore end*/var /*istanbul ignore start*/_character = __webpack_require__(2) /*istanbul ignore end*/;
+	/* istanbul ignore end */const /* istanbul ignore start */_character = __webpack_require__(2) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_word = __webpack_require__(3) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_word = __webpack_require__(3) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_line = __webpack_require__(5) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_line = __webpack_require__(5) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_sentence = __webpack_require__(6) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_sentence = __webpack_require__(6) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_css = __webpack_require__(7) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_css = __webpack_require__(7) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_json = __webpack_require__(8) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_json = __webpack_require__(8) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_array = __webpack_require__(9) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_array = __webpack_require__(9) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_apply = __webpack_require__(10) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_apply = __webpack_require__(10) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_parse = __webpack_require__(11) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_parse = __webpack_require__(11) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_merge = __webpack_require__(13) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_merge = __webpack_require__(13) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_create = __webpack_require__(14) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_create = __webpack_require__(14) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_dmp = __webpack_require__(16) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_dmp = __webpack_require__(16) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_xml = __webpack_require__(17) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_xml = __webpack_require__(17) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	/* istanbul ignore start */function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	/* See LICENSE file for terms of use */
 
@@ -10909,51 +10924,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * "An O(ND) Difference Algorithm and its Variations" (Myers, 1986).
 	 * http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.6927
 	 */
-	exports. /*istanbul ignore end*/Diff = _base2['default'];
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffChars = _character.diffChars;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffWords = _word.diffWords;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffWordsWithSpace = _word.diffWordsWithSpace;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffLines = _line.diffLines;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffTrimmedLines = _line.diffTrimmedLines;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffSentences = _sentence.diffSentences;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffCss = _css.diffCss;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffJson = _json.diffJson;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffArrays = _array.diffArrays;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/structuredPatch = _create.structuredPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/createTwoFilesPatch = _create.createTwoFilesPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/createPatch = _create.createPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/applyPatch = _apply.applyPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/applyPatches = _apply.applyPatches;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/parsePatch = _parse.parsePatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/merge = _merge.merge;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/convertChangesToDMP = _dmp.convertChangesToDMP;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/convertChangesToXML = _xml.convertChangesToXML;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/canonicalize = _json.canonicalize;
+	exports. /* istanbul ignore end */Diff = _base2.default;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffChars = _character.diffChars;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffWords = _word.diffWords;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffWordsWithSpace = _word.diffWordsWithSpace;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffLines = _line.diffLines;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffTrimmedLines = _line.diffTrimmedLines;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffSentences = _sentence.diffSentences;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffCss = _css.diffCss;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffJson = _json.diffJson;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffArrays = _array.diffArrays;
+	/* istanbul ignore start */exports. /* istanbul ignore end */structuredPatch = _create.structuredPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */createTwoFilesPatch = _create.createTwoFilesPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */createPatch = _create.createPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */applyPatch = _apply.applyPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */applyPatches = _apply.applyPatches;
+	/* istanbul ignore start */exports. /* istanbul ignore end */parsePatch = _parse.parsePatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */merge = _merge.merge;
+	/* istanbul ignore start */exports. /* istanbul ignore end */convertChangesToDMP = _dmp.convertChangesToDMP;
+	/* istanbul ignore start */exports. /* istanbul ignore end */convertChangesToXML = _xml.convertChangesToXML;
+	/* istanbul ignore start */exports. /* istanbul ignore end */canonicalize = _json.canonicalize;
 
 
 
-/***/ }),
+/** */ }),
 /* 1 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = /*istanbul ignore end*/Diff;
+	exports.default = /* istanbul ignore end */Diff;
 	function Diff() {}
 
 	Diff.prototype = {
-	  /*istanbul ignore start*/ /*istanbul ignore end*/diff: function diff(oldString, newString) {
-	    /*istanbul ignore start*/var /*istanbul ignore end*/options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	  /* istanbul ignore start */ /* istanbul ignore end */diff: function diff(oldString, newString) {
+	    /* istanbul ignore start */let /* istanbul ignore end */options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-	    var callback = options.callback;
+	    let {callback} = options;
 	    if (typeof options === 'function') {
 	      callback = options;
 	      options = {};
 	    }
 	    this.options = options;
 
-	    var self = this;
+	    const self = this;
 
 	    function done(value) {
 	      if (callback) {
@@ -10961,9 +10978,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          callback(undefined, value);
 	        }, 0);
 	        return true;
-	      } else {
+	      } 
 	        return value;
-	      }
+	      
 	    }
 
 	    // Allow subclasses to massage the input prior to running
@@ -10973,14 +10990,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    oldString = this.removeEmpty(this.tokenize(oldString));
 	    newString = this.removeEmpty(this.tokenize(newString));
 
-	    var newLen = newString.length,
-	        oldLen = oldString.length;
-	    var editLength = 1;
-	    var maxEditLength = newLen + oldLen;
-	    var bestPath = [{ newPos: -1, components: [] }];
+	    const newLen = newString.length;
+	        const oldLen = oldString.length;
+	    let editLength = 1;
+	    const maxEditLength = newLen + oldLen;
+	    const bestPath = [{ newPos: -1, components: [] }];
 
 	    // Seed editLength = 0, i.e. the content starts with the same values
-	    var oldPos = this.extractCommon(bestPath[0], newString, oldString, 0);
+	    const oldPos = this.extractCommon(bestPath[0], newString, oldString, 0);
 	    if (bestPath[0].newPos + 1 >= newLen && oldPos + 1 >= oldLen) {
 	      // Identity per the equality and tokenizer
 	      return done([{ value: this.join(newString), count: newString.length }]);
@@ -10988,18 +11005,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // Main worker method. checks all permutations of a given edit length for acceptance.
 	    function execEditLength() {
-	      for (var diagonalPath = -1 * editLength; diagonalPath <= editLength; diagonalPath += 2) {
-	        var basePath = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
-	        var addPath = bestPath[diagonalPath - 1],
-	            removePath = bestPath[diagonalPath + 1],
-	            _oldPos = (removePath ? removePath.newPos : 0) - diagonalPath;
+	      for (let diagonalPath = -1 * editLength; diagonalPath <= editLength; diagonalPath += 2) {
+	        let basePath = /* istanbul ignore start */void 0 /* istanbul ignore end */;
+	        const addPath = bestPath[diagonalPath - 1];
+	            const removePath = bestPath[diagonalPath + 1];
+	            let _oldPos = (removePath ? removePath.newPos : 0) - diagonalPath;
 	        if (addPath) {
 	          // No one else is going to attempt to use this value, clear it
 	          bestPath[diagonalPath - 1] = undefined;
 	        }
 
-	        var canAdd = addPath && addPath.newPos + 1 < newLen,
-	            canRemove = removePath && 0 <= _oldPos && _oldPos < oldLen;
+	        const canAdd = addPath && addPath.newPos + 1 < newLen;
+	            const canRemove = removePath && _oldPos >= 0 && _oldPos < oldLen;
 	        if (!canAdd && !canRemove) {
 	          // If this path is a terminal then prune
 	          bestPath[diagonalPath] = undefined;
@@ -11023,10 +11040,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // If we have hit the end of both strings, then we are done
 	        if (basePath.newPos + 1 >= newLen && _oldPos + 1 >= oldLen) {
 	          return done(buildValues(self, basePath.components, newString, oldString, self.useLongestToken));
-	        } else {
+	        } 
 	          // Otherwise track this path as a potential candidate and continue.
 	          bestPath[diagonalPath] = basePath;
-	        }
+	        
 	      }
 
 	      editLength++;
@@ -11051,29 +11068,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      })();
 	    } else {
 	      while (editLength <= maxEditLength) {
-	        var ret = execEditLength();
+	        const ret = execEditLength();
 	        if (ret) {
 	          return ret;
 	        }
 	      }
 	    }
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/pushComponent: function pushComponent(components, added, removed) {
-	    var last = components[components.length - 1];
+	  /* istanbul ignore start */ /* istanbul ignore end */pushComponent: function pushComponent(components, added, removed) {
+	    const last = components[components.length - 1];
 	    if (last && last.added === added && last.removed === removed) {
 	      // We need to clone here as the component clone operation is just
 	      // as shallow array clone
-	      components[components.length - 1] = { count: last.count + 1, added: added, removed: removed };
+	      components[components.length - 1] = { count: last.count + 1, added, removed };
 	    } else {
-	      components.push({ count: 1, added: added, removed: removed });
+	      components.push({ count: 1, added, removed });
 	    }
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/extractCommon: function extractCommon(basePath, newString, oldString, diagonalPath) {
-	    var newLen = newString.length,
-	        oldLen = oldString.length,
-	        newPos = basePath.newPos,
-	        oldPos = newPos - diagonalPath,
-	        commonCount = 0;
+	  /* istanbul ignore start */ /* istanbul ignore end */extractCommon: function extractCommon(basePath, newString, oldString, diagonalPath) {
+	    const newLen = newString.length;
+	        const oldLen = oldString.length;
+	        let {newPos} = basePath;
+	        let oldPos = newPos - diagonalPath;
+	        let commonCount = 0;
 	    while (newPos + 1 < newLen && oldPos + 1 < oldLen && this.equals(newString[newPos + 1], oldString[oldPos + 1])) {
 	      newPos++;
 	      oldPos++;
@@ -11087,46 +11104,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	    basePath.newPos = newPos;
 	    return oldPos;
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/equals: function equals(left, right) {
+	  /* istanbul ignore start */ /* istanbul ignore end */equals: function equals(left, right) {
 	    if (this.options.comparator) {
 	      return this.options.comparator(left, right);
-	    } else {
+	    } 
 	      return left === right || this.options.ignoreCase && left.toLowerCase() === right.toLowerCase();
-	    }
+	    
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/removeEmpty: function removeEmpty(array) {
-	    var ret = [];
-	    for (var i = 0; i < array.length; i++) {
+	  /* istanbul ignore start */ /* istanbul ignore end */removeEmpty: function removeEmpty(array) {
+	    const ret = [];
+	    for (let i = 0; i < array.length; i++) {
 	      if (array[i]) {
 	        ret.push(array[i]);
 	      }
 	    }
 	    return ret;
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/castInput: function castInput(value) {
+	  /* istanbul ignore start */ /* istanbul ignore end */castInput: function castInput(value) {
 	    return value;
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/tokenize: function tokenize(value) {
+	  /* istanbul ignore start */ /* istanbul ignore end */tokenize: function tokenize(value) {
 	    return value.split('');
 	  },
-	  /*istanbul ignore start*/ /*istanbul ignore end*/join: function join(chars) {
+	  /* istanbul ignore start */ /* istanbul ignore end */join: function join(chars) {
 	    return chars.join('');
 	  }
 	};
 
 	function buildValues(diff, components, newString, oldString, useLongestToken) {
-	  var componentPos = 0,
-	      componentLen = components.length,
-	      newPos = 0,
-	      oldPos = 0;
+	  let componentPos = 0;
+	      const componentLen = components.length;
+	      let newPos = 0;
+	      let oldPos = 0;
 
 	  for (; componentPos < componentLen; componentPos++) {
-	    var component = components[componentPos];
+	    const component = components[componentPos];
 	    if (!component.removed) {
 	      if (!component.added && useLongestToken) {
-	        var value = newString.slice(newPos, newPos + component.count);
+	        let value = newString.slice(newPos, newPos + component.count);
 	        value = value.map(function (value, i) {
-	          var oldValue = oldString[oldPos + i];
+	          const oldValue = oldString[oldPos + i];
 	          return oldValue.length > value.length ? oldValue : value;
 	        });
 
@@ -11148,7 +11165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // The diffing algorithm is tied to add then remove output and this is the simplest
 	      // route to get the desired output with minimal overhead.
 	      if (componentPos && components[componentPos - 1].added) {
-	        var tmp = components[componentPos - 1];
+	        const tmp = components[componentPos - 1];
 	        components[componentPos - 1] = components[componentPos];
 	        components[componentPos] = tmp;
 	      }
@@ -11158,7 +11175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Special case handle for when one terminal is ignored (i.e. whitespace).
 	  // For this case we merge the terminal into the prior string and drop the change.
 	  // This is only available for string mode.
-	  var lastComponent = components[componentLen - 1];
+	  const lastComponent = components[componentLen - 1];
 	  if (componentLen > 1 && typeof lastComponent.value === 'string' && (lastComponent.added || lastComponent.removed) && diff.equals('', lastComponent.value)) {
 	    components[componentLen - 2].value += lastComponent.value;
 	    components.pop();
@@ -11173,49 +11190,53 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.characterDiff = undefined;
-	exports. /*istanbul ignore end*/diffChars = diffChars;
+	exports. /* istanbul ignore end */diffChars = diffChars;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var characterDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/characterDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	/* istanbul ignore end */const characterDiff = /* istanbul ignore start */exports. /* istanbul ignore end */characterDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	function diffChars(oldStr, newStr, options) {
 	  return characterDiff.diff(oldStr, newStr, options);
 	}
 
 
 
-/***/ }),
+/** */ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.wordDiff = undefined;
-	exports. /*istanbul ignore end*/diffWords = diffWords;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffWordsWithSpace = diffWordsWithSpace;
+	exports. /* istanbul ignore end */diffWords = diffWords;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffWordsWithSpace = diffWordsWithSpace;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
-	/*istanbul ignore end*/var /*istanbul ignore start*/_params = __webpack_require__(4) /*istanbul ignore end*/;
+	/* istanbul ignore end */const /* istanbul ignore start */_params = __webpack_require__(4) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	/* istanbul ignore start */function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/ // Based on https://en.wikipedia.org/wiki/Latin_script_in_Unicode
+	/* istanbul ignore end */ // Based on https://en.wikipedia.org/wiki/Latin_script_in_Unicode
 	//
 	// Ranges and exceptions:
 	// Latin-1 Supplement, 0080–00FF
@@ -11233,11 +11254,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//  - U+02DC  ˜ &#732;  Small Tilde
 	//  - U+02DD  ˝ &#733;  Double Acute Accent
 	// Latin Extended Additional, 1E00–1EFF
-	var extendedWordChars = /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/;
+	const extendedWordChars = /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/;
 
-	var reWhitespace = /\S/;
+	const reWhitespace = /\S/;
 
-	var wordDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/wordDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	const wordDiff = /* istanbul ignore start */exports. /* istanbul ignore end */wordDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	wordDiff.equals = function (left, right) {
 	  if (this.options.ignoreCase) {
 	    left = left.toLowerCase();
@@ -11246,10 +11267,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return left === right || this.options.ignoreWhitespace && !reWhitespace.test(left) && !reWhitespace.test(right);
 	};
 	wordDiff.tokenize = function (value) {
-	  var tokens = value.split(/(\s+|\b)/);
+	  const tokens = value.split(/(\s+|\b)/);
 
 	  // Join the boundary splits that we do not consider to be boundaries. This is primarily the extended Latin character set.
-	  for (var i = 0; i < tokens.length - 1; i++) {
+	  for (let i = 0; i < tokens.length - 1; i++) {
 	    // If we have an empty string in the next field and we have only word chars before and after, merge
 	    if (!tokens[i + 1] && tokens[i + 2] && extendedWordChars.test(tokens[i]) && extendedWordChars.test(tokens[i + 2])) {
 	      tokens[i] += tokens[i + 2];
@@ -11262,7 +11283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function diffWords(oldStr, newStr, options) {
-	  options = /*istanbul ignore start*/(0, _params.generateOptions) /*istanbul ignore end*/(options, { ignoreWhitespace: true });
+	  options = /* istanbul ignore start */(0, _params.generateOptions) /* istanbul ignore end */(options, { ignoreWhitespace: true });
 	  return wordDiff.diff(oldStr, newStr, options);
 	}
 
@@ -11272,19 +11293,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 4 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/generateOptions = generateOptions;
+	exports. /* istanbul ignore end */generateOptions = generateOptions;
 	function generateOptions(options, defaults) {
 	  if (typeof options === 'function') {
 	    defaults.callback = options;
 	  } else if (options) {
-	    for (var name in options) {
+	    for (const name in options) {
 	      /* istanbul ignore else */
 	      if (options.hasOwnProperty(name)) {
 	        defaults[name] = options[name];
@@ -11296,29 +11319,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.lineDiff = undefined;
-	exports. /*istanbul ignore end*/diffLines = diffLines;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/diffTrimmedLines = diffTrimmedLines;
+	exports. /* istanbul ignore end */diffLines = diffLines;
+	/* istanbul ignore start */exports. /* istanbul ignore end */diffTrimmedLines = diffTrimmedLines;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
-	/*istanbul ignore end*/var /*istanbul ignore start*/_params = __webpack_require__(4) /*istanbul ignore end*/;
+	/* istanbul ignore end */const /* istanbul ignore start */_params = __webpack_require__(4) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	/* istanbul ignore start */function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var lineDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/lineDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	/* istanbul ignore end */const lineDiff = /* istanbul ignore start */exports. /* istanbul ignore end */lineDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	lineDiff.tokenize = function (value) {
-	  var retLines = [],
-	      linesAndNewlines = value.split(/(\n|\r\n)/);
+	  const retLines = [];
+	      const linesAndNewlines = value.split(/(\n|\r\n)/);
 
 	  // Ignore the final empty token that occurs if the string ends with a new line
 	  if (!linesAndNewlines[linesAndNewlines.length - 1]) {
@@ -11326,8 +11351,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Merge the content and line separators into single tokens
-	  for (var i = 0; i < linesAndNewlines.length; i++) {
-	    var line = linesAndNewlines[i];
+	  for (let i = 0; i < linesAndNewlines.length; i++) {
+	    let line = linesAndNewlines[i];
 
 	    if (i % 2 && !this.options.newlineIsToken) {
 	      retLines[retLines.length - 1] += line;
@@ -11346,29 +11371,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return lineDiff.diff(oldStr, newStr, callback);
 	}
 	function diffTrimmedLines(oldStr, newStr, callback) {
-	  var options = /*istanbul ignore start*/(0, _params.generateOptions) /*istanbul ignore end*/(callback, { ignoreWhitespace: true });
+	  const options = /* istanbul ignore start */(0, _params.generateOptions) /* istanbul ignore end */(callback, { ignoreWhitespace: true });
 	  return lineDiff.diff(oldStr, newStr, options);
 	}
 
 
 
-/***/ }),
+/** */ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.sentenceDiff = undefined;
-	exports. /*istanbul ignore end*/diffSentences = diffSentences;
+	exports. /* istanbul ignore end */diffSentences = diffSentences;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var sentenceDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/sentenceDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	/* istanbul ignore end */const sentenceDiff = /* istanbul ignore start */exports. /* istanbul ignore end */sentenceDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	sentenceDiff.tokenize = function (value) {
 	  return value.split(/(\S.+?[.!?])(?=\s+|$)/);
 	};
@@ -11379,23 +11406,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.cssDiff = undefined;
-	exports. /*istanbul ignore end*/diffCss = diffCss;
+	exports. /* istanbul ignore end */diffCss = diffCss;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var cssDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/cssDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	/* istanbul ignore end */const cssDiff = /* istanbul ignore start */exports. /* istanbul ignore end */cssDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	cssDiff.tokenize = function (value) {
 	  return value.split(/([{}:;,]|\s+)/);
 	};
@@ -11406,42 +11435,44 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.jsonDiff = undefined;
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	const _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	exports. /*istanbul ignore end*/diffJson = diffJson;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/canonicalize = canonicalize;
+	exports. /* istanbul ignore end */diffJson = diffJson;
+	/* istanbul ignore start */exports. /* istanbul ignore end */canonicalize = canonicalize;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
-	/*istanbul ignore end*/var /*istanbul ignore start*/_line = __webpack_require__(5) /*istanbul ignore end*/;
+	/* istanbul ignore end */const /* istanbul ignore start */_line = __webpack_require__(5) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	/* istanbul ignore start */function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var objectPrototypeToString = Object.prototype.toString;
+	/* istanbul ignore end */const objectPrototypeToString = Object.prototype.toString;
 
-	var jsonDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/jsonDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	const jsonDiff = /* istanbul ignore start */exports. /* istanbul ignore end */jsonDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	// Discriminate between two lines of pretty-printed, serialized JSON where one of them has a
 	// dangling comma and the other doesn't. Turns out including the dangling comma yields the nicest output:
 	jsonDiff.useLongestToken = true;
 
-	jsonDiff.tokenize = /*istanbul ignore start*/_line.lineDiff /*istanbul ignore end*/.tokenize;
+	jsonDiff.tokenize = /* istanbul ignore start */_line.lineDiff /* istanbul ignore end */.tokenize;
 	jsonDiff.castInput = function (value) {
-	  /*istanbul ignore start*/var _options = /*istanbul ignore end*/this.options,
-	      undefinedReplacement = _options.undefinedReplacement,
-	      _options$stringifyRep = _options.stringifyReplacer,
-	      stringifyReplacer = _options$stringifyRep === undefined ? function (k, v) /*istanbul ignore start*/{
-	    return (/*istanbul ignore end*/typeof v === 'undefined' ? undefinedReplacement : v
+	  /* istanbul ignore start */const _options = /* istanbul ignore end */this.options;
+	      const {undefinedReplacement} = _options;
+	      const _options$stringifyRep = _options.stringifyReplacer;
+	      const stringifyReplacer = _options$stringifyRep === undefined ? function (k, v) /* istanbul ignore start */{
+	    return (/* istanbul ignore end */typeof v === 'undefined' ? undefinedReplacement : v
 	    );
 	  } : _options$stringifyRep;
 
@@ -11449,7 +11480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return typeof value === 'string' ? value : JSON.stringify(canonicalize(value, null, null, stringifyReplacer), stringifyReplacer, '  ');
 	};
 	jsonDiff.equals = function (left, right) {
-	  return (/*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/.prototype.equals.call(jsonDiff, left.replace(/,([\r\n])/g, '$1'), right.replace(/,([\r\n])/g, '$1'))
+	  return (/* istanbul ignore start */_base2.default /* istanbul ignore end */.prototype.equals.call(jsonDiff, left.replace(/,([\r\n])/g, '$1'), right.replace(/,([\r\n])/g, '$1'))
 	  );
 	};
 
@@ -11467,7 +11498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    obj = replacer(key, obj);
 	  }
 
-	  var i = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
+	  let i = /* istanbul ignore start */void 0 /* istanbul ignore end */;
 
 	  for (i = 0; i < stack.length; i += 1) {
 	    if (stack[i] === obj) {
@@ -11475,9 +11506,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  var canonicalizedObj = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
+	  let canonicalizedObj = /* istanbul ignore start */void 0 /* istanbul ignore end */;
 
-	  if ('[object Array]' === objectPrototypeToString.call(obj)) {
+	  if (objectPrototypeToString.call(obj) === '[object Array]') {
 	    stack.push(obj);
 	    canonicalizedObj = new Array(obj.length);
 	    replacementStack.push(canonicalizedObj);
@@ -11493,12 +11524,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    obj = obj.toJSON();
 	  }
 
-	  if ( /*istanbul ignore start*/(typeof /*istanbul ignore end*/obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' && obj !== null) {
+	  if ( /* istanbul ignore start */(typeof /* istanbul ignore end */obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' && obj !== null) {
 	    stack.push(obj);
 	    canonicalizedObj = {};
 	    replacementStack.push(canonicalizedObj);
-	    var sortedKeys = [],
-	        _key = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
+	    const sortedKeys = [];
+	        let _key = /* istanbul ignore start */void 0 /* istanbul ignore end */;
 	    for (_key in obj) {
 	      /* istanbul ignore else */
 	      if (obj.hasOwnProperty(_key)) {
@@ -11520,23 +11551,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
 	exports.arrayDiff = undefined;
-	exports. /*istanbul ignore end*/diffArrays = diffArrays;
+	exports. /* istanbul ignore end */diffArrays = diffArrays;
 
-	var /*istanbul ignore start*/_base = __webpack_require__(1) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_base = __webpack_require__(1) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _base2 = _interopRequireDefault(_base);
+	/* istanbul ignore start */const _base2 = _interopRequireDefault(_base);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/var arrayDiff = /*istanbul ignore start*/exports. /*istanbul ignore end*/arrayDiff = new /*istanbul ignore start*/_base2['default'] /*istanbul ignore end*/();
+	/* istanbul ignore end */const arrayDiff = /* istanbul ignore start */exports. /* istanbul ignore end */arrayDiff = new /* istanbul ignore start */_base2.default /* istanbul ignore end */();
 	arrayDiff.tokenize = function (value) {
 	  return value.slice();
 	};
@@ -11550,29 +11583,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/applyPatch = applyPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/applyPatches = applyPatches;
+	exports. /* istanbul ignore end */applyPatch = applyPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */applyPatches = applyPatches;
 
-	var /*istanbul ignore start*/_parse = __webpack_require__(11) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_parse = __webpack_require__(11) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_distanceIterator = __webpack_require__(12) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_distanceIterator = __webpack_require__(12) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/var _distanceIterator2 = _interopRequireDefault(_distanceIterator);
+	/* istanbul ignore start */const _distanceIterator2 = _interopRequireDefault(_distanceIterator);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	/*istanbul ignore end*/function applyPatch(source, uniDiff) {
-	  /*istanbul ignore start*/var /*istanbul ignore end*/options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	/* istanbul ignore end */function applyPatch(source, uniDiff) {
+	  /* istanbul ignore start */const /* istanbul ignore end */options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
 	  if (typeof uniDiff === 'string') {
-	    uniDiff = /*istanbul ignore start*/(0, _parse.parsePatch) /*istanbul ignore end*/(uniDiff);
+	    uniDiff = /* istanbul ignore start */(0, _parse.parsePatch) /* istanbul ignore end */(uniDiff);
 	  }
 
 	  if (Array.isArray(uniDiff)) {
@@ -11584,28 +11619,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Apply the diff to the input
-	  var lines = source.split(/\r\n|[\n\v\f\r\x85]/),
-	      delimiters = source.match(/\r\n|[\n\v\f\r\x85]/g) || [],
-	      hunks = uniDiff.hunks,
-	      compareLine = options.compareLine || function (lineNumber, line, operation, patchContent) /*istanbul ignore start*/{
-	    return (/*istanbul ignore end*/line === patchContent
+	  const lines = source.split(/\r\n|[\n\v\f\r\x85]/);
+	      const delimiters = source.match(/\r\n|[\n\v\f\r\x85]/g) || [];
+	      const {hunks} = uniDiff;
+	      const compareLine = options.compareLine || function (lineNumber, line, operation, patchContent) /* istanbul ignore start */{
+	    return (/* istanbul ignore end */line === patchContent
 	    );
-	  },
-	      errorCount = 0,
-	      fuzzFactor = options.fuzzFactor || 0,
-	      minLine = 0,
-	      offset = 0,
-	      removeEOFNL = /*istanbul ignore start*/void 0 /*istanbul ignore end*/,
-	      addEOFNL = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
+	  };
+	      let errorCount = 0;
+	      const fuzzFactor = options.fuzzFactor || 0;
+	      let minLine = 0;
+	      let offset = 0;
+	      let removeEOFNL = /* istanbul ignore start */void 0 /* istanbul ignore end */;
+	      let addEOFNL = /* istanbul ignore start */void 0 /* istanbul ignore end */;
 
 	  /**
 	   * Checks if the hunk exactly fits on the provided location
 	   */
 	  function hunkFits(hunk, toPos) {
-	    for (var j = 0; j < hunk.lines.length; j++) {
-	      var line = hunk.lines[j],
-	          operation = line.length > 0 ? line[0] : ' ',
-	          content = line.length > 0 ? line.substr(1) : line;
+	    for (let j = 0; j < hunk.lines.length; j++) {
+	      const line = hunk.lines[j];
+	          const operation = line.length > 0 ? line[0] : ' ';
+	          const content = line.length > 0 ? line.substr(1) : line;
 
 	      if (operation === ' ' || operation === '-') {
 	        // Context sanity check
@@ -11624,13 +11659,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Search best fit offsets for each hunk based on the previous ones
-	  for (var i = 0; i < hunks.length; i++) {
-	    var hunk = hunks[i],
-	        maxLine = lines.length - hunk.oldLines,
-	        localOffset = 0,
-	        toPos = offset + hunk.oldStart - 1;
+	  for (let i = 0; i < hunks.length; i++) {
+	    const hunk = hunks[i];
+	        const maxLine = lines.length - hunk.oldLines;
+	        let localOffset = 0;
+	        const toPos = offset + hunk.oldStart - 1;
 
-	    var iterator = /*istanbul ignore start*/(0, _distanceIterator2['default']) /*istanbul ignore end*/(toPos, minLine, maxLine);
+	    const iterator = /* istanbul ignore start */(0, _distanceIterator2.default) /* istanbul ignore end */(toPos, minLine, maxLine);
 
 	    for (; localOffset !== undefined; localOffset = iterator()) {
 	      if (hunkFits(hunk, toPos + localOffset)) {
@@ -11649,10 +11684,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Apply patch hunks
-	  var diffOffset = 0;
-	  for (var _i = 0; _i < hunks.length; _i++) {
-	    var _hunk = hunks[_i],
-	        _toPos = _hunk.oldStart + _hunk.offset + diffOffset - 1;
+	  let diffOffset = 0;
+	  for (let _i = 0; _i < hunks.length; _i++) {
+	    const _hunk = hunks[_i];
+	        let _toPos = _hunk.oldStart + _hunk.offset + diffOffset - 1;
 	    diffOffset += _hunk.newLines - _hunk.oldLines;
 
 	    if (_toPos < 0) {
@@ -11660,11 +11695,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _toPos = 0;
 	    }
 
-	    for (var j = 0; j < _hunk.lines.length; j++) {
-	      var line = _hunk.lines[j],
-	          operation = line.length > 0 ? line[0] : ' ',
-	          content = line.length > 0 ? line.substr(1) : line,
-	          delimiter = _hunk.linedelimiters[j];
+	    for (let j = 0; j < _hunk.lines.length; j++) {
+	      const line = _hunk.lines[j];
+	          const operation = line.length > 0 ? line[0] : ' ';
+	          const content = line.length > 0 ? line.substr(1) : line;
+	          const delimiter = _hunk.linedelimiters[j];
 
 	      if (operation === ' ') {
 	        _toPos++;
@@ -11677,7 +11712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delimiters.splice(_toPos, 0, delimiter);
 	        _toPos++;
 	      } else if (operation === '\\') {
-	        var previousOperation = _hunk.lines[j - 1] ? _hunk.lines[j - 1][0] : null;
+	        const previousOperation = _hunk.lines[j - 1] ? _hunk.lines[j - 1][0] : null;
 	        if (previousOperation === '+') {
 	          removeEOFNL = true;
 	        } else if (previousOperation === '-') {
@@ -11697,7 +11732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    lines.push('');
 	    delimiters.push('\n');
 	  }
-	  for (var _k = 0; _k < lines.length - 1; _k++) {
+	  for (let _k = 0; _k < lines.length - 1; _k++) {
 	    lines[_k] = lines[_k] + delimiters[_k];
 	  }
 	  return lines.join('');
@@ -11706,12 +11741,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Wrapper that supports multiple file patches via callbacks.
 	function applyPatches(uniDiff, options) {
 	  if (typeof uniDiff === 'string') {
-	    uniDiff = /*istanbul ignore start*/(0, _parse.parsePatch) /*istanbul ignore end*/(uniDiff);
+	    uniDiff = /* istanbul ignore start */(0, _parse.parsePatch) /* istanbul ignore end */(uniDiff);
 	  }
 
-	  var currentIndex = 0;
+	  let currentIndex = 0;
 	  function processIndex() {
-	    var index = uniDiff[currentIndex++];
+	    const index = uniDiff[currentIndex++];
 	    if (!index) {
 	      return options.complete();
 	    }
@@ -11721,7 +11756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return options.complete(err);
 	      }
 
-	      var updatedContent = applyPatch(data, index, options);
+	      const updatedContent = applyPatch(data, index, options);
 	      options.patched(index, updatedContent, function (err) {
 	        if (err) {
 	          return options.complete(err);
@@ -11736,29 +11771,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 11 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/parsePatch = parsePatch;
+	exports. /* istanbul ignore end */parsePatch = parsePatch;
 	function parsePatch(uniDiff) {
-	  /*istanbul ignore start*/var /*istanbul ignore end*/options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  /* istanbul ignore start */const /* istanbul ignore end */options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-	  var diffstr = uniDiff.split(/\r\n|[\n\v\f\r\x85]/),
-	      delimiters = uniDiff.match(/\r\n|[\n\v\f\r\x85]/g) || [],
-	      list = [],
-	      i = 0;
+	  const diffstr = uniDiff.split(/\r\n|[\n\v\f\r\x85]/);
+	      const delimiters = uniDiff.match(/\r\n|[\n\v\f\r\x85]/g) || [];
+	      const list = [];
+	      let i = 0;
 
 	  function parseIndex() {
-	    var index = {};
+	    const index = {};
 	    list.push(index);
 
 	    // Parse diff metadata
 	    while (i < diffstr.length) {
-	      var line = diffstr[i];
+	      const line = diffstr[i];
 
 	      // File header found, end parsing diff metadata
 	      if (/^(\-\-\-|\+\+\+|@@)\s/.test(line)) {
@@ -11766,7 +11803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // Diff index
-	      var header = /^(?:Index:|diff(?: -r \w+)+)\s+(.+?)\s*$/.exec(line);
+	      const header = /^(?:Index:|diff(?: -r \w+)+)\s+(.+?)\s*$/.exec(line);
 	      if (header) {
 	        index.index = header[1];
 	      }
@@ -11783,7 +11820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    index.hunks = [];
 
 	    while (i < diffstr.length) {
-	      var _line = diffstr[i];
+	      const _line = diffstr[i];
 
 	      if (/^(Index:|diff|\-\-\-|\+\+\+)\s/.test(_line)) {
 	        break;
@@ -11791,7 +11828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        index.hunks.push(parseHunk());
 	      } else if (_line && options.strict) {
 	        // Ignore unexpected content unless in strict mode
-	        throw new Error('Unknown line ' + (i + 1) + ' ' + JSON.stringify(_line));
+	        throw new Error(`Unknown line ${  i + 1  } ${  JSON.stringify(_line)}`);
 	      } else {
 	        i++;
 	      }
@@ -11801,16 +11838,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Parses the --- and +++ headers, if none are found, no lines
 	  // are consumed.
 	  function parseFileHeader(index) {
-	    var fileHeader = /^(---|\+\+\+)\s+(.*)$/.exec(diffstr[i]);
+	    const fileHeader = /^(---|\+\+\+)\s+(.*)$/.exec(diffstr[i]);
 	    if (fileHeader) {
-	      var keyPrefix = fileHeader[1] === '---' ? 'old' : 'new';
-	      var data = fileHeader[2].split('\t', 2);
-	      var fileName = data[0].replace(/\\\\/g, '\\');
+	      const keyPrefix = fileHeader[1] === '---' ? 'old' : 'new';
+	      const data = fileHeader[2].split('\t', 2);
+	      let fileName = data[0].replace(/\\\\/g, '\\');
 	      if (/^".*"$/.test(fileName)) {
 	        fileName = fileName.substr(1, fileName.length - 2);
 	      }
-	      index[keyPrefix + 'FileName'] = fileName;
-	      index[keyPrefix + 'Header'] = (data[1] || '').trim();
+	      index[`${keyPrefix  }FileName`] = fileName;
+	      index[`${keyPrefix  }Header`] = (data[1] || '').trim();
 
 	      i++;
 	    }
@@ -11819,11 +11856,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Parses a hunk
 	  // This assumes that we are at the start of a hunk.
 	  function parseHunk() {
-	    var chunkHeaderIndex = i,
-	        chunkHeaderLine = diffstr[i++],
-	        chunkHeader = chunkHeaderLine.split(/@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/);
+	    const chunkHeaderIndex = i;
+	        const chunkHeaderLine = diffstr[i++];
+	        const chunkHeader = chunkHeaderLine.split(/@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/);
 
-	    var hunk = {
+	    const hunk = {
 	      oldStart: +chunkHeader[1],
 	      oldLines: +chunkHeader[2] || 1,
 	      newStart: +chunkHeader[3],
@@ -11832,15 +11869,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      linedelimiters: []
 	    };
 
-	    var addCount = 0,
-	        removeCount = 0;
+	    let addCount = 0;
+	        let removeCount = 0;
 	    for (; i < diffstr.length; i++) {
 	      // Lines starting with '---' could be mistaken for the "remove line" operation
 	      // But they could be the header for the next file. Therefore prune such cases out.
 	      if (diffstr[i].indexOf('--- ') === 0 && i + 2 < diffstr.length && diffstr[i + 1].indexOf('+++ ') === 0 && diffstr[i + 2].indexOf('@@') === 0) {
 	        break;
 	      }
-	      var operation = diffstr[i].length == 0 && i != diffstr.length - 1 ? ' ' : diffstr[i][0];
+	      const operation = diffstr[i].length == 0 && i != diffstr.length - 1 ? ' ' : diffstr[i][0];
 
 	      if (operation === '+' || operation === '-' || operation === ' ' || operation === '\\') {
 	        hunk.lines.push(diffstr[i]);
@@ -11870,10 +11907,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Perform optional sanity checking
 	    if (options.strict) {
 	      if (addCount !== hunk.newLines) {
-	        throw new Error('Added line count did not match for hunk at line ' + (chunkHeaderIndex + 1));
+	        throw new Error(`Added line count did not match for hunk at line ${  chunkHeaderIndex + 1}`);
 	      }
 	      if (removeCount !== hunk.oldLines) {
-	        throw new Error('Removed line count did not match for hunk at line ' + (chunkHeaderIndex + 1));
+	        throw new Error(`Removed line count did not match for hunk at line ${  chunkHeaderIndex + 1}`);
 	      }
 	    }
 
@@ -11889,19 +11926,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 12 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/"use strict";
+	/* istanbul ignore start */
+
+"use strict";
 
 	exports.__esModule = true;
 
-	exports["default"] = /*istanbul ignore end*/function (start, minLine, maxLine) {
-	  var wantForward = true,
-	      backwardExhausted = false,
-	      forwardExhausted = false,
-	      localOffset = 1;
+	exports.default = /* istanbul ignore end */function (start, minLine, maxLine) {
+	  let wantForward = true;
+	      let backwardExhausted = false;
+	      let forwardExhausted = false;
+	      let localOffset = 1;
 
 	  return function iterator() {
 	    if (wantForward && !forwardExhausted) {
@@ -11942,28 +11981,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 13 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/calcLineCount = calcLineCount;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/merge = merge;
+	exports. /* istanbul ignore end */calcLineCount = calcLineCount;
+	/* istanbul ignore start */exports. /* istanbul ignore end */merge = merge;
 
-	var /*istanbul ignore start*/_create = __webpack_require__(14) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_create = __webpack_require__(14) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_parse = __webpack_require__(11) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_parse = __webpack_require__(11) /* istanbul ignore end */;
 
-	var /*istanbul ignore start*/_array = __webpack_require__(15) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_array = __webpack_require__(15) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	/* istanbul ignore start */function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; }  return Array.from(arr);  }
 
-	/*istanbul ignore end*/function calcLineCount(hunk) {
-	  /*istanbul ignore start*/var _calcOldNewLineCount = /*istanbul ignore end*/calcOldNewLineCount(hunk.lines),
-	      oldLines = _calcOldNewLineCount.oldLines,
-	      newLines = _calcOldNewLineCount.newLines;
+	/* istanbul ignore end */function calcLineCount(hunk) {
+	  /* istanbul ignore start */const _calcOldNewLineCount = /* istanbul ignore end */calcOldNewLineCount(hunk.lines);
+	      const {oldLines} = _calcOldNewLineCount;
+	      const {newLines} = _calcOldNewLineCount;
 
 	  if (oldLines !== undefined) {
 	    hunk.oldLines = oldLines;
@@ -11982,7 +12023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  mine = loadPatch(mine, base);
 	  theirs = loadPatch(theirs, base);
 
-	  var ret = {};
+	  const ret = {};
 
 	  // For index we just let it pass through as it doesn't have any necessary meaning.
 	  // Leaving sanity checks on this to the API consumer that may know more about the
@@ -12015,14 +12056,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  ret.hunks = [];
 
-	  var mineIndex = 0,
-	      theirsIndex = 0,
-	      mineOffset = 0,
-	      theirsOffset = 0;
+	  let mineIndex = 0;
+	      let theirsIndex = 0;
+	      let mineOffset = 0;
+	      let theirsOffset = 0;
 
 	  while (mineIndex < mine.hunks.length || theirsIndex < theirs.hunks.length) {
-	    var mineCurrent = mine.hunks[mineIndex] || { oldStart: Infinity },
-	        theirsCurrent = theirs.hunks[theirsIndex] || { oldStart: Infinity };
+	    const mineCurrent = mine.hunks[mineIndex] || { oldStart: Infinity };
+	        const theirsCurrent = theirs.hunks[theirsIndex] || { oldStart: Infinity };
 
 	    if (hunkBefore(mineCurrent, theirsCurrent)) {
 	      // This patch does not overlap with any of the others, yay.
@@ -12036,7 +12077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mineOffset += theirsCurrent.newLines - theirsCurrent.oldLines;
 	    } else {
 	      // Overlap, merge as best we can
-	      var mergedHunk = {
+	      const mergedHunk = {
 	        oldStart: Math.min(mineCurrent.oldStart, theirsCurrent.oldStart),
 	        oldLines: 0,
 	        newStart: Math.min(mineCurrent.newStart + mineOffset, theirsCurrent.oldStart + theirsOffset),
@@ -12057,14 +12098,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	function loadPatch(param, base) {
 	  if (typeof param === 'string') {
 	    if (/^@@/m.test(param) || /^Index:/m.test(param)) {
-	      return (/*istanbul ignore start*/(0, _parse.parsePatch) /*istanbul ignore end*/(param)[0]
+	      return (/* istanbul ignore start */(0, _parse.parsePatch) /* istanbul ignore end */(param)[0]
 	      );
 	    }
 
 	    if (!base) {
 	      throw new Error('Must provide a base reference or pass in a patch');
 	    }
-	    return (/*istanbul ignore start*/(0, _create.structuredPatch) /*istanbul ignore end*/(undefined, undefined, base, param)
+	    return (/* istanbul ignore start */(0, _create.structuredPatch) /* istanbul ignore end */(undefined, undefined, base, param)
 	    );
 	  }
 
@@ -12078,10 +12119,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function selectField(index, mine, theirs) {
 	  if (mine === theirs) {
 	    return mine;
-	  } else {
+	  } 
 	    index.conflict = true;
-	    return { mine: mine, theirs: theirs };
-	  }
+	    return { mine, theirs };
+	  
 	}
 
 	function hunkBefore(test, check) {
@@ -12099,8 +12140,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function mergeLines(hunk, mineOffset, mineLines, theirOffset, theirLines) {
 	  // This will generally result in a conflicted hunk, but there are cases where the context
 	  // is the only overlap where we can successfully merge the content here.
-	  var mine = { offset: mineOffset, lines: mineLines, index: 0 },
-	      their = { offset: theirOffset, lines: theirLines, index: 0 };
+	  const mine = { offset: mineOffset, lines: mineLines, index: 0 };
+	      const their = { offset: theirOffset, lines: theirLines, index: 0 };
 
 	  // Handle any leading content
 	  insertLeading(hunk, mine, their);
@@ -12108,22 +12149,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Now in the overlap content. Scan through and select the best changes from each.
 	  while (mine.index < mine.lines.length && their.index < their.lines.length) {
-	    var mineCurrent = mine.lines[mine.index],
-	        theirCurrent = their.lines[their.index];
+	    const mineCurrent = mine.lines[mine.index];
+	        const theirCurrent = their.lines[their.index];
 
 	    if ((mineCurrent[0] === '-' || mineCurrent[0] === '+') && (theirCurrent[0] === '-' || theirCurrent[0] === '+')) {
 	      // Both modified ...
 	      mutualChange(hunk, mine, their);
 	    } else if (mineCurrent[0] === '+' && theirCurrent[0] === ' ') {
-	      /*istanbul ignore start*/var _hunk$lines;
+	      /* istanbul ignore start */var _hunk$lines;
 
-	      /*istanbul ignore end*/ // Mine inserted
-	      /*istanbul ignore start*/(_hunk$lines = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/collectChange(mine)));
+	      /* istanbul ignore end */ // Mine inserted
+	      /* istanbul ignore start */(_hunk$lines = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */collectChange(mine)));
 	    } else if (theirCurrent[0] === '+' && mineCurrent[0] === ' ') {
-	      /*istanbul ignore start*/var _hunk$lines2;
+	      /* istanbul ignore start */var _hunk$lines2;
 
-	      /*istanbul ignore end*/ // Theirs inserted
-	      /*istanbul ignore start*/(_hunk$lines2 = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines2 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/collectChange(their)));
+	      /* istanbul ignore end */ // Theirs inserted
+	      /* istanbul ignore start */(_hunk$lines2 = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines2 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */collectChange(their)));
 	    } else if (mineCurrent[0] === '-' && theirCurrent[0] === ' ') {
 	      // Mine removed or edited
 	      removal(hunk, mine, their);
@@ -12149,26 +12190,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function mutualChange(hunk, mine, their) {
-	  var myChanges = collectChange(mine),
-	      theirChanges = collectChange(their);
+	  const myChanges = collectChange(mine);
+	      const theirChanges = collectChange(their);
 
 	  if (allRemoves(myChanges) && allRemoves(theirChanges)) {
 	    // Special case for remove changes that are supersets of one another
-	    if ( /*istanbul ignore start*/(0, _array.arrayStartsWith) /*istanbul ignore end*/(myChanges, theirChanges) && skipRemoveSuperset(their, myChanges, myChanges.length - theirChanges.length)) {
-	      /*istanbul ignore start*/var _hunk$lines3;
+	    if ( /* istanbul ignore start */(0, _array.arrayStartsWith) /* istanbul ignore end */(myChanges, theirChanges) && skipRemoveSuperset(their, myChanges, myChanges.length - theirChanges.length)) {
+	      /* istanbul ignore start */let _hunk$lines3;
 
-	      /*istanbul ignore end*/ /*istanbul ignore start*/(_hunk$lines3 = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines3 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/myChanges));
+	      /* istanbul ignore end */ /* istanbul ignore start */(_hunk$lines3 = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines3 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */myChanges));
 	      return;
-	    } else if ( /*istanbul ignore start*/(0, _array.arrayStartsWith) /*istanbul ignore end*/(theirChanges, myChanges) && skipRemoveSuperset(mine, theirChanges, theirChanges.length - myChanges.length)) {
-	      /*istanbul ignore start*/var _hunk$lines4;
+	    } if ( /* istanbul ignore start */(0, _array.arrayStartsWith) /* istanbul ignore end */(theirChanges, myChanges) && skipRemoveSuperset(mine, theirChanges, theirChanges.length - myChanges.length)) {
+	      /* istanbul ignore start */let _hunk$lines4;
 
-	      /*istanbul ignore end*/ /*istanbul ignore start*/(_hunk$lines4 = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines4 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/theirChanges));
+	      /* istanbul ignore end */ /* istanbul ignore start */(_hunk$lines4 = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines4 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */theirChanges));
 	      return;
 	    }
-	  } else if ( /*istanbul ignore start*/(0, _array.arrayEqual) /*istanbul ignore end*/(myChanges, theirChanges)) {
-	    /*istanbul ignore start*/var _hunk$lines5;
+	  } else if ( /* istanbul ignore start */(0, _array.arrayEqual) /* istanbul ignore end */(myChanges, theirChanges)) {
+	    /* istanbul ignore start */let _hunk$lines5;
 
-	    /*istanbul ignore end*/ /*istanbul ignore start*/(_hunk$lines5 = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines5 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/myChanges));
+	    /* istanbul ignore end */ /* istanbul ignore start */(_hunk$lines5 = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines5 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */myChanges));
 	    return;
 	  }
 
@@ -12176,12 +12217,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function removal(hunk, mine, their, swap) {
-	  var myChanges = collectChange(mine),
-	      theirChanges = collectContext(their, myChanges);
+	  const myChanges = collectChange(mine);
+	      const theirChanges = collectContext(their, myChanges);
 	  if (theirChanges.merged) {
-	    /*istanbul ignore start*/var _hunk$lines6;
+	    /* istanbul ignore start */let _hunk$lines6;
 
-	    /*istanbul ignore end*/ /*istanbul ignore start*/(_hunk$lines6 = /*istanbul ignore end*/hunk.lines).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_hunk$lines6 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/theirChanges.merged));
+	    /* istanbul ignore end */ /* istanbul ignore start */(_hunk$lines6 = /* istanbul ignore end */hunk.lines).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_hunk$lines6 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */theirChanges.merged));
 	  } else {
 	    conflict(hunk, swap ? theirChanges : myChanges, swap ? myChanges : theirChanges);
 	  }
@@ -12191,30 +12232,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  hunk.conflict = true;
 	  hunk.lines.push({
 	    conflict: true,
-	    mine: mine,
+	    mine,
 	    theirs: their
 	  });
 	}
 
 	function insertLeading(hunk, insert, their) {
 	  while (insert.offset < their.offset && insert.index < insert.lines.length) {
-	    var line = insert.lines[insert.index++];
+	    const line = insert.lines[insert.index++];
 	    hunk.lines.push(line);
 	    insert.offset++;
 	  }
 	}
 	function insertTrailing(hunk, insert) {
 	  while (insert.index < insert.lines.length) {
-	    var line = insert.lines[insert.index++];
+	    const line = insert.lines[insert.index++];
 	    hunk.lines.push(line);
 	  }
 	}
 
 	function collectChange(state) {
-	  var ret = [],
-	      operation = state.lines[state.index][0];
+	  const ret = [];
+	      let operation = state.lines[state.index][0];
 	  while (state.index < state.lines.length) {
-	    var line = state.lines[state.index];
+	    const line = state.lines[state.index];
 
 	    // Group additions that are immediately after subtractions and treat them as one "atomic" modify change.
 	    if (operation === '-' && line[0] === '+') {
@@ -12232,14 +12273,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 	function collectContext(state, matchChanges) {
-	  var changes = [],
-	      merged = [],
-	      matchIndex = 0,
-	      contextChanges = false,
-	      conflicted = false;
+	  const changes = [];
+	      const merged = [];
+	      let matchIndex = 0;
+	      let contextChanges = false;
+	      let conflicted = false;
 	  while (matchIndex < matchChanges.length && state.index < state.lines.length) {
-	    var change = state.lines[state.index],
-	        match = matchChanges[matchIndex];
+	    let change = state.lines[state.index];
+	        const match = matchChanges[matchIndex];
 
 	    // Once we've hit our add, then we are done
 	    if (match[0] === '+') {
@@ -12283,8 +12324,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  return {
-	    merged: merged,
-	    changes: changes
+	    merged,
+	    changes
 	  };
 	}
 
@@ -12294,9 +12335,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, true);
 	}
 	function skipRemoveSuperset(state, removeChanges, delta) {
-	  for (var i = 0; i < delta; i++) {
-	    var changeContent = removeChanges[removeChanges.length - delta + i].substr(1);
-	    if (state.lines[state.index + i] !== ' ' + changeContent) {
+	  for (let i = 0; i < delta; i++) {
+	    const changeContent = removeChanges[removeChanges.length - delta + i].substr(1);
+	    if (state.lines[state.index + i] !== ` ${  changeContent}`) {
 	      return false;
 	    }
 	  }
@@ -12306,13 +12347,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function calcOldNewLineCount(lines) {
-	  var oldLines = 0;
-	  var newLines = 0;
+	  let oldLines = 0;
+	  let newLines = 0;
 
 	  lines.forEach(function (line) {
 	    if (typeof line !== 'string') {
-	      var myCount = calcOldNewLineCount(line.mine);
-	      var theirCount = calcOldNewLineCount(line.theirs);
+	      const myCount = calcOldNewLineCount(line.mine);
+	      const theirCount = calcOldNewLineCount(line.theirs);
 
 	      if (oldLines !== undefined) {
 	        if (myCount.oldLines === theirCount.oldLines) {
@@ -12339,27 +12380,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 
-	  return { oldLines: oldLines, newLines: newLines };
+	  return { oldLines, newLines };
 	}
 
 
 
-/***/ }),
+/** */ }),
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
+/** */ (function(module, exports, __webpack_require__) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/structuredPatch = structuredPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/createTwoFilesPatch = createTwoFilesPatch;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/createPatch = createPatch;
+	exports. /* istanbul ignore end */structuredPatch = structuredPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */createTwoFilesPatch = createTwoFilesPatch;
+	/* istanbul ignore start */exports. /* istanbul ignore end */createPatch = createPatch;
 
-	var /*istanbul ignore start*/_line = __webpack_require__(5) /*istanbul ignore end*/;
+	const /* istanbul ignore start */_line = __webpack_require__(5) /* istanbul ignore end */;
 
-	/*istanbul ignore start*/function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	/* istanbul ignore start */function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; }  return Array.from(arr);  }
 
-	/*istanbul ignore end*/function structuredPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options) {
+	/* istanbul ignore end */function structuredPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options) {
 	  if (!options) {
 	    options = {};
 	  }
@@ -12367,33 +12410,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    options.context = 4;
 	  }
 
-	  var diff = /*istanbul ignore start*/(0, _line.diffLines) /*istanbul ignore end*/(oldStr, newStr, options);
+	  const diff = /* istanbul ignore start */(0, _line.diffLines) /* istanbul ignore end */(oldStr, newStr, options);
 	  diff.push({ value: '', lines: [] }); // Append an empty value to make cleanup easier
 
 	  function contextLines(lines) {
 	    return lines.map(function (entry) {
-	      return ' ' + entry;
+	      return ` ${  entry}`;
 	    });
 	  }
 
-	  var hunks = [];
-	  var oldRangeStart = 0,
-	      newRangeStart = 0,
-	      curRange = [],
-	      oldLine = 1,
-	      newLine = 1;
+	  const hunks = [];
+	  let oldRangeStart = 0;
+	      let newRangeStart = 0;
+	      let curRange = [];
+	      let oldLine = 1;
+	      let newLine = 1;
 
-	  /*istanbul ignore start*/var _loop = function _loop( /*istanbul ignore end*/i) {
-	    var current = diff[i],
-	        lines = current.lines || current.value.replace(/\n$/, '').split('\n');
+	  /* istanbul ignore start */const _loop = function _loop( /* istanbul ignore end */i) {
+	    const current = diff[i];
+	        const lines = current.lines || current.value.replace(/\n$/, '').split('\n');
 	    current.lines = lines;
 
 	    if (current.added || current.removed) {
-	      /*istanbul ignore start*/var _curRange;
+	      /* istanbul ignore start */let _curRange;
 
-	      /*istanbul ignore end*/ // If we have previous context, start with that
+	      /* istanbul ignore end */ // If we have previous context, start with that
 	      if (!oldRangeStart) {
-	        var prev = diff[i - 1];
+	        const prev = diff[i - 1];
 	        oldRangeStart = oldLine;
 	        newRangeStart = newLine;
 
@@ -12405,7 +12448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // Output our changes
-	      /*istanbul ignore start*/(_curRange = /*istanbul ignore end*/curRange).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_curRange /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/lines.map(function (entry) {
+	      /* istanbul ignore start */(_curRange = /* istanbul ignore end */curRange).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_curRange /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */lines.map(function (entry) {
 	        return (current.added ? '+' : '-') + entry;
 	      })));
 
@@ -12420,18 +12463,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (oldRangeStart) {
 	        // Close out any changes that have been output (or join overlapping)
 	        if (lines.length <= options.context * 2 && i < diff.length - 2) {
-	          /*istanbul ignore start*/var _curRange2;
+	          /* istanbul ignore start */let _curRange2;
 
-	          /*istanbul ignore end*/ // Overlapping
-	          /*istanbul ignore start*/(_curRange2 = /*istanbul ignore end*/curRange).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_curRange2 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/contextLines(lines)));
+	          /* istanbul ignore end */ // Overlapping
+	          /* istanbul ignore start */(_curRange2 = /* istanbul ignore end */curRange).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_curRange2 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */contextLines(lines)));
 	        } else {
-	          /*istanbul ignore start*/var _curRange3;
+	          /* istanbul ignore start */let _curRange3;
 
-	          /*istanbul ignore end*/ // end the range and output
-	          var contextSize = Math.min(lines.length, options.context);
-	          /*istanbul ignore start*/(_curRange3 = /*istanbul ignore end*/curRange).push. /*istanbul ignore start*/apply /*istanbul ignore end*/( /*istanbul ignore start*/_curRange3 /*istanbul ignore end*/, /*istanbul ignore start*/_toConsumableArray( /*istanbul ignore end*/contextLines(lines.slice(0, contextSize))));
+	          /* istanbul ignore end */ // end the range and output
+	          const contextSize = Math.min(lines.length, options.context);
+	          /* istanbul ignore start */(_curRange3 = /* istanbul ignore end */curRange).push. /* istanbul ignore start */apply /* istanbul ignore end */( /* istanbul ignore start */_curRange3 /* istanbul ignore end */, /* istanbul ignore start */_toConsumableArray( /* istanbul ignore end */contextLines(lines.slice(0, contextSize))));
 
-	          var hunk = {
+	          const hunk = {
 	            oldStart: oldRangeStart,
 	            oldLines: oldLine - oldRangeStart + contextSize,
 	            newStart: newRangeStart,
@@ -12440,8 +12483,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          };
 	          if (i >= diff.length - 2 && lines.length <= options.context) {
 	            // EOF is inside this hunk
-	            var oldEOFNewline = /\n$/.test(oldStr);
-	            var newEOFNewline = /\n$/.test(newStr);
+	            const oldEOFNewline = /\n$/.test(oldStr);
+	            const newEOFNewline = /\n$/.test(newStr);
 	            if (lines.length == 0 && !oldEOFNewline) {
 	              // special case: old has no eol and no trailing context; no-nl can end up before adds
 	              curRange.splice(hunk.oldLines, 0, '\\ No newline at end of file');
@@ -12461,35 +12504,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  for (var i = 0; i < diff.length; i++) {
-	    /*istanbul ignore start*/_loop( /*istanbul ignore end*/i);
+	  for (let i = 0; i < diff.length; i++) {
+	    /* istanbul ignore start */_loop( /* istanbul ignore end */i);
 	  }
 
 	  return {
-	    oldFileName: oldFileName, newFileName: newFileName,
-	    oldHeader: oldHeader, newHeader: newHeader,
-	    hunks: hunks
+	    oldFileName, newFileName,
+	    oldHeader, newHeader,
+	    hunks
 	  };
 	}
 
 	function createTwoFilesPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options) {
-	  var diff = structuredPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options);
+	  const diff = structuredPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options);
 
-	  var ret = [];
+	  const ret = [];
 	  if (oldFileName == newFileName) {
-	    ret.push('Index: ' + oldFileName);
+	    ret.push(`Index: ${  oldFileName}`);
 	  }
 	  ret.push('===================================================================');
-	  ret.push('--- ' + diff.oldFileName + (typeof diff.oldHeader === 'undefined' ? '' : '\t' + diff.oldHeader));
-	  ret.push('+++ ' + diff.newFileName + (typeof diff.newHeader === 'undefined' ? '' : '\t' + diff.newHeader));
+	  ret.push(`--- ${  diff.oldFileName  }${typeof diff.oldHeader === 'undefined' ? '' : `\t${  diff.oldHeader}`}`);
+	  ret.push(`+++ ${  diff.newFileName  }${typeof diff.newHeader === 'undefined' ? '' : `\t${  diff.newHeader}`}`);
 
-	  for (var i = 0; i < diff.hunks.length; i++) {
-	    var hunk = diff.hunks[i];
-	    ret.push('@@ -' + hunk.oldStart + ',' + hunk.oldLines + ' +' + hunk.newStart + ',' + hunk.newLines + ' @@');
+	  for (let i = 0; i < diff.hunks.length; i++) {
+	    const hunk = diff.hunks[i];
+	    ret.push(`@@ -${  hunk.oldStart  },${  hunk.oldLines  } +${  hunk.newStart  },${  hunk.newLines  } @@`);
 	    ret.push.apply(ret, hunk.lines);
 	  }
 
-	  return ret.join('\n') + '\n';
+	  return `${ret.join('\n')  }\n`;
 	}
 
 	function createPatch(fileName, oldStr, newStr, oldHeader, newHeader, options) {
@@ -12498,15 +12541,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 15 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/"use strict";
+	/* istanbul ignore start */
+
+"use strict";
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/arrayEqual = arrayEqual;
-	/*istanbul ignore start*/exports. /*istanbul ignore end*/arrayStartsWith = arrayStartsWith;
+	exports. /* istanbul ignore end */arrayEqual = arrayEqual;
+	/* istanbul ignore start */exports. /* istanbul ignore end */arrayStartsWith = arrayStartsWith;
 	function arrayEqual(a, b) {
 	  if (a.length !== b.length) {
 	    return false;
@@ -12520,7 +12565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	  }
 
-	  for (var i = 0; i < start.length; i++) {
+	  for (let i = 0; i < start.length; i++) {
 	    if (start[i] !== array[i]) {
 	      return false;
 	    }
@@ -12531,20 +12576,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 16 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/"use strict";
+	/* istanbul ignore start */
+
+"use strict";
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/convertChangesToDMP = convertChangesToDMP;
+	exports. /* istanbul ignore end */convertChangesToDMP = convertChangesToDMP;
 	// See: http://code.google.com/p/google-diff-match-patch/wiki/API
 	function convertChangesToDMP(changes) {
-	  var ret = [],
-	      change = /*istanbul ignore start*/void 0 /*istanbul ignore end*/,
-	      operation = /*istanbul ignore start*/void 0 /*istanbul ignore end*/;
-	  for (var i = 0; i < changes.length; i++) {
+	  const ret = [];
+	      let change = /* istanbul ignore start */void 0 /* istanbul ignore end */;
+	      let operation = /* istanbul ignore start */void 0 /* istanbul ignore end */;
+	  for (let i = 0; i < changes.length; i++) {
 	    change = changes[i];
 	    if (change.added) {
 	      operation = 1;
@@ -12561,18 +12608,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ }),
+/** */ }),
 /* 17 */
-/***/ (function(module, exports) {
+/** */ (function(module, exports) {
 
-	/*istanbul ignore start*/'use strict';
+	/* istanbul ignore start */
+
+'use strict';
 
 	exports.__esModule = true;
-	exports. /*istanbul ignore end*/convertChangesToXML = convertChangesToXML;
+	exports. /* istanbul ignore end */convertChangesToXML = convertChangesToXML;
 	function convertChangesToXML(changes) {
-	  var ret = [];
-	  for (var i = 0; i < changes.length; i++) {
-	    var change = changes[i];
+	  const ret = [];
+	  for (let i = 0; i < changes.length; i++) {
+	    const change = changes[i];
 	    if (change.added) {
 	      ret.push('<ins>');
 	    } else if (change.removed) {
@@ -12591,7 +12640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function escapeHTML(s) {
-	  var n = s;
+	  let n = s;
 	  n = n.replace(/&/g, '&amp;');
 	  n = n.replace(/</g, '&lt;');
 	  n = n.replace(/>/g, '&gt;');
@@ -12602,14 +12651,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-/***/ })
-/******/ ])
+/** */ })
+/** *** */ ])
 });
 ;
 },{}],49:[function(require,module,exports){
 'use strict';
 
-var matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
+const matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
 
 module.exports = function (str) {
 	if (typeof str !== 'string') {
@@ -12641,9 +12690,9 @@ module.exports = function (str) {
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var objectCreate = Object.create || objectCreatePolyfill
-var objectKeys = Object.keys || objectKeysPolyfill
-var bind = Function.prototype.bind || functionBindPolyfill
+const objectCreate = Object.create || objectCreatePolyfill
+const objectKeys = Object.keys || objectKeysPolyfill
+const bind = Function.prototype.bind || functionBindPolyfill
 
 function EventEmitter() {
   if (!this._events || !Object.prototype.hasOwnProperty.call(this, '_events')) {
@@ -12663,21 +12712,21 @@ EventEmitter.prototype._maxListeners = undefined;
 
 // By default EventEmitters will print a warning if more than 10 listeners are
 // added to it. This is a useful default which helps finding memory leaks.
-var defaultMaxListeners = 10;
+let defaultMaxListeners = 10;
 
-var hasDefineProperty;
+let hasDefineProperty;
 try {
-  var o = {};
+  const o = {};
   if (Object.defineProperty) Object.defineProperty(o, 'x', { value: 0 });
   hasDefineProperty = o.x === 0;
 } catch (err) { hasDefineProperty = false }
 if (hasDefineProperty) {
   Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
     enumerable: true,
-    get: function() {
+    get() {
       return defaultMaxListeners;
     },
-    set: function(arg) {
+    set(arg) {
       // check whether the input is a positive number (whose value is zero or
       // greater and not a NaN).
       if (typeof arg !== 'number' || arg < 0 || arg !== arg)
@@ -12717,9 +12766,9 @@ function emitNone(handler, isFn, self) {
   if (isFn)
     handler.call(self);
   else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
+    const len = handler.length;
+    const listeners = arrayClone(handler, len);
+    for (let i = 0; i < len; ++i)
       listeners[i].call(self);
   }
 }
@@ -12727,9 +12776,9 @@ function emitOne(handler, isFn, self, arg1) {
   if (isFn)
     handler.call(self, arg1);
   else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
+    const len = handler.length;
+    const listeners = arrayClone(handler, len);
+    for (let i = 0; i < len; ++i)
       listeners[i].call(self, arg1);
   }
 }
@@ -12737,9 +12786,9 @@ function emitTwo(handler, isFn, self, arg1, arg2) {
   if (isFn)
     handler.call(self, arg1, arg2);
   else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
+    const len = handler.length;
+    const listeners = arrayClone(handler, len);
+    for (let i = 0; i < len; ++i)
       listeners[i].call(self, arg1, arg2);
   }
 }
@@ -12747,9 +12796,9 @@ function emitThree(handler, isFn, self, arg1, arg2, arg3) {
   if (isFn)
     handler.call(self, arg1, arg2, arg3);
   else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
+    const len = handler.length;
+    const listeners = arrayClone(handler, len);
+    for (let i = 0; i < len; ++i)
       listeners[i].call(self, arg1, arg2, arg3);
   }
 }
@@ -12758,16 +12807,16 @@ function emitMany(handler, isFn, self, args) {
   if (isFn)
     handler.apply(self, args);
   else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
+    const len = handler.length;
+    const listeners = arrayClone(handler, len);
+    for (let i = 0; i < len; ++i)
       listeners[i].apply(self, args);
   }
 }
 
 EventEmitter.prototype.emit = function emit(type) {
-  var er, handler, len, args, i, events;
-  var doError = (type === 'error');
+  let er; let handler; let len; let args; let i; let events;
+  let doError = (type === 'error');
 
   events = this._events;
   if (events)
@@ -12783,7 +12832,7 @@ EventEmitter.prototype.emit = function emit(type) {
       throw er; // Unhandled 'error' event
     } else {
       // At least give some kind of context to the user
-      var err = new Error('Unhandled "error" event. (' + er + ')');
+      const err = new Error(`Unhandled "error" event. (${  er  })`);
       err.context = er;
       throw err;
     }
@@ -12795,7 +12844,7 @@ EventEmitter.prototype.emit = function emit(type) {
   if (!handler)
     return false;
 
-  var isFn = typeof handler === 'function';
+  const isFn = typeof handler === 'function';
   len = arguments.length;
   switch (len) {
       // fast cases
@@ -12823,9 +12872,9 @@ EventEmitter.prototype.emit = function emit(type) {
 };
 
 function _addListener(target, type, listener, prepend) {
-  var m;
-  var events;
-  var existing;
+  let m;
+  let events;
+  let existing;
 
   if (typeof listener !== 'function')
     throw new TypeError('"listener" argument must be a function');
@@ -12871,10 +12920,10 @@ function _addListener(target, type, listener, prepend) {
       m = $getMaxListeners(target);
       if (m && m > 0 && existing.length > m) {
         existing.warned = true;
-        var w = new Error('Possible EventEmitter memory leak detected. ' +
-            existing.length + ' "' + String(type) + '" listeners ' +
-            'added. Use emitter.setMaxListeners() to ' +
-            'increase limit.');
+        const w = new Error(`Possible EventEmitter memory leak detected. ${ 
+            existing.length  } "${  String(type)  }" listeners ` +
+            `added. Use emitter.setMaxListeners() to ` +
+            `increase limit.`);
         w.name = 'MaxListenersExceededWarning';
         w.emitter = target;
         w.type = type;
@@ -12916,7 +12965,7 @@ function onceWrapper() {
             arguments[2]);
       default:
         var args = new Array(arguments.length);
-        for (var i = 0; i < args.length; ++i)
+        for (let i = 0; i < args.length; ++i)
           args[i] = arguments[i];
         this.listener.apply(this.target, args);
     }
@@ -12924,8 +12973,8 @@ function onceWrapper() {
 }
 
 function _onceWrap(target, type, listener) {
-  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
-  var wrapped = bind.call(onceWrapper, state);
+  const state = { fired: false, wrapFn: undefined, target, type, listener };
+  const wrapped = bind.call(onceWrapper, state);
   wrapped.listener = listener;
   state.wrapFn = wrapped;
   return wrapped;
@@ -12949,7 +12998,7 @@ EventEmitter.prototype.prependOnceListener =
 // Emits a 'removeListener' event if and only if the listener was removed.
 EventEmitter.prototype.removeListener =
     function removeListener(type, listener) {
-      var list, events, position, i, originalListener;
+      let list; let events; let position; let i; let originalListener;
 
       if (typeof listener !== 'function')
         throw new TypeError('"listener" argument must be a function');
@@ -13001,7 +13050,7 @@ EventEmitter.prototype.removeListener =
 
 EventEmitter.prototype.removeAllListeners =
     function removeAllListeners(type) {
-      var listeners, events, i;
+      let listeners; let events; let i;
 
       events = this._events;
       if (!events)
@@ -13023,8 +13072,8 @@ EventEmitter.prototype.removeAllListeners =
 
       // emit removeListener for all listeners on all events
       if (arguments.length === 0) {
-        var keys = objectKeys(events);
-        var key;
+        const keys = objectKeys(events);
+        let key;
         for (i = 0; i < keys.length; ++i) {
           key = keys[i];
           if (key === 'removeListener') continue;
@@ -13051,12 +13100,12 @@ EventEmitter.prototype.removeAllListeners =
     };
 
 function _listeners(target, type, unwrap) {
-  var events = target._events;
+  const events = target._events;
 
   if (!events)
     return [];
 
-  var evlistener = events[type];
+  const evlistener = events[type];
   if (!evlistener)
     return [];
 
@@ -13077,21 +13126,21 @@ EventEmitter.prototype.rawListeners = function rawListeners(type) {
 EventEmitter.listenerCount = function(emitter, type) {
   if (typeof emitter.listenerCount === 'function') {
     return emitter.listenerCount(type);
-  } else {
+  } 
     return listenerCount.call(emitter, type);
-  }
+  
 };
 
 EventEmitter.prototype.listenerCount = listenerCount;
 function listenerCount(type) {
-  var events = this._events;
+  const events = this._events;
 
   if (events) {
-    var evlistener = events[type];
+    const evlistener = events[type];
 
     if (typeof evlistener === 'function') {
       return 1;
-    } else if (evlistener) {
+    } if (evlistener) {
       return evlistener.length;
     }
   }
@@ -13105,40 +13154,40 @@ EventEmitter.prototype.eventNames = function eventNames() {
 
 // About 1.5x faster than the two-arg version of Array#splice().
 function spliceOne(list, index) {
-  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
+  for (let i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
     list[i] = list[k];
   list.pop();
 }
 
 function arrayClone(arr, n) {
-  var copy = new Array(n);
-  for (var i = 0; i < n; ++i)
+  const copy = new Array(n);
+  for (let i = 0; i < n; ++i)
     copy[i] = arr[i];
   return copy;
 }
 
 function unwrapListeners(arr) {
-  var ret = new Array(arr.length);
-  for (var i = 0; i < ret.length; ++i) {
+  const ret = new Array(arr.length);
+  for (let i = 0; i < ret.length; ++i) {
     ret[i] = arr[i].listener || arr[i];
   }
   return ret;
 }
 
 function objectCreatePolyfill(proto) {
-  var F = function() {};
+  const F = function() {};
   F.prototype = proto;
   return new F;
 }
 function objectKeysPolyfill(obj) {
-  var keys = [];
+  const keys = [];
   for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) {
     keys.push(k);
   }
   return k;
 }
 function functionBindPolyfill(context) {
-  var fn = this;
+  const fn = this;
   return function () {
     return fn.apply(context, arguments);
   };
@@ -13149,22 +13198,22 @@ function functionBindPolyfill(context) {
 
 /* eslint no-invalid-this: 1 */
 
-var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
-var slice = Array.prototype.slice;
-var toStr = Object.prototype.toString;
-var funcType = '[object Function]';
+const ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+const {slice} = Array.prototype;
+const toStr = Object.prototype.toString;
+const funcType = '[object Function]';
 
 module.exports = function bind(that) {
-    var target = this;
+    const target = this;
     if (typeof target !== 'function' || toStr.call(target) !== funcType) {
         throw new TypeError(ERROR_MESSAGE + target);
     }
-    var args = slice.call(arguments, 1);
+    const args = slice.call(arguments, 1);
 
-    var bound;
-    var binder = function () {
+    let bound;
+    const binder = function () {
         if (this instanceof bound) {
-            var result = target.apply(
+            const result = target.apply(
                 this,
                 args.concat(slice.call(arguments))
             );
@@ -13172,24 +13221,24 @@ module.exports = function bind(that) {
                 return result;
             }
             return this;
-        } else {
+        } 
             return target.apply(
                 that,
                 args.concat(slice.call(arguments))
             );
-        }
+        
     };
 
-    var boundLength = Math.max(0, target.length - args.length);
-    var boundArgs = [];
-    for (var i = 0; i < boundLength; i++) {
-        boundArgs.push('$' + i);
+    const boundLength = Math.max(0, target.length - args.length);
+    const boundArgs = [];
+    for (let i = 0; i < boundLength; i++) {
+        boundArgs.push(`$${  i}`);
     }
 
-    bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this,arguments); }')(binder);
+    bound = Function('binder', `return function (${  boundArgs.join(',')  }){ return binder.apply(this,arguments); }`)(binder);
 
     if (target.prototype) {
-        var Empty = function Empty() {};
+        const Empty = function Empty() {};
         Empty.prototype = target.prototype;
         bound.prototype = new Empty();
         Empty.prototype = null;
@@ -13201,7 +13250,7 @@ module.exports = function bind(that) {
 },{}],52:[function(require,module,exports){
 'use strict';
 
-var implementation = require('./implementation');
+const implementation = require('./implementation');
 
 module.exports = Function.prototype.bind || implementation;
 
@@ -13213,9 +13262,9 @@ module.exports = function hasSymbols() {
 	if (typeof Symbol !== 'function' || typeof Object.getOwnPropertySymbols !== 'function') { return false; }
 	if (typeof Symbol.iterator === 'symbol') { return true; }
 
-	var obj = {};
-	var sym = Symbol('test');
-	var symObj = Object(sym);
+	const obj = {};
+	let sym = Symbol('test');
+	const symObj = Object(sym);
 	if (typeof sym === 'string') { return false; }
 
 	if (Object.prototype.toString.call(sym) !== '[object Symbol]') { return false; }
@@ -13229,20 +13278,20 @@ module.exports = function hasSymbols() {
 	// if (typeof Symbol.prototype.toString !== 'function') { return false; }
 	// if (String(sym) !== Symbol.prototype.toString.call(sym)) { return false; }
 
-	var symVal = 42;
+	const symVal = 42;
 	obj[sym] = symVal;
 	for (sym in obj) { return false; } // eslint-disable-line no-restricted-syntax
 	if (typeof Object.keys === 'function' && Object.keys(obj).length !== 0) { return false; }
 
 	if (typeof Object.getOwnPropertyNames === 'function' && Object.getOwnPropertyNames(obj).length !== 0) { return false; }
 
-	var syms = Object.getOwnPropertySymbols(obj);
+	const syms = Object.getOwnPropertySymbols(obj);
 	if (syms.length !== 1 || syms[0] !== sym) { return false; }
 
 	if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) { return false; }
 
 	if (typeof Object.getOwnPropertyDescriptor === 'function') {
-		var descriptor = Object.getOwnPropertyDescriptor(obj, sym);
+		const descriptor = Object.getOwnPropertyDescriptor(obj, sym);
 		if (descriptor.value !== symVal || descriptor.enumerable !== true) { return false; }
 	}
 
@@ -13255,15 +13304,15 @@ module.exports = function hasSymbols() {
 ;(function(root) {
 
 	// Detect free variables `exports`.
-	var freeExports = typeof exports == 'object' && exports;
+	const freeExports = typeof exports === 'object' && exports;
 
 	// Detect free variable `module`.
-	var freeModule = typeof module == 'object' && module &&
+	const freeModule = typeof module === 'object' && module &&
 		module.exports == freeExports && module;
 
 	// Detect free variable `global`, from Node.js or Browserified code,
 	// and use it as `root`.
-	var freeGlobal = typeof global == 'object' && global;
+	const freeGlobal = typeof global === 'object' && global;
 	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
 		root = freeGlobal;
 	}
@@ -13271,21 +13320,21 @@ module.exports = function hasSymbols() {
 	/*--------------------------------------------------------------------------*/
 
 	// All astral symbols.
-	var regexAstralSymbols = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+	const regexAstralSymbols = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 	// All ASCII symbols (not just printable ASCII) except those listed in the
 	// first column of the overrides table.
 	// https://html.spec.whatwg.org/multipage/syntax.html#table-charref-overrides
-	var regexAsciiWhitelist = /[\x01-\x7F]/g;
+	const regexAsciiWhitelist = /[\x01-\x7F]/g;
 	// All BMP symbols that are not ASCII newlines, printable ASCII symbols, or
 	// code points listed in the first column of the overrides table on
 	// https://html.spec.whatwg.org/multipage/syntax.html#table-charref-overrides.
-	var regexBmpWhitelist = /[\x01-\t\x0B\f\x0E-\x1F\x7F\x81\x8D\x8F\x90\x9D\xA0-\uFFFF]/g;
+	const regexBmpWhitelist = /[\x01-\t\x0B\f\x0E-\x1F\x7F\x81\x8D\x8F\x90\x9D\xA0-\uFFFF]/g;
 
-	var regexEncodeNonAscii = /<\u20D2|=\u20E5|>\u20D2|\u205F\u200A|\u219D\u0338|\u2202\u0338|\u2220\u20D2|\u2229\uFE00|\u222A\uFE00|\u223C\u20D2|\u223D\u0331|\u223E\u0333|\u2242\u0338|\u224B\u0338|\u224D\u20D2|\u224E\u0338|\u224F\u0338|\u2250\u0338|\u2261\u20E5|\u2264\u20D2|\u2265\u20D2|\u2266\u0338|\u2267\u0338|\u2268\uFE00|\u2269\uFE00|\u226A\u0338|\u226A\u20D2|\u226B\u0338|\u226B\u20D2|\u227F\u0338|\u2282\u20D2|\u2283\u20D2|\u228A\uFE00|\u228B\uFE00|\u228F\u0338|\u2290\u0338|\u2293\uFE00|\u2294\uFE00|\u22B4\u20D2|\u22B5\u20D2|\u22D8\u0338|\u22D9\u0338|\u22DA\uFE00|\u22DB\uFE00|\u22F5\u0338|\u22F9\u0338|\u2933\u0338|\u29CF\u0338|\u29D0\u0338|\u2A6D\u0338|\u2A70\u0338|\u2A7D\u0338|\u2A7E\u0338|\u2AA1\u0338|\u2AA2\u0338|\u2AAC\uFE00|\u2AAD\uFE00|\u2AAF\u0338|\u2AB0\u0338|\u2AC5\u0338|\u2AC6\u0338|\u2ACB\uFE00|\u2ACC\uFE00|\u2AFD\u20E5|[\xA0-\u0113\u0116-\u0122\u0124-\u012B\u012E-\u014D\u0150-\u017E\u0192\u01B5\u01F5\u0237\u02C6\u02C7\u02D8-\u02DD\u0311\u0391-\u03A1\u03A3-\u03A9\u03B1-\u03C9\u03D1\u03D2\u03D5\u03D6\u03DC\u03DD\u03F0\u03F1\u03F5\u03F6\u0401-\u040C\u040E-\u044F\u0451-\u045C\u045E\u045F\u2002-\u2005\u2007-\u2010\u2013-\u2016\u2018-\u201A\u201C-\u201E\u2020-\u2022\u2025\u2026\u2030-\u2035\u2039\u203A\u203E\u2041\u2043\u2044\u204F\u2057\u205F-\u2063\u20AC\u20DB\u20DC\u2102\u2105\u210A-\u2113\u2115-\u211E\u2122\u2124\u2127-\u2129\u212C\u212D\u212F-\u2131\u2133-\u2138\u2145-\u2148\u2153-\u215E\u2190-\u219B\u219D-\u21A7\u21A9-\u21AE\u21B0-\u21B3\u21B5-\u21B7\u21BA-\u21DB\u21DD\u21E4\u21E5\u21F5\u21FD-\u2205\u2207-\u2209\u220B\u220C\u220F-\u2214\u2216-\u2218\u221A\u221D-\u2238\u223A-\u2257\u2259\u225A\u225C\u225F-\u2262\u2264-\u228B\u228D-\u229B\u229D-\u22A5\u22A7-\u22B0\u22B2-\u22BB\u22BD-\u22DB\u22DE-\u22E3\u22E6-\u22F7\u22F9-\u22FE\u2305\u2306\u2308-\u2310\u2312\u2313\u2315\u2316\u231C-\u231F\u2322\u2323\u232D\u232E\u2336\u233D\u233F\u237C\u23B0\u23B1\u23B4-\u23B6\u23DC-\u23DF\u23E2\u23E7\u2423\u24C8\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2550-\u256C\u2580\u2584\u2588\u2591-\u2593\u25A1\u25AA\u25AB\u25AD\u25AE\u25B1\u25B3-\u25B5\u25B8\u25B9\u25BD-\u25BF\u25C2\u25C3\u25CA\u25CB\u25EC\u25EF\u25F8-\u25FC\u2605\u2606\u260E\u2640\u2642\u2660\u2663\u2665\u2666\u266A\u266D-\u266F\u2713\u2717\u2720\u2736\u2758\u2772\u2773\u27C8\u27C9\u27E6-\u27ED\u27F5-\u27FA\u27FC\u27FF\u2902-\u2905\u290C-\u2913\u2916\u2919-\u2920\u2923-\u292A\u2933\u2935-\u2939\u293C\u293D\u2945\u2948-\u294B\u294E-\u2976\u2978\u2979\u297B-\u297F\u2985\u2986\u298B-\u2996\u299A\u299C\u299D\u29A4-\u29B7\u29B9\u29BB\u29BC\u29BE-\u29C5\u29C9\u29CD-\u29D0\u29DC-\u29DE\u29E3-\u29E5\u29EB\u29F4\u29F6\u2A00-\u2A02\u2A04\u2A06\u2A0C\u2A0D\u2A10-\u2A17\u2A22-\u2A27\u2A29\u2A2A\u2A2D-\u2A31\u2A33-\u2A3C\u2A3F\u2A40\u2A42-\u2A4D\u2A50\u2A53-\u2A58\u2A5A-\u2A5D\u2A5F\u2A66\u2A6A\u2A6D-\u2A75\u2A77-\u2A9A\u2A9D-\u2AA2\u2AA4-\u2AB0\u2AB3-\u2AC8\u2ACB\u2ACC\u2ACF-\u2ADB\u2AE4\u2AE6-\u2AE9\u2AEB-\u2AF3\u2AFD\uFB00-\uFB04]|\uD835[\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDCCF\uDD04\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDD6B]/g;
-	var encodeMap = {'\xAD':'shy','\u200C':'zwnj','\u200D':'zwj','\u200E':'lrm','\u2063':'ic','\u2062':'it','\u2061':'af','\u200F':'rlm','\u200B':'ZeroWidthSpace','\u2060':'NoBreak','\u0311':'DownBreve','\u20DB':'tdot','\u20DC':'DotDot','\t':'Tab','\n':'NewLine','\u2008':'puncsp','\u205F':'MediumSpace','\u2009':'thinsp','\u200A':'hairsp','\u2004':'emsp13','\u2002':'ensp','\u2005':'emsp14','\u2003':'emsp','\u2007':'numsp','\xA0':'nbsp','\u205F\u200A':'ThickSpace','\u203E':'oline','_':'lowbar','\u2010':'dash','\u2013':'ndash','\u2014':'mdash','\u2015':'horbar',',':'comma',';':'semi','\u204F':'bsemi',':':'colon','\u2A74':'Colone','!':'excl','\xA1':'iexcl','?':'quest','\xBF':'iquest','.':'period','\u2025':'nldr','\u2026':'mldr','\xB7':'middot','\'':'apos','\u2018':'lsquo','\u2019':'rsquo','\u201A':'sbquo','\u2039':'lsaquo','\u203A':'rsaquo','"':'quot','\u201C':'ldquo','\u201D':'rdquo','\u201E':'bdquo','\xAB':'laquo','\xBB':'raquo','(':'lpar',')':'rpar','[':'lsqb',']':'rsqb','{':'lcub','}':'rcub','\u2308':'lceil','\u2309':'rceil','\u230A':'lfloor','\u230B':'rfloor','\u2985':'lopar','\u2986':'ropar','\u298B':'lbrke','\u298C':'rbrke','\u298D':'lbrkslu','\u298E':'rbrksld','\u298F':'lbrksld','\u2990':'rbrkslu','\u2991':'langd','\u2992':'rangd','\u2993':'lparlt','\u2994':'rpargt','\u2995':'gtlPar','\u2996':'ltrPar','\u27E6':'lobrk','\u27E7':'robrk','\u27E8':'lang','\u27E9':'rang','\u27EA':'Lang','\u27EB':'Rang','\u27EC':'loang','\u27ED':'roang','\u2772':'lbbrk','\u2773':'rbbrk','\u2016':'Vert','\xA7':'sect','\xB6':'para','@':'commat','*':'ast','/':'sol','undefined':null,'&':'amp','#':'num','%':'percnt','\u2030':'permil','\u2031':'pertenk','\u2020':'dagger','\u2021':'Dagger','\u2022':'bull','\u2043':'hybull','\u2032':'prime','\u2033':'Prime','\u2034':'tprime','\u2057':'qprime','\u2035':'bprime','\u2041':'caret','`':'grave','\xB4':'acute','\u02DC':'tilde','^':'Hat','\xAF':'macr','\u02D8':'breve','\u02D9':'dot','\xA8':'die','\u02DA':'ring','\u02DD':'dblac','\xB8':'cedil','\u02DB':'ogon','\u02C6':'circ','\u02C7':'caron','\xB0':'deg','\xA9':'copy','\xAE':'reg','\u2117':'copysr','\u2118':'wp','\u211E':'rx','\u2127':'mho','\u2129':'iiota','\u2190':'larr','\u219A':'nlarr','\u2192':'rarr','\u219B':'nrarr','\u2191':'uarr','\u2193':'darr','\u2194':'harr','\u21AE':'nharr','\u2195':'varr','\u2196':'nwarr','\u2197':'nearr','\u2198':'searr','\u2199':'swarr','\u219D':'rarrw','\u219D\u0338':'nrarrw','\u219E':'Larr','\u219F':'Uarr','\u21A0':'Rarr','\u21A1':'Darr','\u21A2':'larrtl','\u21A3':'rarrtl','\u21A4':'mapstoleft','\u21A5':'mapstoup','\u21A6':'map','\u21A7':'mapstodown','\u21A9':'larrhk','\u21AA':'rarrhk','\u21AB':'larrlp','\u21AC':'rarrlp','\u21AD':'harrw','\u21B0':'lsh','\u21B1':'rsh','\u21B2':'ldsh','\u21B3':'rdsh','\u21B5':'crarr','\u21B6':'cularr','\u21B7':'curarr','\u21BA':'olarr','\u21BB':'orarr','\u21BC':'lharu','\u21BD':'lhard','\u21BE':'uharr','\u21BF':'uharl','\u21C0':'rharu','\u21C1':'rhard','\u21C2':'dharr','\u21C3':'dharl','\u21C4':'rlarr','\u21C5':'udarr','\u21C6':'lrarr','\u21C7':'llarr','\u21C8':'uuarr','\u21C9':'rrarr','\u21CA':'ddarr','\u21CB':'lrhar','\u21CC':'rlhar','\u21D0':'lArr','\u21CD':'nlArr','\u21D1':'uArr','\u21D2':'rArr','\u21CF':'nrArr','\u21D3':'dArr','\u21D4':'iff','\u21CE':'nhArr','\u21D5':'vArr','\u21D6':'nwArr','\u21D7':'neArr','\u21D8':'seArr','\u21D9':'swArr','\u21DA':'lAarr','\u21DB':'rAarr','\u21DD':'zigrarr','\u21E4':'larrb','\u21E5':'rarrb','\u21F5':'duarr','\u21FD':'loarr','\u21FE':'roarr','\u21FF':'hoarr','\u2200':'forall','\u2201':'comp','\u2202':'part','\u2202\u0338':'npart','\u2203':'exist','\u2204':'nexist','\u2205':'empty','\u2207':'Del','\u2208':'in','\u2209':'notin','\u220B':'ni','\u220C':'notni','\u03F6':'bepsi','\u220F':'prod','\u2210':'coprod','\u2211':'sum','+':'plus','\xB1':'pm','\xF7':'div','\xD7':'times','<':'lt','\u226E':'nlt','<\u20D2':'nvlt','=':'equals','\u2260':'ne','=\u20E5':'bne','\u2A75':'Equal','>':'gt','\u226F':'ngt','>\u20D2':'nvgt','\xAC':'not','|':'vert','\xA6':'brvbar','\u2212':'minus','\u2213':'mp','\u2214':'plusdo','\u2044':'frasl','\u2216':'setmn','\u2217':'lowast','\u2218':'compfn','\u221A':'Sqrt','\u221D':'prop','\u221E':'infin','\u221F':'angrt','\u2220':'ang','\u2220\u20D2':'nang','\u2221':'angmsd','\u2222':'angsph','\u2223':'mid','\u2224':'nmid','\u2225':'par','\u2226':'npar','\u2227':'and','\u2228':'or','\u2229':'cap','\u2229\uFE00':'caps','\u222A':'cup','\u222A\uFE00':'cups','\u222B':'int','\u222C':'Int','\u222D':'tint','\u2A0C':'qint','\u222E':'oint','\u222F':'Conint','\u2230':'Cconint','\u2231':'cwint','\u2232':'cwconint','\u2233':'awconint','\u2234':'there4','\u2235':'becaus','\u2236':'ratio','\u2237':'Colon','\u2238':'minusd','\u223A':'mDDot','\u223B':'homtht','\u223C':'sim','\u2241':'nsim','\u223C\u20D2':'nvsim','\u223D':'bsim','\u223D\u0331':'race','\u223E':'ac','\u223E\u0333':'acE','\u223F':'acd','\u2240':'wr','\u2242':'esim','\u2242\u0338':'nesim','\u2243':'sime','\u2244':'nsime','\u2245':'cong','\u2247':'ncong','\u2246':'simne','\u2248':'ap','\u2249':'nap','\u224A':'ape','\u224B':'apid','\u224B\u0338':'napid','\u224C':'bcong','\u224D':'CupCap','\u226D':'NotCupCap','\u224D\u20D2':'nvap','\u224E':'bump','\u224E\u0338':'nbump','\u224F':'bumpe','\u224F\u0338':'nbumpe','\u2250':'doteq','\u2250\u0338':'nedot','\u2251':'eDot','\u2252':'efDot','\u2253':'erDot','\u2254':'colone','\u2255':'ecolon','\u2256':'ecir','\u2257':'cire','\u2259':'wedgeq','\u225A':'veeeq','\u225C':'trie','\u225F':'equest','\u2261':'equiv','\u2262':'nequiv','\u2261\u20E5':'bnequiv','\u2264':'le','\u2270':'nle','\u2264\u20D2':'nvle','\u2265':'ge','\u2271':'nge','\u2265\u20D2':'nvge','\u2266':'lE','\u2266\u0338':'nlE','\u2267':'gE','\u2267\u0338':'ngE','\u2268\uFE00':'lvnE','\u2268':'lnE','\u2269':'gnE','\u2269\uFE00':'gvnE','\u226A':'ll','\u226A\u0338':'nLtv','\u226A\u20D2':'nLt','\u226B':'gg','\u226B\u0338':'nGtv','\u226B\u20D2':'nGt','\u226C':'twixt','\u2272':'lsim','\u2274':'nlsim','\u2273':'gsim','\u2275':'ngsim','\u2276':'lg','\u2278':'ntlg','\u2277':'gl','\u2279':'ntgl','\u227A':'pr','\u2280':'npr','\u227B':'sc','\u2281':'nsc','\u227C':'prcue','\u22E0':'nprcue','\u227D':'sccue','\u22E1':'nsccue','\u227E':'prsim','\u227F':'scsim','\u227F\u0338':'NotSucceedsTilde','\u2282':'sub','\u2284':'nsub','\u2282\u20D2':'vnsub','\u2283':'sup','\u2285':'nsup','\u2283\u20D2':'vnsup','\u2286':'sube','\u2288':'nsube','\u2287':'supe','\u2289':'nsupe','\u228A\uFE00':'vsubne','\u228A':'subne','\u228B\uFE00':'vsupne','\u228B':'supne','\u228D':'cupdot','\u228E':'uplus','\u228F':'sqsub','\u228F\u0338':'NotSquareSubset','\u2290':'sqsup','\u2290\u0338':'NotSquareSuperset','\u2291':'sqsube','\u22E2':'nsqsube','\u2292':'sqsupe','\u22E3':'nsqsupe','\u2293':'sqcap','\u2293\uFE00':'sqcaps','\u2294':'sqcup','\u2294\uFE00':'sqcups','\u2295':'oplus','\u2296':'ominus','\u2297':'otimes','\u2298':'osol','\u2299':'odot','\u229A':'ocir','\u229B':'oast','\u229D':'odash','\u229E':'plusb','\u229F':'minusb','\u22A0':'timesb','\u22A1':'sdotb','\u22A2':'vdash','\u22AC':'nvdash','\u22A3':'dashv','\u22A4':'top','\u22A5':'bot','\u22A7':'models','\u22A8':'vDash','\u22AD':'nvDash','\u22A9':'Vdash','\u22AE':'nVdash','\u22AA':'Vvdash','\u22AB':'VDash','\u22AF':'nVDash','\u22B0':'prurel','\u22B2':'vltri','\u22EA':'nltri','\u22B3':'vrtri','\u22EB':'nrtri','\u22B4':'ltrie','\u22EC':'nltrie','\u22B4\u20D2':'nvltrie','\u22B5':'rtrie','\u22ED':'nrtrie','\u22B5\u20D2':'nvrtrie','\u22B6':'origof','\u22B7':'imof','\u22B8':'mumap','\u22B9':'hercon','\u22BA':'intcal','\u22BB':'veebar','\u22BD':'barvee','\u22BE':'angrtvb','\u22BF':'lrtri','\u22C0':'Wedge','\u22C1':'Vee','\u22C2':'xcap','\u22C3':'xcup','\u22C4':'diam','\u22C5':'sdot','\u22C6':'Star','\u22C7':'divonx','\u22C8':'bowtie','\u22C9':'ltimes','\u22CA':'rtimes','\u22CB':'lthree','\u22CC':'rthree','\u22CD':'bsime','\u22CE':'cuvee','\u22CF':'cuwed','\u22D0':'Sub','\u22D1':'Sup','\u22D2':'Cap','\u22D3':'Cup','\u22D4':'fork','\u22D5':'epar','\u22D6':'ltdot','\u22D7':'gtdot','\u22D8':'Ll','\u22D8\u0338':'nLl','\u22D9':'Gg','\u22D9\u0338':'nGg','\u22DA\uFE00':'lesg','\u22DA':'leg','\u22DB':'gel','\u22DB\uFE00':'gesl','\u22DE':'cuepr','\u22DF':'cuesc','\u22E6':'lnsim','\u22E7':'gnsim','\u22E8':'prnsim','\u22E9':'scnsim','\u22EE':'vellip','\u22EF':'ctdot','\u22F0':'utdot','\u22F1':'dtdot','\u22F2':'disin','\u22F3':'isinsv','\u22F4':'isins','\u22F5':'isindot','\u22F5\u0338':'notindot','\u22F6':'notinvc','\u22F7':'notinvb','\u22F9':'isinE','\u22F9\u0338':'notinE','\u22FA':'nisd','\u22FB':'xnis','\u22FC':'nis','\u22FD':'notnivc','\u22FE':'notnivb','\u2305':'barwed','\u2306':'Barwed','\u230C':'drcrop','\u230D':'dlcrop','\u230E':'urcrop','\u230F':'ulcrop','\u2310':'bnot','\u2312':'profline','\u2313':'profsurf','\u2315':'telrec','\u2316':'target','\u231C':'ulcorn','\u231D':'urcorn','\u231E':'dlcorn','\u231F':'drcorn','\u2322':'frown','\u2323':'smile','\u232D':'cylcty','\u232E':'profalar','\u2336':'topbot','\u233D':'ovbar','\u233F':'solbar','\u237C':'angzarr','\u23B0':'lmoust','\u23B1':'rmoust','\u23B4':'tbrk','\u23B5':'bbrk','\u23B6':'bbrktbrk','\u23DC':'OverParenthesis','\u23DD':'UnderParenthesis','\u23DE':'OverBrace','\u23DF':'UnderBrace','\u23E2':'trpezium','\u23E7':'elinters','\u2423':'blank','\u2500':'boxh','\u2502':'boxv','\u250C':'boxdr','\u2510':'boxdl','\u2514':'boxur','\u2518':'boxul','\u251C':'boxvr','\u2524':'boxvl','\u252C':'boxhd','\u2534':'boxhu','\u253C':'boxvh','\u2550':'boxH','\u2551':'boxV','\u2552':'boxdR','\u2553':'boxDr','\u2554':'boxDR','\u2555':'boxdL','\u2556':'boxDl','\u2557':'boxDL','\u2558':'boxuR','\u2559':'boxUr','\u255A':'boxUR','\u255B':'boxuL','\u255C':'boxUl','\u255D':'boxUL','\u255E':'boxvR','\u255F':'boxVr','\u2560':'boxVR','\u2561':'boxvL','\u2562':'boxVl','\u2563':'boxVL','\u2564':'boxHd','\u2565':'boxhD','\u2566':'boxHD','\u2567':'boxHu','\u2568':'boxhU','\u2569':'boxHU','\u256A':'boxvH','\u256B':'boxVh','\u256C':'boxVH','\u2580':'uhblk','\u2584':'lhblk','\u2588':'block','\u2591':'blk14','\u2592':'blk12','\u2593':'blk34','\u25A1':'squ','\u25AA':'squf','\u25AB':'EmptyVerySmallSquare','\u25AD':'rect','\u25AE':'marker','\u25B1':'fltns','\u25B3':'xutri','\u25B4':'utrif','\u25B5':'utri','\u25B8':'rtrif','\u25B9':'rtri','\u25BD':'xdtri','\u25BE':'dtrif','\u25BF':'dtri','\u25C2':'ltrif','\u25C3':'ltri','\u25CA':'loz','\u25CB':'cir','\u25EC':'tridot','\u25EF':'xcirc','\u25F8':'ultri','\u25F9':'urtri','\u25FA':'lltri','\u25FB':'EmptySmallSquare','\u25FC':'FilledSmallSquare','\u2605':'starf','\u2606':'star','\u260E':'phone','\u2640':'female','\u2642':'male','\u2660':'spades','\u2663':'clubs','\u2665':'hearts','\u2666':'diams','\u266A':'sung','\u2713':'check','\u2717':'cross','\u2720':'malt','\u2736':'sext','\u2758':'VerticalSeparator','\u27C8':'bsolhsub','\u27C9':'suphsol','\u27F5':'xlarr','\u27F6':'xrarr','\u27F7':'xharr','\u27F8':'xlArr','\u27F9':'xrArr','\u27FA':'xhArr','\u27FC':'xmap','\u27FF':'dzigrarr','\u2902':'nvlArr','\u2903':'nvrArr','\u2904':'nvHarr','\u2905':'Map','\u290C':'lbarr','\u290D':'rbarr','\u290E':'lBarr','\u290F':'rBarr','\u2910':'RBarr','\u2911':'DDotrahd','\u2912':'UpArrowBar','\u2913':'DownArrowBar','\u2916':'Rarrtl','\u2919':'latail','\u291A':'ratail','\u291B':'lAtail','\u291C':'rAtail','\u291D':'larrfs','\u291E':'rarrfs','\u291F':'larrbfs','\u2920':'rarrbfs','\u2923':'nwarhk','\u2924':'nearhk','\u2925':'searhk','\u2926':'swarhk','\u2927':'nwnear','\u2928':'toea','\u2929':'tosa','\u292A':'swnwar','\u2933':'rarrc','\u2933\u0338':'nrarrc','\u2935':'cudarrr','\u2936':'ldca','\u2937':'rdca','\u2938':'cudarrl','\u2939':'larrpl','\u293C':'curarrm','\u293D':'cularrp','\u2945':'rarrpl','\u2948':'harrcir','\u2949':'Uarrocir','\u294A':'lurdshar','\u294B':'ldrushar','\u294E':'LeftRightVector','\u294F':'RightUpDownVector','\u2950':'DownLeftRightVector','\u2951':'LeftUpDownVector','\u2952':'LeftVectorBar','\u2953':'RightVectorBar','\u2954':'RightUpVectorBar','\u2955':'RightDownVectorBar','\u2956':'DownLeftVectorBar','\u2957':'DownRightVectorBar','\u2958':'LeftUpVectorBar','\u2959':'LeftDownVectorBar','\u295A':'LeftTeeVector','\u295B':'RightTeeVector','\u295C':'RightUpTeeVector','\u295D':'RightDownTeeVector','\u295E':'DownLeftTeeVector','\u295F':'DownRightTeeVector','\u2960':'LeftUpTeeVector','\u2961':'LeftDownTeeVector','\u2962':'lHar','\u2963':'uHar','\u2964':'rHar','\u2965':'dHar','\u2966':'luruhar','\u2967':'ldrdhar','\u2968':'ruluhar','\u2969':'rdldhar','\u296A':'lharul','\u296B':'llhard','\u296C':'rharul','\u296D':'lrhard','\u296E':'udhar','\u296F':'duhar','\u2970':'RoundImplies','\u2971':'erarr','\u2972':'simrarr','\u2973':'larrsim','\u2974':'rarrsim','\u2975':'rarrap','\u2976':'ltlarr','\u2978':'gtrarr','\u2979':'subrarr','\u297B':'suplarr','\u297C':'lfisht','\u297D':'rfisht','\u297E':'ufisht','\u297F':'dfisht','\u299A':'vzigzag','\u299C':'vangrt','\u299D':'angrtvbd','\u29A4':'ange','\u29A5':'range','\u29A6':'dwangle','\u29A7':'uwangle','\u29A8':'angmsdaa','\u29A9':'angmsdab','\u29AA':'angmsdac','\u29AB':'angmsdad','\u29AC':'angmsdae','\u29AD':'angmsdaf','\u29AE':'angmsdag','\u29AF':'angmsdah','\u29B0':'bemptyv','\u29B1':'demptyv','\u29B2':'cemptyv','\u29B3':'raemptyv','\u29B4':'laemptyv','\u29B5':'ohbar','\u29B6':'omid','\u29B7':'opar','\u29B9':'operp','\u29BB':'olcross','\u29BC':'odsold','\u29BE':'olcir','\u29BF':'ofcir','\u29C0':'olt','\u29C1':'ogt','\u29C2':'cirscir','\u29C3':'cirE','\u29C4':'solb','\u29C5':'bsolb','\u29C9':'boxbox','\u29CD':'trisb','\u29CE':'rtriltri','\u29CF':'LeftTriangleBar','\u29CF\u0338':'NotLeftTriangleBar','\u29D0':'RightTriangleBar','\u29D0\u0338':'NotRightTriangleBar','\u29DC':'iinfin','\u29DD':'infintie','\u29DE':'nvinfin','\u29E3':'eparsl','\u29E4':'smeparsl','\u29E5':'eqvparsl','\u29EB':'lozf','\u29F4':'RuleDelayed','\u29F6':'dsol','\u2A00':'xodot','\u2A01':'xoplus','\u2A02':'xotime','\u2A04':'xuplus','\u2A06':'xsqcup','\u2A0D':'fpartint','\u2A10':'cirfnint','\u2A11':'awint','\u2A12':'rppolint','\u2A13':'scpolint','\u2A14':'npolint','\u2A15':'pointint','\u2A16':'quatint','\u2A17':'intlarhk','\u2A22':'pluscir','\u2A23':'plusacir','\u2A24':'simplus','\u2A25':'plusdu','\u2A26':'plussim','\u2A27':'plustwo','\u2A29':'mcomma','\u2A2A':'minusdu','\u2A2D':'loplus','\u2A2E':'roplus','\u2A2F':'Cross','\u2A30':'timesd','\u2A31':'timesbar','\u2A33':'smashp','\u2A34':'lotimes','\u2A35':'rotimes','\u2A36':'otimesas','\u2A37':'Otimes','\u2A38':'odiv','\u2A39':'triplus','\u2A3A':'triminus','\u2A3B':'tritime','\u2A3C':'iprod','\u2A3F':'amalg','\u2A40':'capdot','\u2A42':'ncup','\u2A43':'ncap','\u2A44':'capand','\u2A45':'cupor','\u2A46':'cupcap','\u2A47':'capcup','\u2A48':'cupbrcap','\u2A49':'capbrcup','\u2A4A':'cupcup','\u2A4B':'capcap','\u2A4C':'ccups','\u2A4D':'ccaps','\u2A50':'ccupssm','\u2A53':'And','\u2A54':'Or','\u2A55':'andand','\u2A56':'oror','\u2A57':'orslope','\u2A58':'andslope','\u2A5A':'andv','\u2A5B':'orv','\u2A5C':'andd','\u2A5D':'ord','\u2A5F':'wedbar','\u2A66':'sdote','\u2A6A':'simdot','\u2A6D':'congdot','\u2A6D\u0338':'ncongdot','\u2A6E':'easter','\u2A6F':'apacir','\u2A70':'apE','\u2A70\u0338':'napE','\u2A71':'eplus','\u2A72':'pluse','\u2A73':'Esim','\u2A77':'eDDot','\u2A78':'equivDD','\u2A79':'ltcir','\u2A7A':'gtcir','\u2A7B':'ltquest','\u2A7C':'gtquest','\u2A7D':'les','\u2A7D\u0338':'nles','\u2A7E':'ges','\u2A7E\u0338':'nges','\u2A7F':'lesdot','\u2A80':'gesdot','\u2A81':'lesdoto','\u2A82':'gesdoto','\u2A83':'lesdotor','\u2A84':'gesdotol','\u2A85':'lap','\u2A86':'gap','\u2A87':'lne','\u2A88':'gne','\u2A89':'lnap','\u2A8A':'gnap','\u2A8B':'lEg','\u2A8C':'gEl','\u2A8D':'lsime','\u2A8E':'gsime','\u2A8F':'lsimg','\u2A90':'gsiml','\u2A91':'lgE','\u2A92':'glE','\u2A93':'lesges','\u2A94':'gesles','\u2A95':'els','\u2A96':'egs','\u2A97':'elsdot','\u2A98':'egsdot','\u2A99':'el','\u2A9A':'eg','\u2A9D':'siml','\u2A9E':'simg','\u2A9F':'simlE','\u2AA0':'simgE','\u2AA1':'LessLess','\u2AA1\u0338':'NotNestedLessLess','\u2AA2':'GreaterGreater','\u2AA2\u0338':'NotNestedGreaterGreater','\u2AA4':'glj','\u2AA5':'gla','\u2AA6':'ltcc','\u2AA7':'gtcc','\u2AA8':'lescc','\u2AA9':'gescc','\u2AAA':'smt','\u2AAB':'lat','\u2AAC':'smte','\u2AAC\uFE00':'smtes','\u2AAD':'late','\u2AAD\uFE00':'lates','\u2AAE':'bumpE','\u2AAF':'pre','\u2AAF\u0338':'npre','\u2AB0':'sce','\u2AB0\u0338':'nsce','\u2AB3':'prE','\u2AB4':'scE','\u2AB5':'prnE','\u2AB6':'scnE','\u2AB7':'prap','\u2AB8':'scap','\u2AB9':'prnap','\u2ABA':'scnap','\u2ABB':'Pr','\u2ABC':'Sc','\u2ABD':'subdot','\u2ABE':'supdot','\u2ABF':'subplus','\u2AC0':'supplus','\u2AC1':'submult','\u2AC2':'supmult','\u2AC3':'subedot','\u2AC4':'supedot','\u2AC5':'subE','\u2AC5\u0338':'nsubE','\u2AC6':'supE','\u2AC6\u0338':'nsupE','\u2AC7':'subsim','\u2AC8':'supsim','\u2ACB\uFE00':'vsubnE','\u2ACB':'subnE','\u2ACC\uFE00':'vsupnE','\u2ACC':'supnE','\u2ACF':'csub','\u2AD0':'csup','\u2AD1':'csube','\u2AD2':'csupe','\u2AD3':'subsup','\u2AD4':'supsub','\u2AD5':'subsub','\u2AD6':'supsup','\u2AD7':'suphsub','\u2AD8':'supdsub','\u2AD9':'forkv','\u2ADA':'topfork','\u2ADB':'mlcp','\u2AE4':'Dashv','\u2AE6':'Vdashl','\u2AE7':'Barv','\u2AE8':'vBar','\u2AE9':'vBarv','\u2AEB':'Vbar','\u2AEC':'Not','\u2AED':'bNot','\u2AEE':'rnmid','\u2AEF':'cirmid','\u2AF0':'midcir','\u2AF1':'topcir','\u2AF2':'nhpar','\u2AF3':'parsim','\u2AFD':'parsl','\u2AFD\u20E5':'nparsl','\u266D':'flat','\u266E':'natur','\u266F':'sharp','\xA4':'curren','\xA2':'cent','$':'dollar','\xA3':'pound','\xA5':'yen','\u20AC':'euro','\xB9':'sup1','\xBD':'half','\u2153':'frac13','\xBC':'frac14','\u2155':'frac15','\u2159':'frac16','\u215B':'frac18','\xB2':'sup2','\u2154':'frac23','\u2156':'frac25','\xB3':'sup3','\xBE':'frac34','\u2157':'frac35','\u215C':'frac38','\u2158':'frac45','\u215A':'frac56','\u215D':'frac58','\u215E':'frac78','\uD835\uDCB6':'ascr','\uD835\uDD52':'aopf','\uD835\uDD1E':'afr','\uD835\uDD38':'Aopf','\uD835\uDD04':'Afr','\uD835\uDC9C':'Ascr','\xAA':'ordf','\xE1':'aacute','\xC1':'Aacute','\xE0':'agrave','\xC0':'Agrave','\u0103':'abreve','\u0102':'Abreve','\xE2':'acirc','\xC2':'Acirc','\xE5':'aring','\xC5':'angst','\xE4':'auml','\xC4':'Auml','\xE3':'atilde','\xC3':'Atilde','\u0105':'aogon','\u0104':'Aogon','\u0101':'amacr','\u0100':'Amacr','\xE6':'aelig','\xC6':'AElig','\uD835\uDCB7':'bscr','\uD835\uDD53':'bopf','\uD835\uDD1F':'bfr','\uD835\uDD39':'Bopf','\u212C':'Bscr','\uD835\uDD05':'Bfr','\uD835\uDD20':'cfr','\uD835\uDCB8':'cscr','\uD835\uDD54':'copf','\u212D':'Cfr','\uD835\uDC9E':'Cscr','\u2102':'Copf','\u0107':'cacute','\u0106':'Cacute','\u0109':'ccirc','\u0108':'Ccirc','\u010D':'ccaron','\u010C':'Ccaron','\u010B':'cdot','\u010A':'Cdot','\xE7':'ccedil','\xC7':'Ccedil','\u2105':'incare','\uD835\uDD21':'dfr','\u2146':'dd','\uD835\uDD55':'dopf','\uD835\uDCB9':'dscr','\uD835\uDC9F':'Dscr','\uD835\uDD07':'Dfr','\u2145':'DD','\uD835\uDD3B':'Dopf','\u010F':'dcaron','\u010E':'Dcaron','\u0111':'dstrok','\u0110':'Dstrok','\xF0':'eth','\xD0':'ETH','\u2147':'ee','\u212F':'escr','\uD835\uDD22':'efr','\uD835\uDD56':'eopf','\u2130':'Escr','\uD835\uDD08':'Efr','\uD835\uDD3C':'Eopf','\xE9':'eacute','\xC9':'Eacute','\xE8':'egrave','\xC8':'Egrave','\xEA':'ecirc','\xCA':'Ecirc','\u011B':'ecaron','\u011A':'Ecaron','\xEB':'euml','\xCB':'Euml','\u0117':'edot','\u0116':'Edot','\u0119':'eogon','\u0118':'Eogon','\u0113':'emacr','\u0112':'Emacr','\uD835\uDD23':'ffr','\uD835\uDD57':'fopf','\uD835\uDCBB':'fscr','\uD835\uDD09':'Ffr','\uD835\uDD3D':'Fopf','\u2131':'Fscr','\uFB00':'fflig','\uFB03':'ffilig','\uFB04':'ffllig','\uFB01':'filig','fj':'fjlig','\uFB02':'fllig','\u0192':'fnof','\u210A':'gscr','\uD835\uDD58':'gopf','\uD835\uDD24':'gfr','\uD835\uDCA2':'Gscr','\uD835\uDD3E':'Gopf','\uD835\uDD0A':'Gfr','\u01F5':'gacute','\u011F':'gbreve','\u011E':'Gbreve','\u011D':'gcirc','\u011C':'Gcirc','\u0121':'gdot','\u0120':'Gdot','\u0122':'Gcedil','\uD835\uDD25':'hfr','\u210E':'planckh','\uD835\uDCBD':'hscr','\uD835\uDD59':'hopf','\u210B':'Hscr','\u210C':'Hfr','\u210D':'Hopf','\u0125':'hcirc','\u0124':'Hcirc','\u210F':'hbar','\u0127':'hstrok','\u0126':'Hstrok','\uD835\uDD5A':'iopf','\uD835\uDD26':'ifr','\uD835\uDCBE':'iscr','\u2148':'ii','\uD835\uDD40':'Iopf','\u2110':'Iscr','\u2111':'Im','\xED':'iacute','\xCD':'Iacute','\xEC':'igrave','\xCC':'Igrave','\xEE':'icirc','\xCE':'Icirc','\xEF':'iuml','\xCF':'Iuml','\u0129':'itilde','\u0128':'Itilde','\u0130':'Idot','\u012F':'iogon','\u012E':'Iogon','\u012B':'imacr','\u012A':'Imacr','\u0133':'ijlig','\u0132':'IJlig','\u0131':'imath','\uD835\uDCBF':'jscr','\uD835\uDD5B':'jopf','\uD835\uDD27':'jfr','\uD835\uDCA5':'Jscr','\uD835\uDD0D':'Jfr','\uD835\uDD41':'Jopf','\u0135':'jcirc','\u0134':'Jcirc','\u0237':'jmath','\uD835\uDD5C':'kopf','\uD835\uDCC0':'kscr','\uD835\uDD28':'kfr','\uD835\uDCA6':'Kscr','\uD835\uDD42':'Kopf','\uD835\uDD0E':'Kfr','\u0137':'kcedil','\u0136':'Kcedil','\uD835\uDD29':'lfr','\uD835\uDCC1':'lscr','\u2113':'ell','\uD835\uDD5D':'lopf','\u2112':'Lscr','\uD835\uDD0F':'Lfr','\uD835\uDD43':'Lopf','\u013A':'lacute','\u0139':'Lacute','\u013E':'lcaron','\u013D':'Lcaron','\u013C':'lcedil','\u013B':'Lcedil','\u0142':'lstrok','\u0141':'Lstrok','\u0140':'lmidot','\u013F':'Lmidot','\uD835\uDD2A':'mfr','\uD835\uDD5E':'mopf','\uD835\uDCC2':'mscr','\uD835\uDD10':'Mfr','\uD835\uDD44':'Mopf','\u2133':'Mscr','\uD835\uDD2B':'nfr','\uD835\uDD5F':'nopf','\uD835\uDCC3':'nscr','\u2115':'Nopf','\uD835\uDCA9':'Nscr','\uD835\uDD11':'Nfr','\u0144':'nacute','\u0143':'Nacute','\u0148':'ncaron','\u0147':'Ncaron','\xF1':'ntilde','\xD1':'Ntilde','\u0146':'ncedil','\u0145':'Ncedil','\u2116':'numero','\u014B':'eng','\u014A':'ENG','\uD835\uDD60':'oopf','\uD835\uDD2C':'ofr','\u2134':'oscr','\uD835\uDCAA':'Oscr','\uD835\uDD12':'Ofr','\uD835\uDD46':'Oopf','\xBA':'ordm','\xF3':'oacute','\xD3':'Oacute','\xF2':'ograve','\xD2':'Ograve','\xF4':'ocirc','\xD4':'Ocirc','\xF6':'ouml','\xD6':'Ouml','\u0151':'odblac','\u0150':'Odblac','\xF5':'otilde','\xD5':'Otilde','\xF8':'oslash','\xD8':'Oslash','\u014D':'omacr','\u014C':'Omacr','\u0153':'oelig','\u0152':'OElig','\uD835\uDD2D':'pfr','\uD835\uDCC5':'pscr','\uD835\uDD61':'popf','\u2119':'Popf','\uD835\uDD13':'Pfr','\uD835\uDCAB':'Pscr','\uD835\uDD62':'qopf','\uD835\uDD2E':'qfr','\uD835\uDCC6':'qscr','\uD835\uDCAC':'Qscr','\uD835\uDD14':'Qfr','\u211A':'Qopf','\u0138':'kgreen','\uD835\uDD2F':'rfr','\uD835\uDD63':'ropf','\uD835\uDCC7':'rscr','\u211B':'Rscr','\u211C':'Re','\u211D':'Ropf','\u0155':'racute','\u0154':'Racute','\u0159':'rcaron','\u0158':'Rcaron','\u0157':'rcedil','\u0156':'Rcedil','\uD835\uDD64':'sopf','\uD835\uDCC8':'sscr','\uD835\uDD30':'sfr','\uD835\uDD4A':'Sopf','\uD835\uDD16':'Sfr','\uD835\uDCAE':'Sscr','\u24C8':'oS','\u015B':'sacute','\u015A':'Sacute','\u015D':'scirc','\u015C':'Scirc','\u0161':'scaron','\u0160':'Scaron','\u015F':'scedil','\u015E':'Scedil','\xDF':'szlig','\uD835\uDD31':'tfr','\uD835\uDCC9':'tscr','\uD835\uDD65':'topf','\uD835\uDCAF':'Tscr','\uD835\uDD17':'Tfr','\uD835\uDD4B':'Topf','\u0165':'tcaron','\u0164':'Tcaron','\u0163':'tcedil','\u0162':'Tcedil','\u2122':'trade','\u0167':'tstrok','\u0166':'Tstrok','\uD835\uDCCA':'uscr','\uD835\uDD66':'uopf','\uD835\uDD32':'ufr','\uD835\uDD4C':'Uopf','\uD835\uDD18':'Ufr','\uD835\uDCB0':'Uscr','\xFA':'uacute','\xDA':'Uacute','\xF9':'ugrave','\xD9':'Ugrave','\u016D':'ubreve','\u016C':'Ubreve','\xFB':'ucirc','\xDB':'Ucirc','\u016F':'uring','\u016E':'Uring','\xFC':'uuml','\xDC':'Uuml','\u0171':'udblac','\u0170':'Udblac','\u0169':'utilde','\u0168':'Utilde','\u0173':'uogon','\u0172':'Uogon','\u016B':'umacr','\u016A':'Umacr','\uD835\uDD33':'vfr','\uD835\uDD67':'vopf','\uD835\uDCCB':'vscr','\uD835\uDD19':'Vfr','\uD835\uDD4D':'Vopf','\uD835\uDCB1':'Vscr','\uD835\uDD68':'wopf','\uD835\uDCCC':'wscr','\uD835\uDD34':'wfr','\uD835\uDCB2':'Wscr','\uD835\uDD4E':'Wopf','\uD835\uDD1A':'Wfr','\u0175':'wcirc','\u0174':'Wcirc','\uD835\uDD35':'xfr','\uD835\uDCCD':'xscr','\uD835\uDD69':'xopf','\uD835\uDD4F':'Xopf','\uD835\uDD1B':'Xfr','\uD835\uDCB3':'Xscr','\uD835\uDD36':'yfr','\uD835\uDCCE':'yscr','\uD835\uDD6A':'yopf','\uD835\uDCB4':'Yscr','\uD835\uDD1C':'Yfr','\uD835\uDD50':'Yopf','\xFD':'yacute','\xDD':'Yacute','\u0177':'ycirc','\u0176':'Ycirc','\xFF':'yuml','\u0178':'Yuml','\uD835\uDCCF':'zscr','\uD835\uDD37':'zfr','\uD835\uDD6B':'zopf','\u2128':'Zfr','\u2124':'Zopf','\uD835\uDCB5':'Zscr','\u017A':'zacute','\u0179':'Zacute','\u017E':'zcaron','\u017D':'Zcaron','\u017C':'zdot','\u017B':'Zdot','\u01B5':'imped','\xFE':'thorn','\xDE':'THORN','\u0149':'napos','\u03B1':'alpha','\u0391':'Alpha','\u03B2':'beta','\u0392':'Beta','\u03B3':'gamma','\u0393':'Gamma','\u03B4':'delta','\u0394':'Delta','\u03B5':'epsi','\u03F5':'epsiv','\u0395':'Epsilon','\u03DD':'gammad','\u03DC':'Gammad','\u03B6':'zeta','\u0396':'Zeta','\u03B7':'eta','\u0397':'Eta','\u03B8':'theta','\u03D1':'thetav','\u0398':'Theta','\u03B9':'iota','\u0399':'Iota','\u03BA':'kappa','\u03F0':'kappav','\u039A':'Kappa','\u03BB':'lambda','\u039B':'Lambda','\u03BC':'mu','\xB5':'micro','\u039C':'Mu','\u03BD':'nu','\u039D':'Nu','\u03BE':'xi','\u039E':'Xi','\u03BF':'omicron','\u039F':'Omicron','\u03C0':'pi','\u03D6':'piv','\u03A0':'Pi','\u03C1':'rho','\u03F1':'rhov','\u03A1':'Rho','\u03C3':'sigma','\u03A3':'Sigma','\u03C2':'sigmaf','\u03C4':'tau','\u03A4':'Tau','\u03C5':'upsi','\u03A5':'Upsilon','\u03D2':'Upsi','\u03C6':'phi','\u03D5':'phiv','\u03A6':'Phi','\u03C7':'chi','\u03A7':'Chi','\u03C8':'psi','\u03A8':'Psi','\u03C9':'omega','\u03A9':'ohm','\u0430':'acy','\u0410':'Acy','\u0431':'bcy','\u0411':'Bcy','\u0432':'vcy','\u0412':'Vcy','\u0433':'gcy','\u0413':'Gcy','\u0453':'gjcy','\u0403':'GJcy','\u0434':'dcy','\u0414':'Dcy','\u0452':'djcy','\u0402':'DJcy','\u0435':'iecy','\u0415':'IEcy','\u0451':'iocy','\u0401':'IOcy','\u0454':'jukcy','\u0404':'Jukcy','\u0436':'zhcy','\u0416':'ZHcy','\u0437':'zcy','\u0417':'Zcy','\u0455':'dscy','\u0405':'DScy','\u0438':'icy','\u0418':'Icy','\u0456':'iukcy','\u0406':'Iukcy','\u0457':'yicy','\u0407':'YIcy','\u0439':'jcy','\u0419':'Jcy','\u0458':'jsercy','\u0408':'Jsercy','\u043A':'kcy','\u041A':'Kcy','\u045C':'kjcy','\u040C':'KJcy','\u043B':'lcy','\u041B':'Lcy','\u0459':'ljcy','\u0409':'LJcy','\u043C':'mcy','\u041C':'Mcy','\u043D':'ncy','\u041D':'Ncy','\u045A':'njcy','\u040A':'NJcy','\u043E':'ocy','\u041E':'Ocy','\u043F':'pcy','\u041F':'Pcy','\u0440':'rcy','\u0420':'Rcy','\u0441':'scy','\u0421':'Scy','\u0442':'tcy','\u0422':'Tcy','\u045B':'tshcy','\u040B':'TSHcy','\u0443':'ucy','\u0423':'Ucy','\u045E':'ubrcy','\u040E':'Ubrcy','\u0444':'fcy','\u0424':'Fcy','\u0445':'khcy','\u0425':'KHcy','\u0446':'tscy','\u0426':'TScy','\u0447':'chcy','\u0427':'CHcy','\u045F':'dzcy','\u040F':'DZcy','\u0448':'shcy','\u0428':'SHcy','\u0449':'shchcy','\u0429':'SHCHcy','\u044A':'hardcy','\u042A':'HARDcy','\u044B':'ycy','\u042B':'Ycy','\u044C':'softcy','\u042C':'SOFTcy','\u044D':'ecy','\u042D':'Ecy','\u044E':'yucy','\u042E':'YUcy','\u044F':'yacy','\u042F':'YAcy','\u2135':'aleph','\u2136':'beth','\u2137':'gimel','\u2138':'daleth'};
+	const regexEncodeNonAscii = /<\u20D2|=\u20E5|>\u20D2|\u205F\u200A|\u219D\u0338|\u2202\u0338|\u2220\u20D2|\u2229\uFE00|\u222A\uFE00|\u223C\u20D2|\u223D\u0331|\u223E\u0333|\u2242\u0338|\u224B\u0338|\u224D\u20D2|\u224E\u0338|\u224F\u0338|\u2250\u0338|\u2261\u20E5|\u2264\u20D2|\u2265\u20D2|\u2266\u0338|\u2267\u0338|\u2268\uFE00|\u2269\uFE00|\u226A\u0338|\u226A\u20D2|\u226B\u0338|\u226B\u20D2|\u227F\u0338|\u2282\u20D2|\u2283\u20D2|\u228A\uFE00|\u228B\uFE00|\u228F\u0338|\u2290\u0338|\u2293\uFE00|\u2294\uFE00|\u22B4\u20D2|\u22B5\u20D2|\u22D8\u0338|\u22D9\u0338|\u22DA\uFE00|\u22DB\uFE00|\u22F5\u0338|\u22F9\u0338|\u2933\u0338|\u29CF\u0338|\u29D0\u0338|\u2A6D\u0338|\u2A70\u0338|\u2A7D\u0338|\u2A7E\u0338|\u2AA1\u0338|\u2AA2\u0338|\u2AAC\uFE00|\u2AAD\uFE00|\u2AAF\u0338|\u2AB0\u0338|\u2AC5\u0338|\u2AC6\u0338|\u2ACB\uFE00|\u2ACC\uFE00|\u2AFD\u20E5|[\xA0-\u0113\u0116-\u0122\u0124-\u012B\u012E-\u014D\u0150-\u017E\u0192\u01B5\u01F5\u0237\u02C6\u02C7\u02D8-\u02DD\u0311\u0391-\u03A1\u03A3-\u03A9\u03B1-\u03C9\u03D1\u03D2\u03D5\u03D6\u03DC\u03DD\u03F0\u03F1\u03F5\u03F6\u0401-\u040C\u040E-\u044F\u0451-\u045C\u045E\u045F\u2002-\u2005\u2007-\u2010\u2013-\u2016\u2018-\u201A\u201C-\u201E\u2020-\u2022\u2025\u2026\u2030-\u2035\u2039\u203A\u203E\u2041\u2043\u2044\u204F\u2057\u205F-\u2063\u20AC\u20DB\u20DC\u2102\u2105\u210A-\u2113\u2115-\u211E\u2122\u2124\u2127-\u2129\u212C\u212D\u212F-\u2131\u2133-\u2138\u2145-\u2148\u2153-\u215E\u2190-\u219B\u219D-\u21A7\u21A9-\u21AE\u21B0-\u21B3\u21B5-\u21B7\u21BA-\u21DB\u21DD\u21E4\u21E5\u21F5\u21FD-\u2205\u2207-\u2209\u220B\u220C\u220F-\u2214\u2216-\u2218\u221A\u221D-\u2238\u223A-\u2257\u2259\u225A\u225C\u225F-\u2262\u2264-\u228B\u228D-\u229B\u229D-\u22A5\u22A7-\u22B0\u22B2-\u22BB\u22BD-\u22DB\u22DE-\u22E3\u22E6-\u22F7\u22F9-\u22FE\u2305\u2306\u2308-\u2310\u2312\u2313\u2315\u2316\u231C-\u231F\u2322\u2323\u232D\u232E\u2336\u233D\u233F\u237C\u23B0\u23B1\u23B4-\u23B6\u23DC-\u23DF\u23E2\u23E7\u2423\u24C8\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2550-\u256C\u2580\u2584\u2588\u2591-\u2593\u25A1\u25AA\u25AB\u25AD\u25AE\u25B1\u25B3-\u25B5\u25B8\u25B9\u25BD-\u25BF\u25C2\u25C3\u25CA\u25CB\u25EC\u25EF\u25F8-\u25FC\u2605\u2606\u260E\u2640\u2642\u2660\u2663\u2665\u2666\u266A\u266D-\u266F\u2713\u2717\u2720\u2736\u2758\u2772\u2773\u27C8\u27C9\u27E6-\u27ED\u27F5-\u27FA\u27FC\u27FF\u2902-\u2905\u290C-\u2913\u2916\u2919-\u2920\u2923-\u292A\u2933\u2935-\u2939\u293C\u293D\u2945\u2948-\u294B\u294E-\u2976\u2978\u2979\u297B-\u297F\u2985\u2986\u298B-\u2996\u299A\u299C\u299D\u29A4-\u29B7\u29B9\u29BB\u29BC\u29BE-\u29C5\u29C9\u29CD-\u29D0\u29DC-\u29DE\u29E3-\u29E5\u29EB\u29F4\u29F6\u2A00-\u2A02\u2A04\u2A06\u2A0C\u2A0D\u2A10-\u2A17\u2A22-\u2A27\u2A29\u2A2A\u2A2D-\u2A31\u2A33-\u2A3C\u2A3F\u2A40\u2A42-\u2A4D\u2A50\u2A53-\u2A58\u2A5A-\u2A5D\u2A5F\u2A66\u2A6A\u2A6D-\u2A75\u2A77-\u2A9A\u2A9D-\u2AA2\u2AA4-\u2AB0\u2AB3-\u2AC8\u2ACB\u2ACC\u2ACF-\u2ADB\u2AE4\u2AE6-\u2AE9\u2AEB-\u2AF3\u2AFD\uFB00-\uFB04]|\uD835[\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDCCF\uDD04\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDD6B]/g;
+	const encodeMap = {'\xAD':'shy','\u200C':'zwnj','\u200D':'zwj','\u200E':'lrm','\u2063':'ic','\u2062':'it','\u2061':'af','\u200F':'rlm','\u200B':'ZeroWidthSpace','\u2060':'NoBreak','\u0311':'DownBreve','\u20DB':'tdot','\u20DC':'DotDot','\t':'Tab','\n':'NewLine','\u2008':'puncsp','\u205F':'MediumSpace','\u2009':'thinsp','\u200A':'hairsp','\u2004':'emsp13','\u2002':'ensp','\u2005':'emsp14','\u2003':'emsp','\u2007':'numsp','\xA0':'nbsp','\u205F\u200A':'ThickSpace','\u203E':'oline','_':'lowbar','\u2010':'dash','\u2013':'ndash','\u2014':'mdash','\u2015':'horbar',',':'comma',';':'semi','\u204F':'bsemi',':':'colon','\u2A74':'Colone','!':'excl','\xA1':'iexcl','?':'quest','\xBF':'iquest','.':'period','\u2025':'nldr','\u2026':'mldr','\xB7':'middot','\'':'apos','\u2018':'lsquo','\u2019':'rsquo','\u201A':'sbquo','\u2039':'lsaquo','\u203A':'rsaquo','"':'quot','\u201C':'ldquo','\u201D':'rdquo','\u201E':'bdquo','\xAB':'laquo','\xBB':'raquo','(':'lpar',')':'rpar','[':'lsqb',']':'rsqb','{':'lcub','}':'rcub','\u2308':'lceil','\u2309':'rceil','\u230A':'lfloor','\u230B':'rfloor','\u2985':'lopar','\u2986':'ropar','\u298B':'lbrke','\u298C':'rbrke','\u298D':'lbrkslu','\u298E':'rbrksld','\u298F':'lbrksld','\u2990':'rbrkslu','\u2991':'langd','\u2992':'rangd','\u2993':'lparlt','\u2994':'rpargt','\u2995':'gtlPar','\u2996':'ltrPar','\u27E6':'lobrk','\u27E7':'robrk','\u27E8':'lang','\u27E9':'rang','\u27EA':'Lang','\u27EB':'Rang','\u27EC':'loang','\u27ED':'roang','\u2772':'lbbrk','\u2773':'rbbrk','\u2016':'Vert','\xA7':'sect','\xB6':'para','@':'commat','*':'ast','/':'sol','undefined':null,'&':'amp','#':'num','%':'percnt','\u2030':'permil','\u2031':'pertenk','\u2020':'dagger','\u2021':'Dagger','\u2022':'bull','\u2043':'hybull','\u2032':'prime','\u2033':'Prime','\u2034':'tprime','\u2057':'qprime','\u2035':'bprime','\u2041':'caret','`':'grave','\xB4':'acute','\u02DC':'tilde','^':'Hat','\xAF':'macr','\u02D8':'breve','\u02D9':'dot','\xA8':'die','\u02DA':'ring','\u02DD':'dblac','\xB8':'cedil','\u02DB':'ogon','\u02C6':'circ','\u02C7':'caron','\xB0':'deg','\xA9':'copy','\xAE':'reg','\u2117':'copysr','\u2118':'wp','\u211E':'rx','\u2127':'mho','\u2129':'iiota','\u2190':'larr','\u219A':'nlarr','\u2192':'rarr','\u219B':'nrarr','\u2191':'uarr','\u2193':'darr','\u2194':'harr','\u21AE':'nharr','\u2195':'varr','\u2196':'nwarr','\u2197':'nearr','\u2198':'searr','\u2199':'swarr','\u219D':'rarrw','\u219D\u0338':'nrarrw','\u219E':'Larr','\u219F':'Uarr','\u21A0':'Rarr','\u21A1':'Darr','\u21A2':'larrtl','\u21A3':'rarrtl','\u21A4':'mapstoleft','\u21A5':'mapstoup','\u21A6':'map','\u21A7':'mapstodown','\u21A9':'larrhk','\u21AA':'rarrhk','\u21AB':'larrlp','\u21AC':'rarrlp','\u21AD':'harrw','\u21B0':'lsh','\u21B1':'rsh','\u21B2':'ldsh','\u21B3':'rdsh','\u21B5':'crarr','\u21B6':'cularr','\u21B7':'curarr','\u21BA':'olarr','\u21BB':'orarr','\u21BC':'lharu','\u21BD':'lhard','\u21BE':'uharr','\u21BF':'uharl','\u21C0':'rharu','\u21C1':'rhard','\u21C2':'dharr','\u21C3':'dharl','\u21C4':'rlarr','\u21C5':'udarr','\u21C6':'lrarr','\u21C7':'llarr','\u21C8':'uuarr','\u21C9':'rrarr','\u21CA':'ddarr','\u21CB':'lrhar','\u21CC':'rlhar','\u21D0':'lArr','\u21CD':'nlArr','\u21D1':'uArr','\u21D2':'rArr','\u21CF':'nrArr','\u21D3':'dArr','\u21D4':'iff','\u21CE':'nhArr','\u21D5':'vArr','\u21D6':'nwArr','\u21D7':'neArr','\u21D8':'seArr','\u21D9':'swArr','\u21DA':'lAarr','\u21DB':'rAarr','\u21DD':'zigrarr','\u21E4':'larrb','\u21E5':'rarrb','\u21F5':'duarr','\u21FD':'loarr','\u21FE':'roarr','\u21FF':'hoarr','\u2200':'forall','\u2201':'comp','\u2202':'part','\u2202\u0338':'npart','\u2203':'exist','\u2204':'nexist','\u2205':'empty','\u2207':'Del','\u2208':'in','\u2209':'notin','\u220B':'ni','\u220C':'notni','\u03F6':'bepsi','\u220F':'prod','\u2210':'coprod','\u2211':'sum','+':'plus','\xB1':'pm','\xF7':'div','\xD7':'times','<':'lt','\u226E':'nlt','<\u20D2':'nvlt','=':'equals','\u2260':'ne','=\u20E5':'bne','\u2A75':'Equal','>':'gt','\u226F':'ngt','>\u20D2':'nvgt','\xAC':'not','|':'vert','\xA6':'brvbar','\u2212':'minus','\u2213':'mp','\u2214':'plusdo','\u2044':'frasl','\u2216':'setmn','\u2217':'lowast','\u2218':'compfn','\u221A':'Sqrt','\u221D':'prop','\u221E':'infin','\u221F':'angrt','\u2220':'ang','\u2220\u20D2':'nang','\u2221':'angmsd','\u2222':'angsph','\u2223':'mid','\u2224':'nmid','\u2225':'par','\u2226':'npar','\u2227':'and','\u2228':'or','\u2229':'cap','\u2229\uFE00':'caps','\u222A':'cup','\u222A\uFE00':'cups','\u222B':'int','\u222C':'Int','\u222D':'tint','\u2A0C':'qint','\u222E':'oint','\u222F':'Conint','\u2230':'Cconint','\u2231':'cwint','\u2232':'cwconint','\u2233':'awconint','\u2234':'there4','\u2235':'becaus','\u2236':'ratio','\u2237':'Colon','\u2238':'minusd','\u223A':'mDDot','\u223B':'homtht','\u223C':'sim','\u2241':'nsim','\u223C\u20D2':'nvsim','\u223D':'bsim','\u223D\u0331':'race','\u223E':'ac','\u223E\u0333':'acE','\u223F':'acd','\u2240':'wr','\u2242':'esim','\u2242\u0338':'nesim','\u2243':'sime','\u2244':'nsime','\u2245':'cong','\u2247':'ncong','\u2246':'simne','\u2248':'ap','\u2249':'nap','\u224A':'ape','\u224B':'apid','\u224B\u0338':'napid','\u224C':'bcong','\u224D':'CupCap','\u226D':'NotCupCap','\u224D\u20D2':'nvap','\u224E':'bump','\u224E\u0338':'nbump','\u224F':'bumpe','\u224F\u0338':'nbumpe','\u2250':'doteq','\u2250\u0338':'nedot','\u2251':'eDot','\u2252':'efDot','\u2253':'erDot','\u2254':'colone','\u2255':'ecolon','\u2256':'ecir','\u2257':'cire','\u2259':'wedgeq','\u225A':'veeeq','\u225C':'trie','\u225F':'equest','\u2261':'equiv','\u2262':'nequiv','\u2261\u20E5':'bnequiv','\u2264':'le','\u2270':'nle','\u2264\u20D2':'nvle','\u2265':'ge','\u2271':'nge','\u2265\u20D2':'nvge','\u2266':'lE','\u2266\u0338':'nlE','\u2267':'gE','\u2267\u0338':'ngE','\u2268\uFE00':'lvnE','\u2268':'lnE','\u2269':'gnE','\u2269\uFE00':'gvnE','\u226A':'ll','\u226A\u0338':'nLtv','\u226A\u20D2':'nLt','\u226B':'gg','\u226B\u0338':'nGtv','\u226B\u20D2':'nGt','\u226C':'twixt','\u2272':'lsim','\u2274':'nlsim','\u2273':'gsim','\u2275':'ngsim','\u2276':'lg','\u2278':'ntlg','\u2277':'gl','\u2279':'ntgl','\u227A':'pr','\u2280':'npr','\u227B':'sc','\u2281':'nsc','\u227C':'prcue','\u22E0':'nprcue','\u227D':'sccue','\u22E1':'nsccue','\u227E':'prsim','\u227F':'scsim','\u227F\u0338':'NotSucceedsTilde','\u2282':'sub','\u2284':'nsub','\u2282\u20D2':'vnsub','\u2283':'sup','\u2285':'nsup','\u2283\u20D2':'vnsup','\u2286':'sube','\u2288':'nsube','\u2287':'supe','\u2289':'nsupe','\u228A\uFE00':'vsubne','\u228A':'subne','\u228B\uFE00':'vsupne','\u228B':'supne','\u228D':'cupdot','\u228E':'uplus','\u228F':'sqsub','\u228F\u0338':'NotSquareSubset','\u2290':'sqsup','\u2290\u0338':'NotSquareSuperset','\u2291':'sqsube','\u22E2':'nsqsube','\u2292':'sqsupe','\u22E3':'nsqsupe','\u2293':'sqcap','\u2293\uFE00':'sqcaps','\u2294':'sqcup','\u2294\uFE00':'sqcups','\u2295':'oplus','\u2296':'ominus','\u2297':'otimes','\u2298':'osol','\u2299':'odot','\u229A':'ocir','\u229B':'oast','\u229D':'odash','\u229E':'plusb','\u229F':'minusb','\u22A0':'timesb','\u22A1':'sdotb','\u22A2':'vdash','\u22AC':'nvdash','\u22A3':'dashv','\u22A4':'top','\u22A5':'bot','\u22A7':'models','\u22A8':'vDash','\u22AD':'nvDash','\u22A9':'Vdash','\u22AE':'nVdash','\u22AA':'Vvdash','\u22AB':'VDash','\u22AF':'nVDash','\u22B0':'prurel','\u22B2':'vltri','\u22EA':'nltri','\u22B3':'vrtri','\u22EB':'nrtri','\u22B4':'ltrie','\u22EC':'nltrie','\u22B4\u20D2':'nvltrie','\u22B5':'rtrie','\u22ED':'nrtrie','\u22B5\u20D2':'nvrtrie','\u22B6':'origof','\u22B7':'imof','\u22B8':'mumap','\u22B9':'hercon','\u22BA':'intcal','\u22BB':'veebar','\u22BD':'barvee','\u22BE':'angrtvb','\u22BF':'lrtri','\u22C0':'Wedge','\u22C1':'Vee','\u22C2':'xcap','\u22C3':'xcup','\u22C4':'diam','\u22C5':'sdot','\u22C6':'Star','\u22C7':'divonx','\u22C8':'bowtie','\u22C9':'ltimes','\u22CA':'rtimes','\u22CB':'lthree','\u22CC':'rthree','\u22CD':'bsime','\u22CE':'cuvee','\u22CF':'cuwed','\u22D0':'Sub','\u22D1':'Sup','\u22D2':'Cap','\u22D3':'Cup','\u22D4':'fork','\u22D5':'epar','\u22D6':'ltdot','\u22D7':'gtdot','\u22D8':'Ll','\u22D8\u0338':'nLl','\u22D9':'Gg','\u22D9\u0338':'nGg','\u22DA\uFE00':'lesg','\u22DA':'leg','\u22DB':'gel','\u22DB\uFE00':'gesl','\u22DE':'cuepr','\u22DF':'cuesc','\u22E6':'lnsim','\u22E7':'gnsim','\u22E8':'prnsim','\u22E9':'scnsim','\u22EE':'vellip','\u22EF':'ctdot','\u22F0':'utdot','\u22F1':'dtdot','\u22F2':'disin','\u22F3':'isinsv','\u22F4':'isins','\u22F5':'isindot','\u22F5\u0338':'notindot','\u22F6':'notinvc','\u22F7':'notinvb','\u22F9':'isinE','\u22F9\u0338':'notinE','\u22FA':'nisd','\u22FB':'xnis','\u22FC':'nis','\u22FD':'notnivc','\u22FE':'notnivb','\u2305':'barwed','\u2306':'Barwed','\u230C':'drcrop','\u230D':'dlcrop','\u230E':'urcrop','\u230F':'ulcrop','\u2310':'bnot','\u2312':'profline','\u2313':'profsurf','\u2315':'telrec','\u2316':'target','\u231C':'ulcorn','\u231D':'urcorn','\u231E':'dlcorn','\u231F':'drcorn','\u2322':'frown','\u2323':'smile','\u232D':'cylcty','\u232E':'profalar','\u2336':'topbot','\u233D':'ovbar','\u233F':'solbar','\u237C':'angzarr','\u23B0':'lmoust','\u23B1':'rmoust','\u23B4':'tbrk','\u23B5':'bbrk','\u23B6':'bbrktbrk','\u23DC':'OverParenthesis','\u23DD':'UnderParenthesis','\u23DE':'OverBrace','\u23DF':'UnderBrace','\u23E2':'trpezium','\u23E7':'elinters','\u2423':'blank','\u2500':'boxh','\u2502':'boxv','\u250C':'boxdr','\u2510':'boxdl','\u2514':'boxur','\u2518':'boxul','\u251C':'boxvr','\u2524':'boxvl','\u252C':'boxhd','\u2534':'boxhu','\u253C':'boxvh','\u2550':'boxH','\u2551':'boxV','\u2552':'boxdR','\u2553':'boxDr','\u2554':'boxDR','\u2555':'boxdL','\u2556':'boxDl','\u2557':'boxDL','\u2558':'boxuR','\u2559':'boxUr','\u255A':'boxUR','\u255B':'boxuL','\u255C':'boxUl','\u255D':'boxUL','\u255E':'boxvR','\u255F':'boxVr','\u2560':'boxVR','\u2561':'boxvL','\u2562':'boxVl','\u2563':'boxVL','\u2564':'boxHd','\u2565':'boxhD','\u2566':'boxHD','\u2567':'boxHu','\u2568':'boxhU','\u2569':'boxHU','\u256A':'boxvH','\u256B':'boxVh','\u256C':'boxVH','\u2580':'uhblk','\u2584':'lhblk','\u2588':'block','\u2591':'blk14','\u2592':'blk12','\u2593':'blk34','\u25A1':'squ','\u25AA':'squf','\u25AB':'EmptyVerySmallSquare','\u25AD':'rect','\u25AE':'marker','\u25B1':'fltns','\u25B3':'xutri','\u25B4':'utrif','\u25B5':'utri','\u25B8':'rtrif','\u25B9':'rtri','\u25BD':'xdtri','\u25BE':'dtrif','\u25BF':'dtri','\u25C2':'ltrif','\u25C3':'ltri','\u25CA':'loz','\u25CB':'cir','\u25EC':'tridot','\u25EF':'xcirc','\u25F8':'ultri','\u25F9':'urtri','\u25FA':'lltri','\u25FB':'EmptySmallSquare','\u25FC':'FilledSmallSquare','\u2605':'starf','\u2606':'star','\u260E':'phone','\u2640':'female','\u2642':'male','\u2660':'spades','\u2663':'clubs','\u2665':'hearts','\u2666':'diams','\u266A':'sung','\u2713':'check','\u2717':'cross','\u2720':'malt','\u2736':'sext','\u2758':'VerticalSeparator','\u27C8':'bsolhsub','\u27C9':'suphsol','\u27F5':'xlarr','\u27F6':'xrarr','\u27F7':'xharr','\u27F8':'xlArr','\u27F9':'xrArr','\u27FA':'xhArr','\u27FC':'xmap','\u27FF':'dzigrarr','\u2902':'nvlArr','\u2903':'nvrArr','\u2904':'nvHarr','\u2905':'Map','\u290C':'lbarr','\u290D':'rbarr','\u290E':'lBarr','\u290F':'rBarr','\u2910':'RBarr','\u2911':'DDotrahd','\u2912':'UpArrowBar','\u2913':'DownArrowBar','\u2916':'Rarrtl','\u2919':'latail','\u291A':'ratail','\u291B':'lAtail','\u291C':'rAtail','\u291D':'larrfs','\u291E':'rarrfs','\u291F':'larrbfs','\u2920':'rarrbfs','\u2923':'nwarhk','\u2924':'nearhk','\u2925':'searhk','\u2926':'swarhk','\u2927':'nwnear','\u2928':'toea','\u2929':'tosa','\u292A':'swnwar','\u2933':'rarrc','\u2933\u0338':'nrarrc','\u2935':'cudarrr','\u2936':'ldca','\u2937':'rdca','\u2938':'cudarrl','\u2939':'larrpl','\u293C':'curarrm','\u293D':'cularrp','\u2945':'rarrpl','\u2948':'harrcir','\u2949':'Uarrocir','\u294A':'lurdshar','\u294B':'ldrushar','\u294E':'LeftRightVector','\u294F':'RightUpDownVector','\u2950':'DownLeftRightVector','\u2951':'LeftUpDownVector','\u2952':'LeftVectorBar','\u2953':'RightVectorBar','\u2954':'RightUpVectorBar','\u2955':'RightDownVectorBar','\u2956':'DownLeftVectorBar','\u2957':'DownRightVectorBar','\u2958':'LeftUpVectorBar','\u2959':'LeftDownVectorBar','\u295A':'LeftTeeVector','\u295B':'RightTeeVector','\u295C':'RightUpTeeVector','\u295D':'RightDownTeeVector','\u295E':'DownLeftTeeVector','\u295F':'DownRightTeeVector','\u2960':'LeftUpTeeVector','\u2961':'LeftDownTeeVector','\u2962':'lHar','\u2963':'uHar','\u2964':'rHar','\u2965':'dHar','\u2966':'luruhar','\u2967':'ldrdhar','\u2968':'ruluhar','\u2969':'rdldhar','\u296A':'lharul','\u296B':'llhard','\u296C':'rharul','\u296D':'lrhard','\u296E':'udhar','\u296F':'duhar','\u2970':'RoundImplies','\u2971':'erarr','\u2972':'simrarr','\u2973':'larrsim','\u2974':'rarrsim','\u2975':'rarrap','\u2976':'ltlarr','\u2978':'gtrarr','\u2979':'subrarr','\u297B':'suplarr','\u297C':'lfisht','\u297D':'rfisht','\u297E':'ufisht','\u297F':'dfisht','\u299A':'vzigzag','\u299C':'vangrt','\u299D':'angrtvbd','\u29A4':'ange','\u29A5':'range','\u29A6':'dwangle','\u29A7':'uwangle','\u29A8':'angmsdaa','\u29A9':'angmsdab','\u29AA':'angmsdac','\u29AB':'angmsdad','\u29AC':'angmsdae','\u29AD':'angmsdaf','\u29AE':'angmsdag','\u29AF':'angmsdah','\u29B0':'bemptyv','\u29B1':'demptyv','\u29B2':'cemptyv','\u29B3':'raemptyv','\u29B4':'laemptyv','\u29B5':'ohbar','\u29B6':'omid','\u29B7':'opar','\u29B9':'operp','\u29BB':'olcross','\u29BC':'odsold','\u29BE':'olcir','\u29BF':'ofcir','\u29C0':'olt','\u29C1':'ogt','\u29C2':'cirscir','\u29C3':'cirE','\u29C4':'solb','\u29C5':'bsolb','\u29C9':'boxbox','\u29CD':'trisb','\u29CE':'rtriltri','\u29CF':'LeftTriangleBar','\u29CF\u0338':'NotLeftTriangleBar','\u29D0':'RightTriangleBar','\u29D0\u0338':'NotRightTriangleBar','\u29DC':'iinfin','\u29DD':'infintie','\u29DE':'nvinfin','\u29E3':'eparsl','\u29E4':'smeparsl','\u29E5':'eqvparsl','\u29EB':'lozf','\u29F4':'RuleDelayed','\u29F6':'dsol','\u2A00':'xodot','\u2A01':'xoplus','\u2A02':'xotime','\u2A04':'xuplus','\u2A06':'xsqcup','\u2A0D':'fpartint','\u2A10':'cirfnint','\u2A11':'awint','\u2A12':'rppolint','\u2A13':'scpolint','\u2A14':'npolint','\u2A15':'pointint','\u2A16':'quatint','\u2A17':'intlarhk','\u2A22':'pluscir','\u2A23':'plusacir','\u2A24':'simplus','\u2A25':'plusdu','\u2A26':'plussim','\u2A27':'plustwo','\u2A29':'mcomma','\u2A2A':'minusdu','\u2A2D':'loplus','\u2A2E':'roplus','\u2A2F':'Cross','\u2A30':'timesd','\u2A31':'timesbar','\u2A33':'smashp','\u2A34':'lotimes','\u2A35':'rotimes','\u2A36':'otimesas','\u2A37':'Otimes','\u2A38':'odiv','\u2A39':'triplus','\u2A3A':'triminus','\u2A3B':'tritime','\u2A3C':'iprod','\u2A3F':'amalg','\u2A40':'capdot','\u2A42':'ncup','\u2A43':'ncap','\u2A44':'capand','\u2A45':'cupor','\u2A46':'cupcap','\u2A47':'capcup','\u2A48':'cupbrcap','\u2A49':'capbrcup','\u2A4A':'cupcup','\u2A4B':'capcap','\u2A4C':'ccups','\u2A4D':'ccaps','\u2A50':'ccupssm','\u2A53':'And','\u2A54':'Or','\u2A55':'andand','\u2A56':'oror','\u2A57':'orslope','\u2A58':'andslope','\u2A5A':'andv','\u2A5B':'orv','\u2A5C':'andd','\u2A5D':'ord','\u2A5F':'wedbar','\u2A66':'sdote','\u2A6A':'simdot','\u2A6D':'congdot','\u2A6D\u0338':'ncongdot','\u2A6E':'easter','\u2A6F':'apacir','\u2A70':'apE','\u2A70\u0338':'napE','\u2A71':'eplus','\u2A72':'pluse','\u2A73':'Esim','\u2A77':'eDDot','\u2A78':'equivDD','\u2A79':'ltcir','\u2A7A':'gtcir','\u2A7B':'ltquest','\u2A7C':'gtquest','\u2A7D':'les','\u2A7D\u0338':'nles','\u2A7E':'ges','\u2A7E\u0338':'nges','\u2A7F':'lesdot','\u2A80':'gesdot','\u2A81':'lesdoto','\u2A82':'gesdoto','\u2A83':'lesdotor','\u2A84':'gesdotol','\u2A85':'lap','\u2A86':'gap','\u2A87':'lne','\u2A88':'gne','\u2A89':'lnap','\u2A8A':'gnap','\u2A8B':'lEg','\u2A8C':'gEl','\u2A8D':'lsime','\u2A8E':'gsime','\u2A8F':'lsimg','\u2A90':'gsiml','\u2A91':'lgE','\u2A92':'glE','\u2A93':'lesges','\u2A94':'gesles','\u2A95':'els','\u2A96':'egs','\u2A97':'elsdot','\u2A98':'egsdot','\u2A99':'el','\u2A9A':'eg','\u2A9D':'siml','\u2A9E':'simg','\u2A9F':'simlE','\u2AA0':'simgE','\u2AA1':'LessLess','\u2AA1\u0338':'NotNestedLessLess','\u2AA2':'GreaterGreater','\u2AA2\u0338':'NotNestedGreaterGreater','\u2AA4':'glj','\u2AA5':'gla','\u2AA6':'ltcc','\u2AA7':'gtcc','\u2AA8':'lescc','\u2AA9':'gescc','\u2AAA':'smt','\u2AAB':'lat','\u2AAC':'smte','\u2AAC\uFE00':'smtes','\u2AAD':'late','\u2AAD\uFE00':'lates','\u2AAE':'bumpE','\u2AAF':'pre','\u2AAF\u0338':'npre','\u2AB0':'sce','\u2AB0\u0338':'nsce','\u2AB3':'prE','\u2AB4':'scE','\u2AB5':'prnE','\u2AB6':'scnE','\u2AB7':'prap','\u2AB8':'scap','\u2AB9':'prnap','\u2ABA':'scnap','\u2ABB':'Pr','\u2ABC':'Sc','\u2ABD':'subdot','\u2ABE':'supdot','\u2ABF':'subplus','\u2AC0':'supplus','\u2AC1':'submult','\u2AC2':'supmult','\u2AC3':'subedot','\u2AC4':'supedot','\u2AC5':'subE','\u2AC5\u0338':'nsubE','\u2AC6':'supE','\u2AC6\u0338':'nsupE','\u2AC7':'subsim','\u2AC8':'supsim','\u2ACB\uFE00':'vsubnE','\u2ACB':'subnE','\u2ACC\uFE00':'vsupnE','\u2ACC':'supnE','\u2ACF':'csub','\u2AD0':'csup','\u2AD1':'csube','\u2AD2':'csupe','\u2AD3':'subsup','\u2AD4':'supsub','\u2AD5':'subsub','\u2AD6':'supsup','\u2AD7':'suphsub','\u2AD8':'supdsub','\u2AD9':'forkv','\u2ADA':'topfork','\u2ADB':'mlcp','\u2AE4':'Dashv','\u2AE6':'Vdashl','\u2AE7':'Barv','\u2AE8':'vBar','\u2AE9':'vBarv','\u2AEB':'Vbar','\u2AEC':'Not','\u2AED':'bNot','\u2AEE':'rnmid','\u2AEF':'cirmid','\u2AF0':'midcir','\u2AF1':'topcir','\u2AF2':'nhpar','\u2AF3':'parsim','\u2AFD':'parsl','\u2AFD\u20E5':'nparsl','\u266D':'flat','\u266E':'natur','\u266F':'sharp','\xA4':'curren','\xA2':'cent','$':'dollar','\xA3':'pound','\xA5':'yen','\u20AC':'euro','\xB9':'sup1','\xBD':'half','\u2153':'frac13','\xBC':'frac14','\u2155':'frac15','\u2159':'frac16','\u215B':'frac18','\xB2':'sup2','\u2154':'frac23','\u2156':'frac25','\xB3':'sup3','\xBE':'frac34','\u2157':'frac35','\u215C':'frac38','\u2158':'frac45','\u215A':'frac56','\u215D':'frac58','\u215E':'frac78','\uD835\uDCB6':'ascr','\uD835\uDD52':'aopf','\uD835\uDD1E':'afr','\uD835\uDD38':'Aopf','\uD835\uDD04':'Afr','\uD835\uDC9C':'Ascr','\xAA':'ordf','\xE1':'aacute','\xC1':'Aacute','\xE0':'agrave','\xC0':'Agrave','\u0103':'abreve','\u0102':'Abreve','\xE2':'acirc','\xC2':'Acirc','\xE5':'aring','\xC5':'angst','\xE4':'auml','\xC4':'Auml','\xE3':'atilde','\xC3':'Atilde','\u0105':'aogon','\u0104':'Aogon','\u0101':'amacr','\u0100':'Amacr','\xE6':'aelig','\xC6':'AElig','\uD835\uDCB7':'bscr','\uD835\uDD53':'bopf','\uD835\uDD1F':'bfr','\uD835\uDD39':'Bopf','\u212C':'Bscr','\uD835\uDD05':'Bfr','\uD835\uDD20':'cfr','\uD835\uDCB8':'cscr','\uD835\uDD54':'copf','\u212D':'Cfr','\uD835\uDC9E':'Cscr','\u2102':'Copf','\u0107':'cacute','\u0106':'Cacute','\u0109':'ccirc','\u0108':'Ccirc','\u010D':'ccaron','\u010C':'Ccaron','\u010B':'cdot','\u010A':'Cdot','\xE7':'ccedil','\xC7':'Ccedil','\u2105':'incare','\uD835\uDD21':'dfr','\u2146':'dd','\uD835\uDD55':'dopf','\uD835\uDCB9':'dscr','\uD835\uDC9F':'Dscr','\uD835\uDD07':'Dfr','\u2145':'DD','\uD835\uDD3B':'Dopf','\u010F':'dcaron','\u010E':'Dcaron','\u0111':'dstrok','\u0110':'Dstrok','\xF0':'eth','\xD0':'ETH','\u2147':'ee','\u212F':'escr','\uD835\uDD22':'efr','\uD835\uDD56':'eopf','\u2130':'Escr','\uD835\uDD08':'Efr','\uD835\uDD3C':'Eopf','\xE9':'eacute','\xC9':'Eacute','\xE8':'egrave','\xC8':'Egrave','\xEA':'ecirc','\xCA':'Ecirc','\u011B':'ecaron','\u011A':'Ecaron','\xEB':'euml','\xCB':'Euml','\u0117':'edot','\u0116':'Edot','\u0119':'eogon','\u0118':'Eogon','\u0113':'emacr','\u0112':'Emacr','\uD835\uDD23':'ffr','\uD835\uDD57':'fopf','\uD835\uDCBB':'fscr','\uD835\uDD09':'Ffr','\uD835\uDD3D':'Fopf','\u2131':'Fscr','\uFB00':'fflig','\uFB03':'ffilig','\uFB04':'ffllig','\uFB01':'filig','fj':'fjlig','\uFB02':'fllig','\u0192':'fnof','\u210A':'gscr','\uD835\uDD58':'gopf','\uD835\uDD24':'gfr','\uD835\uDCA2':'Gscr','\uD835\uDD3E':'Gopf','\uD835\uDD0A':'Gfr','\u01F5':'gacute','\u011F':'gbreve','\u011E':'Gbreve','\u011D':'gcirc','\u011C':'Gcirc','\u0121':'gdot','\u0120':'Gdot','\u0122':'Gcedil','\uD835\uDD25':'hfr','\u210E':'planckh','\uD835\uDCBD':'hscr','\uD835\uDD59':'hopf','\u210B':'Hscr','\u210C':'Hfr','\u210D':'Hopf','\u0125':'hcirc','\u0124':'Hcirc','\u210F':'hbar','\u0127':'hstrok','\u0126':'Hstrok','\uD835\uDD5A':'iopf','\uD835\uDD26':'ifr','\uD835\uDCBE':'iscr','\u2148':'ii','\uD835\uDD40':'Iopf','\u2110':'Iscr','\u2111':'Im','\xED':'iacute','\xCD':'Iacute','\xEC':'igrave','\xCC':'Igrave','\xEE':'icirc','\xCE':'Icirc','\xEF':'iuml','\xCF':'Iuml','\u0129':'itilde','\u0128':'Itilde','\u0130':'Idot','\u012F':'iogon','\u012E':'Iogon','\u012B':'imacr','\u012A':'Imacr','\u0133':'ijlig','\u0132':'IJlig','\u0131':'imath','\uD835\uDCBF':'jscr','\uD835\uDD5B':'jopf','\uD835\uDD27':'jfr','\uD835\uDCA5':'Jscr','\uD835\uDD0D':'Jfr','\uD835\uDD41':'Jopf','\u0135':'jcirc','\u0134':'Jcirc','\u0237':'jmath','\uD835\uDD5C':'kopf','\uD835\uDCC0':'kscr','\uD835\uDD28':'kfr','\uD835\uDCA6':'Kscr','\uD835\uDD42':'Kopf','\uD835\uDD0E':'Kfr','\u0137':'kcedil','\u0136':'Kcedil','\uD835\uDD29':'lfr','\uD835\uDCC1':'lscr','\u2113':'ell','\uD835\uDD5D':'lopf','\u2112':'Lscr','\uD835\uDD0F':'Lfr','\uD835\uDD43':'Lopf','\u013A':'lacute','\u0139':'Lacute','\u013E':'lcaron','\u013D':'Lcaron','\u013C':'lcedil','\u013B':'Lcedil','\u0142':'lstrok','\u0141':'Lstrok','\u0140':'lmidot','\u013F':'Lmidot','\uD835\uDD2A':'mfr','\uD835\uDD5E':'mopf','\uD835\uDCC2':'mscr','\uD835\uDD10':'Mfr','\uD835\uDD44':'Mopf','\u2133':'Mscr','\uD835\uDD2B':'nfr','\uD835\uDD5F':'nopf','\uD835\uDCC3':'nscr','\u2115':'Nopf','\uD835\uDCA9':'Nscr','\uD835\uDD11':'Nfr','\u0144':'nacute','\u0143':'Nacute','\u0148':'ncaron','\u0147':'Ncaron','\xF1':'ntilde','\xD1':'Ntilde','\u0146':'ncedil','\u0145':'Ncedil','\u2116':'numero','\u014B':'eng','\u014A':'ENG','\uD835\uDD60':'oopf','\uD835\uDD2C':'ofr','\u2134':'oscr','\uD835\uDCAA':'Oscr','\uD835\uDD12':'Ofr','\uD835\uDD46':'Oopf','\xBA':'ordm','\xF3':'oacute','\xD3':'Oacute','\xF2':'ograve','\xD2':'Ograve','\xF4':'ocirc','\xD4':'Ocirc','\xF6':'ouml','\xD6':'Ouml','\u0151':'odblac','\u0150':'Odblac','\xF5':'otilde','\xD5':'Otilde','\xF8':'oslash','\xD8':'Oslash','\u014D':'omacr','\u014C':'Omacr','\u0153':'oelig','\u0152':'OElig','\uD835\uDD2D':'pfr','\uD835\uDCC5':'pscr','\uD835\uDD61':'popf','\u2119':'Popf','\uD835\uDD13':'Pfr','\uD835\uDCAB':'Pscr','\uD835\uDD62':'qopf','\uD835\uDD2E':'qfr','\uD835\uDCC6':'qscr','\uD835\uDCAC':'Qscr','\uD835\uDD14':'Qfr','\u211A':'Qopf','\u0138':'kgreen','\uD835\uDD2F':'rfr','\uD835\uDD63':'ropf','\uD835\uDCC7':'rscr','\u211B':'Rscr','\u211C':'Re','\u211D':'Ropf','\u0155':'racute','\u0154':'Racute','\u0159':'rcaron','\u0158':'Rcaron','\u0157':'rcedil','\u0156':'Rcedil','\uD835\uDD64':'sopf','\uD835\uDCC8':'sscr','\uD835\uDD30':'sfr','\uD835\uDD4A':'Sopf','\uD835\uDD16':'Sfr','\uD835\uDCAE':'Sscr','\u24C8':'oS','\u015B':'sacute','\u015A':'Sacute','\u015D':'scirc','\u015C':'Scirc','\u0161':'scaron','\u0160':'Scaron','\u015F':'scedil','\u015E':'Scedil','\xDF':'szlig','\uD835\uDD31':'tfr','\uD835\uDCC9':'tscr','\uD835\uDD65':'topf','\uD835\uDCAF':'Tscr','\uD835\uDD17':'Tfr','\uD835\uDD4B':'Topf','\u0165':'tcaron','\u0164':'Tcaron','\u0163':'tcedil','\u0162':'Tcedil','\u2122':'trade','\u0167':'tstrok','\u0166':'Tstrok','\uD835\uDCCA':'uscr','\uD835\uDD66':'uopf','\uD835\uDD32':'ufr','\uD835\uDD4C':'Uopf','\uD835\uDD18':'Ufr','\uD835\uDCB0':'Uscr','\xFA':'uacute','\xDA':'Uacute','\xF9':'ugrave','\xD9':'Ugrave','\u016D':'ubreve','\u016C':'Ubreve','\xFB':'ucirc','\xDB':'Ucirc','\u016F':'uring','\u016E':'Uring','\xFC':'uuml','\xDC':'Uuml','\u0171':'udblac','\u0170':'Udblac','\u0169':'utilde','\u0168':'Utilde','\u0173':'uogon','\u0172':'Uogon','\u016B':'umacr','\u016A':'Umacr','\uD835\uDD33':'vfr','\uD835\uDD67':'vopf','\uD835\uDCCB':'vscr','\uD835\uDD19':'Vfr','\uD835\uDD4D':'Vopf','\uD835\uDCB1':'Vscr','\uD835\uDD68':'wopf','\uD835\uDCCC':'wscr','\uD835\uDD34':'wfr','\uD835\uDCB2':'Wscr','\uD835\uDD4E':'Wopf','\uD835\uDD1A':'Wfr','\u0175':'wcirc','\u0174':'Wcirc','\uD835\uDD35':'xfr','\uD835\uDCCD':'xscr','\uD835\uDD69':'xopf','\uD835\uDD4F':'Xopf','\uD835\uDD1B':'Xfr','\uD835\uDCB3':'Xscr','\uD835\uDD36':'yfr','\uD835\uDCCE':'yscr','\uD835\uDD6A':'yopf','\uD835\uDCB4':'Yscr','\uD835\uDD1C':'Yfr','\uD835\uDD50':'Yopf','\xFD':'yacute','\xDD':'Yacute','\u0177':'ycirc','\u0176':'Ycirc','\xFF':'yuml','\u0178':'Yuml','\uD835\uDCCF':'zscr','\uD835\uDD37':'zfr','\uD835\uDD6B':'zopf','\u2128':'Zfr','\u2124':'Zopf','\uD835\uDCB5':'Zscr','\u017A':'zacute','\u0179':'Zacute','\u017E':'zcaron','\u017D':'Zcaron','\u017C':'zdot','\u017B':'Zdot','\u01B5':'imped','\xFE':'thorn','\xDE':'THORN','\u0149':'napos','\u03B1':'alpha','\u0391':'Alpha','\u03B2':'beta','\u0392':'Beta','\u03B3':'gamma','\u0393':'Gamma','\u03B4':'delta','\u0394':'Delta','\u03B5':'epsi','\u03F5':'epsiv','\u0395':'Epsilon','\u03DD':'gammad','\u03DC':'Gammad','\u03B6':'zeta','\u0396':'Zeta','\u03B7':'eta','\u0397':'Eta','\u03B8':'theta','\u03D1':'thetav','\u0398':'Theta','\u03B9':'iota','\u0399':'Iota','\u03BA':'kappa','\u03F0':'kappav','\u039A':'Kappa','\u03BB':'lambda','\u039B':'Lambda','\u03BC':'mu','\xB5':'micro','\u039C':'Mu','\u03BD':'nu','\u039D':'Nu','\u03BE':'xi','\u039E':'Xi','\u03BF':'omicron','\u039F':'Omicron','\u03C0':'pi','\u03D6':'piv','\u03A0':'Pi','\u03C1':'rho','\u03F1':'rhov','\u03A1':'Rho','\u03C3':'sigma','\u03A3':'Sigma','\u03C2':'sigmaf','\u03C4':'tau','\u03A4':'Tau','\u03C5':'upsi','\u03A5':'Upsilon','\u03D2':'Upsi','\u03C6':'phi','\u03D5':'phiv','\u03A6':'Phi','\u03C7':'chi','\u03A7':'Chi','\u03C8':'psi','\u03A8':'Psi','\u03C9':'omega','\u03A9':'ohm','\u0430':'acy','\u0410':'Acy','\u0431':'bcy','\u0411':'Bcy','\u0432':'vcy','\u0412':'Vcy','\u0433':'gcy','\u0413':'Gcy','\u0453':'gjcy','\u0403':'GJcy','\u0434':'dcy','\u0414':'Dcy','\u0452':'djcy','\u0402':'DJcy','\u0435':'iecy','\u0415':'IEcy','\u0451':'iocy','\u0401':'IOcy','\u0454':'jukcy','\u0404':'Jukcy','\u0436':'zhcy','\u0416':'ZHcy','\u0437':'zcy','\u0417':'Zcy','\u0455':'dscy','\u0405':'DScy','\u0438':'icy','\u0418':'Icy','\u0456':'iukcy','\u0406':'Iukcy','\u0457':'yicy','\u0407':'YIcy','\u0439':'jcy','\u0419':'Jcy','\u0458':'jsercy','\u0408':'Jsercy','\u043A':'kcy','\u041A':'Kcy','\u045C':'kjcy','\u040C':'KJcy','\u043B':'lcy','\u041B':'Lcy','\u0459':'ljcy','\u0409':'LJcy','\u043C':'mcy','\u041C':'Mcy','\u043D':'ncy','\u041D':'Ncy','\u045A':'njcy','\u040A':'NJcy','\u043E':'ocy','\u041E':'Ocy','\u043F':'pcy','\u041F':'Pcy','\u0440':'rcy','\u0420':'Rcy','\u0441':'scy','\u0421':'Scy','\u0442':'tcy','\u0422':'Tcy','\u045B':'tshcy','\u040B':'TSHcy','\u0443':'ucy','\u0423':'Ucy','\u045E':'ubrcy','\u040E':'Ubrcy','\u0444':'fcy','\u0424':'Fcy','\u0445':'khcy','\u0425':'KHcy','\u0446':'tscy','\u0426':'TScy','\u0447':'chcy','\u0427':'CHcy','\u045F':'dzcy','\u040F':'DZcy','\u0448':'shcy','\u0428':'SHcy','\u0449':'shchcy','\u0429':'SHCHcy','\u044A':'hardcy','\u042A':'HARDcy','\u044B':'ycy','\u042B':'Ycy','\u044C':'softcy','\u042C':'SOFTcy','\u044D':'ecy','\u042D':'Ecy','\u044E':'yucy','\u042E':'YUcy','\u044F':'yacy','\u042F':'YAcy','\u2135':'aleph','\u2136':'beth','\u2137':'gimel','\u2138':'daleth'};
 
-	var regexEscape = /["&'<>`]/g;
-	var escapeMap = {
+	const regexEscape = /["&'<>`]/g;
+	const escapeMap = {
 		'"': '&quot;',
 		'&': '&amp;',
 		'\'': '&#x27;',
@@ -13302,27 +13351,27 @@ module.exports = function hasSymbols() {
 		'`': '&#x60;'
 	};
 
-	var regexInvalidEntity = /&#(?:[xX][^a-fA-F0-9]|[^0-9xX])/;
-	var regexInvalidRawCodePoint = /[\0-\x08\x0B\x0E-\x1F\x7F-\x9F\uFDD0-\uFDEF\uFFFE\uFFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F\uDBBF\uDBFF][\uDFFE\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
-	var regexDecode = /&(CounterClockwiseContourIntegral|DoubleLongLeftRightArrow|ClockwiseContourIntegral|NotNestedGreaterGreater|NotSquareSupersetEqual|DiacriticalDoubleAcute|NotRightTriangleEqual|NotSucceedsSlantEqual|NotPrecedesSlantEqual|CloseCurlyDoubleQuote|NegativeVeryThinSpace|DoubleContourIntegral|FilledVerySmallSquare|CapitalDifferentialD|OpenCurlyDoubleQuote|EmptyVerySmallSquare|NestedGreaterGreater|DoubleLongRightArrow|NotLeftTriangleEqual|NotGreaterSlantEqual|ReverseUpEquilibrium|DoubleLeftRightArrow|NotSquareSubsetEqual|NotDoubleVerticalBar|RightArrowLeftArrow|NotGreaterFullEqual|NotRightTriangleBar|SquareSupersetEqual|DownLeftRightVector|DoubleLongLeftArrow|leftrightsquigarrow|LeftArrowRightArrow|NegativeMediumSpace|blacktriangleright|RightDownVectorBar|PrecedesSlantEqual|RightDoubleBracket|SucceedsSlantEqual|NotLeftTriangleBar|RightTriangleEqual|SquareIntersection|RightDownTeeVector|ReverseEquilibrium|NegativeThickSpace|longleftrightarrow|Longleftrightarrow|LongLeftRightArrow|DownRightTeeVector|DownRightVectorBar|GreaterSlantEqual|SquareSubsetEqual|LeftDownVectorBar|LeftDoubleBracket|VerticalSeparator|rightleftharpoons|NotGreaterGreater|NotSquareSuperset|blacktriangleleft|blacktriangledown|NegativeThinSpace|LeftDownTeeVector|NotLessSlantEqual|leftrightharpoons|DoubleUpDownArrow|DoubleVerticalBar|LeftTriangleEqual|FilledSmallSquare|twoheadrightarrow|NotNestedLessLess|DownLeftTeeVector|DownLeftVectorBar|RightAngleBracket|NotTildeFullEqual|NotReverseElement|RightUpDownVector|DiacriticalTilde|NotSucceedsTilde|circlearrowright|NotPrecedesEqual|rightharpoondown|DoubleRightArrow|NotSucceedsEqual|NonBreakingSpace|NotRightTriangle|LessEqualGreater|RightUpTeeVector|LeftAngleBracket|GreaterFullEqual|DownArrowUpArrow|RightUpVectorBar|twoheadleftarrow|GreaterEqualLess|downharpoonright|RightTriangleBar|ntrianglerighteq|NotSupersetEqual|LeftUpDownVector|DiacriticalAcute|rightrightarrows|vartriangleright|UpArrowDownArrow|DiacriticalGrave|UnderParenthesis|EmptySmallSquare|LeftUpVectorBar|leftrightarrows|DownRightVector|downharpoonleft|trianglerighteq|ShortRightArrow|OverParenthesis|DoubleLeftArrow|DoubleDownArrow|NotSquareSubset|bigtriangledown|ntrianglelefteq|UpperRightArrow|curvearrowright|vartriangleleft|NotLeftTriangle|nleftrightarrow|LowerRightArrow|NotHumpDownHump|NotGreaterTilde|rightthreetimes|LeftUpTeeVector|NotGreaterEqual|straightepsilon|LeftTriangleBar|rightsquigarrow|ContourIntegral|rightleftarrows|CloseCurlyQuote|RightDownVector|LeftRightVector|nLeftrightarrow|leftharpoondown|circlearrowleft|SquareSuperset|OpenCurlyQuote|hookrightarrow|HorizontalLine|DiacriticalDot|NotLessGreater|ntriangleright|DoubleRightTee|InvisibleComma|InvisibleTimes|LowerLeftArrow|DownLeftVector|NotSubsetEqual|curvearrowleft|trianglelefteq|NotVerticalBar|TildeFullEqual|downdownarrows|NotGreaterLess|RightTeeVector|ZeroWidthSpace|looparrowright|LongRightArrow|doublebarwedge|ShortLeftArrow|ShortDownArrow|RightVectorBar|GreaterGreater|ReverseElement|rightharpoonup|LessSlantEqual|leftthreetimes|upharpoonright|rightarrowtail|LeftDownVector|Longrightarrow|NestedLessLess|UpperLeftArrow|nshortparallel|leftleftarrows|leftrightarrow|Leftrightarrow|LeftRightArrow|longrightarrow|upharpoonleft|RightArrowBar|ApplyFunction|LeftTeeVector|leftarrowtail|NotEqualTilde|varsubsetneqq|varsupsetneqq|RightTeeArrow|SucceedsEqual|SucceedsTilde|LeftVectorBar|SupersetEqual|hookleftarrow|DifferentialD|VerticalTilde|VeryThinSpace|blacktriangle|bigtriangleup|LessFullEqual|divideontimes|leftharpoonup|UpEquilibrium|ntriangleleft|RightTriangle|measuredangle|shortparallel|longleftarrow|Longleftarrow|LongLeftArrow|DoubleLeftTee|Poincareplane|PrecedesEqual|triangleright|DoubleUpArrow|RightUpVector|fallingdotseq|looparrowleft|PrecedesTilde|NotTildeEqual|NotTildeTilde|smallsetminus|Proportional|triangleleft|triangledown|UnderBracket|NotHumpEqual|exponentiale|ExponentialE|NotLessTilde|HilbertSpace|RightCeiling|blacklozenge|varsupsetneq|HumpDownHump|GreaterEqual|VerticalLine|LeftTeeArrow|NotLessEqual|DownTeeArrow|LeftTriangle|varsubsetneq|Intersection|NotCongruent|DownArrowBar|LeftUpVector|LeftArrowBar|risingdotseq|GreaterTilde|RoundImplies|SquareSubset|ShortUpArrow|NotSuperset|quaternions|precnapprox|backepsilon|preccurlyeq|OverBracket|blacksquare|MediumSpace|VerticalBar|circledcirc|circleddash|CircleMinus|CircleTimes|LessGreater|curlyeqprec|curlyeqsucc|diamondsuit|UpDownArrow|Updownarrow|RuleDelayed|Rrightarrow|updownarrow|RightVector|nRightarrow|nrightarrow|eqslantless|LeftCeiling|Equilibrium|SmallCircle|expectation|NotSucceeds|thickapprox|GreaterLess|SquareUnion|NotPrecedes|NotLessLess|straightphi|succnapprox|succcurlyeq|SubsetEqual|sqsupseteq|Proportion|Laplacetrf|ImaginaryI|supsetneqq|NotGreater|gtreqqless|NotElement|ThickSpace|TildeEqual|TildeTilde|Fouriertrf|rmoustache|EqualTilde|eqslantgtr|UnderBrace|LeftVector|UpArrowBar|nLeftarrow|nsubseteqq|subsetneqq|nsupseteqq|nleftarrow|succapprox|lessapprox|UpTeeArrow|upuparrows|curlywedge|lesseqqgtr|varepsilon|varnothing|RightFloor|complement|CirclePlus|sqsubseteq|Lleftarrow|circledast|RightArrow|Rightarrow|rightarrow|lmoustache|Bernoullis|precapprox|mapstoleft|mapstodown|longmapsto|dotsquare|downarrow|DoubleDot|nsubseteq|supsetneq|leftarrow|nsupseteq|subsetneq|ThinSpace|ngeqslant|subseteqq|HumpEqual|NotSubset|triangleq|NotCupCap|lesseqgtr|heartsuit|TripleDot|Leftarrow|Coproduct|Congruent|varpropto|complexes|gvertneqq|LeftArrow|LessTilde|supseteqq|MinusPlus|CircleDot|nleqslant|NotExists|gtreqless|nparallel|UnionPlus|LeftFloor|checkmark|CenterDot|centerdot|Mellintrf|gtrapprox|bigotimes|OverBrace|spadesuit|therefore|pitchfork|rationals|PlusMinus|Backslash|Therefore|DownBreve|backsimeq|backprime|DownArrow|nshortmid|Downarrow|lvertneqq|eqvparsl|imagline|imagpart|infintie|integers|Integral|intercal|LessLess|Uarrocir|intlarhk|sqsupset|angmsdaf|sqsubset|llcorner|vartheta|cupbrcap|lnapprox|Superset|SuchThat|succnsim|succneqq|angmsdag|biguplus|curlyvee|trpezium|Succeeds|NotTilde|bigwedge|angmsdah|angrtvbd|triminus|cwconint|fpartint|lrcorner|smeparsl|subseteq|urcorner|lurdshar|laemptyv|DDotrahd|approxeq|ldrushar|awconint|mapstoup|backcong|shortmid|triangle|geqslant|gesdotol|timesbar|circledR|circledS|setminus|multimap|naturals|scpolint|ncongdot|RightTee|boxminus|gnapprox|boxtimes|andslope|thicksim|angmsdaa|varsigma|cirfnint|rtriltri|angmsdab|rppolint|angmsdac|barwedge|drbkarow|clubsuit|thetasym|bsolhsub|capbrcup|dzigrarr|doteqdot|DotEqual|dotminus|UnderBar|NotEqual|realpart|otimesas|ulcorner|hksearow|hkswarow|parallel|PartialD|elinters|emptyset|plusacir|bbrktbrk|angmsdad|pointint|bigoplus|angmsdae|Precedes|bigsqcup|varkappa|notindot|supseteq|precneqq|precnsim|profalar|profline|profsurf|leqslant|lesdotor|raemptyv|subplus|notnivb|notnivc|subrarr|zigrarr|vzigzag|submult|subedot|Element|between|cirscir|larrbfs|larrsim|lotimes|lbrksld|lbrkslu|lozenge|ldrdhar|dbkarow|bigcirc|epsilon|simrarr|simplus|ltquest|Epsilon|luruhar|gtquest|maltese|npolint|eqcolon|npreceq|bigodot|ddagger|gtrless|bnequiv|harrcir|ddotseq|equivDD|backsim|demptyv|nsqsube|nsqsupe|Upsilon|nsubset|upsilon|minusdu|nsucceq|swarrow|nsupset|coloneq|searrow|boxplus|napprox|natural|asympeq|alefsym|congdot|nearrow|bigstar|diamond|supplus|tritime|LeftTee|nvinfin|triplus|NewLine|nvltrie|nvrtrie|nwarrow|nexists|Diamond|ruluhar|Implies|supmult|angzarr|suplarr|suphsub|questeq|because|digamma|Because|olcross|bemptyv|omicron|Omicron|rotimes|NoBreak|intprod|angrtvb|orderof|uwangle|suphsol|lesdoto|orslope|DownTee|realine|cudarrl|rdldhar|OverBar|supedot|lessdot|supdsub|topfork|succsim|rbrkslu|rbrksld|pertenk|cudarrr|isindot|planckh|lessgtr|pluscir|gesdoto|plussim|plustwo|lesssim|cularrp|rarrsim|Cayleys|notinva|notinvb|notinvc|UpArrow|Uparrow|uparrow|NotLess|dwangle|precsim|Product|curarrm|Cconint|dotplus|rarrbfs|ccupssm|Cedilla|cemptyv|notniva|quatint|frac35|frac38|frac45|frac56|frac58|frac78|tridot|xoplus|gacute|gammad|Gammad|lfisht|lfloor|bigcup|sqsupe|gbreve|Gbreve|lharul|sqsube|sqcups|Gcedil|apacir|llhard|lmidot|Lmidot|lmoust|andand|sqcaps|approx|Abreve|spades|circeq|tprime|divide|topcir|Assign|topbot|gesdot|divonx|xuplus|timesd|gesles|atilde|solbar|SOFTcy|loplus|timesb|lowast|lowbar|dlcorn|dlcrop|softcy|dollar|lparlt|thksim|lrhard|Atilde|lsaquo|smashp|bigvee|thinsp|wreath|bkarow|lsquor|lstrok|Lstrok|lthree|ltimes|ltlarr|DotDot|simdot|ltrPar|weierp|xsqcup|angmsd|sigmav|sigmaf|zeetrf|Zcaron|zcaron|mapsto|vsupne|thetav|cirmid|marker|mcomma|Zacute|vsubnE|there4|gtlPar|vsubne|bottom|gtrarr|SHCHcy|shchcy|midast|midcir|middot|minusb|minusd|gtrdot|bowtie|sfrown|mnplus|models|colone|seswar|Colone|mstpos|searhk|gtrsim|nacute|Nacute|boxbox|telrec|hairsp|Tcedil|nbumpe|scnsim|ncaron|Ncaron|ncedil|Ncedil|hamilt|Scedil|nearhk|hardcy|HARDcy|tcedil|Tcaron|commat|nequiv|nesear|tcaron|target|hearts|nexist|varrho|scedil|Scaron|scaron|hellip|Sacute|sacute|hercon|swnwar|compfn|rtimes|rthree|rsquor|rsaquo|zacute|wedgeq|homtht|barvee|barwed|Barwed|rpargt|horbar|conint|swarhk|roplus|nltrie|hslash|hstrok|Hstrok|rmoust|Conint|bprime|hybull|hyphen|iacute|Iacute|supsup|supsub|supsim|varphi|coprod|brvbar|agrave|Supset|supset|igrave|Igrave|notinE|Agrave|iiiint|iinfin|copysr|wedbar|Verbar|vangrt|becaus|incare|verbar|inodot|bullet|drcorn|intcal|drcrop|cularr|vellip|Utilde|bumpeq|cupcap|dstrok|Dstrok|CupCap|cupcup|cupdot|eacute|Eacute|supdot|iquest|easter|ecaron|Ecaron|ecolon|isinsv|utilde|itilde|Itilde|curarr|succeq|Bumpeq|cacute|ulcrop|nparsl|Cacute|nprcue|egrave|Egrave|nrarrc|nrarrw|subsup|subsub|nrtrie|jsercy|nsccue|Jsercy|kappav|kcedil|Kcedil|subsim|ulcorn|nsimeq|egsdot|veebar|kgreen|capand|elsdot|Subset|subset|curren|aacute|lacute|Lacute|emptyv|ntilde|Ntilde|lagran|lambda|Lambda|capcap|Ugrave|langle|subdot|emsp13|numero|emsp14|nvdash|nvDash|nVdash|nVDash|ugrave|ufisht|nvHarr|larrfs|nvlArr|larrhk|larrlp|larrpl|nvrArr|Udblac|nwarhk|larrtl|nwnear|oacute|Oacute|latail|lAtail|sstarf|lbrace|odblac|Odblac|lbrack|udblac|odsold|eparsl|lcaron|Lcaron|ograve|Ograve|lcedil|Lcedil|Aacute|ssmile|ssetmn|squarf|ldquor|capcup|ominus|cylcty|rharul|eqcirc|dagger|rfloor|rfisht|Dagger|daleth|equals|origof|capdot|equest|dcaron|Dcaron|rdquor|oslash|Oslash|otilde|Otilde|otimes|Otimes|urcrop|Ubreve|ubreve|Yacute|Uacute|uacute|Rcedil|rcedil|urcorn|parsim|Rcaron|Vdashl|rcaron|Tstrok|percnt|period|permil|Exists|yacute|rbrack|rbrace|phmmat|ccaron|Ccaron|planck|ccedil|plankv|tstrok|female|plusdo|plusdu|ffilig|plusmn|ffllig|Ccedil|rAtail|dfisht|bernou|ratail|Rarrtl|rarrtl|angsph|rarrpl|rarrlp|rarrhk|xwedge|xotime|forall|ForAll|Vvdash|vsupnE|preceq|bigcap|frac12|frac13|frac14|primes|rarrfs|prnsim|frac15|Square|frac16|square|lesdot|frac18|frac23|propto|prurel|rarrap|rangle|puncsp|frac25|Racute|qprime|racute|lesges|frac34|abreve|AElig|eqsim|utdot|setmn|urtri|Equal|Uring|seArr|uring|searr|dashv|Dashv|mumap|nabla|iogon|Iogon|sdote|sdotb|scsim|napid|napos|equiv|natur|Acirc|dblac|erarr|nbump|iprod|erDot|ucirc|awint|esdot|angrt|ncong|isinE|scnap|Scirc|scirc|ndash|isins|Ubrcy|nearr|neArr|isinv|nedot|ubrcy|acute|Ycirc|iukcy|Iukcy|xutri|nesim|caret|jcirc|Jcirc|caron|twixt|ddarr|sccue|exist|jmath|sbquo|ngeqq|angst|ccaps|lceil|ngsim|UpTee|delta|Delta|rtrif|nharr|nhArr|nhpar|rtrie|jukcy|Jukcy|kappa|rsquo|Kappa|nlarr|nlArr|TSHcy|rrarr|aogon|Aogon|fflig|xrarr|tshcy|ccirc|nleqq|filig|upsih|nless|dharl|nlsim|fjlig|ropar|nltri|dharr|robrk|roarr|fllig|fltns|roang|rnmid|subnE|subne|lAarr|trisb|Ccirc|acirc|ccups|blank|VDash|forkv|Vdash|langd|cedil|blk12|blk14|laquo|strns|diams|notin|vDash|larrb|blk34|block|disin|uplus|vdash|vBarv|aelig|starf|Wedge|check|xrArr|lates|lbarr|lBarr|notni|lbbrk|bcong|frasl|lbrke|frown|vrtri|vprop|vnsup|gamma|Gamma|wedge|xodot|bdquo|srarr|doteq|ldquo|boxdl|boxdL|gcirc|Gcirc|boxDl|boxDL|boxdr|boxdR|boxDr|TRADE|trade|rlhar|boxDR|vnsub|npart|vltri|rlarr|boxhd|boxhD|nprec|gescc|nrarr|nrArr|boxHd|boxHD|boxhu|boxhU|nrtri|boxHu|clubs|boxHU|times|colon|Colon|gimel|xlArr|Tilde|nsime|tilde|nsmid|nspar|THORN|thorn|xlarr|nsube|nsubE|thkap|xhArr|comma|nsucc|boxul|boxuL|nsupe|nsupE|gneqq|gnsim|boxUl|boxUL|grave|boxur|boxuR|boxUr|boxUR|lescc|angle|bepsi|boxvh|varpi|boxvH|numsp|Theta|gsime|gsiml|theta|boxVh|boxVH|boxvl|gtcir|gtdot|boxvL|boxVl|boxVL|crarr|cross|Cross|nvsim|boxvr|nwarr|nwArr|sqsup|dtdot|Uogon|lhard|lharu|dtrif|ocirc|Ocirc|lhblk|duarr|odash|sqsub|Hacek|sqcup|llarr|duhar|oelig|OElig|ofcir|boxvR|uogon|lltri|boxVr|csube|uuarr|ohbar|csupe|ctdot|olarr|olcir|harrw|oline|sqcap|omacr|Omacr|omega|Omega|boxVR|aleph|lneqq|lnsim|loang|loarr|rharu|lobrk|hcirc|operp|oplus|rhard|Hcirc|orarr|Union|order|ecirc|Ecirc|cuepr|szlig|cuesc|breve|reals|eDDot|Breve|hoarr|lopar|utrif|rdquo|Umacr|umacr|efDot|swArr|ultri|alpha|rceil|ovbar|swarr|Wcirc|wcirc|smtes|smile|bsemi|lrarr|aring|parsl|lrhar|bsime|uhblk|lrtri|cupor|Aring|uharr|uharl|slarr|rbrke|bsolb|lsime|rbbrk|RBarr|lsimg|phone|rBarr|rbarr|icirc|lsquo|Icirc|emacr|Emacr|ratio|simne|plusb|simlE|simgE|simeq|pluse|ltcir|ltdot|empty|xharr|xdtri|iexcl|Alpha|ltrie|rarrw|pound|ltrif|xcirc|bumpe|prcue|bumpE|asymp|amacr|cuvee|Sigma|sigma|iiint|udhar|iiota|ijlig|IJlig|supnE|imacr|Imacr|prime|Prime|image|prnap|eogon|Eogon|rarrc|mdash|mDDot|cuwed|imath|supne|imped|Amacr|udarr|prsim|micro|rarrb|cwint|raquo|infin|eplus|range|rangd|Ucirc|radic|minus|amalg|veeeq|rAarr|epsiv|ycirc|quest|sharp|quot|zwnj|Qscr|race|qscr|Qopf|qopf|qint|rang|Rang|Zscr|zscr|Zopf|zopf|rarr|rArr|Rarr|Pscr|pscr|prop|prod|prnE|prec|ZHcy|zhcy|prap|Zeta|zeta|Popf|popf|Zdot|plus|zdot|Yuml|yuml|phiv|YUcy|yucy|Yscr|yscr|perp|Yopf|yopf|part|para|YIcy|Ouml|rcub|yicy|YAcy|rdca|ouml|osol|Oscr|rdsh|yacy|real|oscr|xvee|andd|rect|andv|Xscr|oror|ordm|ordf|xscr|ange|aopf|Aopf|rHar|Xopf|opar|Oopf|xopf|xnis|rhov|oopf|omid|xmap|oint|apid|apos|ogon|ascr|Ascr|odot|odiv|xcup|xcap|ocir|oast|nvlt|nvle|nvgt|nvge|nvap|Wscr|wscr|auml|ntlg|ntgl|nsup|nsub|nsim|Nscr|nscr|nsce|Wopf|ring|npre|wopf|npar|Auml|Barv|bbrk|Nopf|nopf|nmid|nLtv|beta|ropf|Ropf|Beta|beth|nles|rpar|nleq|bnot|bNot|nldr|NJcy|rscr|Rscr|Vscr|vscr|rsqb|njcy|bopf|nisd|Bopf|rtri|Vopf|nGtv|ngtr|vopf|boxh|boxH|boxv|nges|ngeq|boxV|bscr|scap|Bscr|bsim|Vert|vert|bsol|bull|bump|caps|cdot|ncup|scnE|ncap|nbsp|napE|Cdot|cent|sdot|Vbar|nang|vBar|chcy|Mscr|mscr|sect|semi|CHcy|Mopf|mopf|sext|circ|cire|mldr|mlcp|cirE|comp|shcy|SHcy|vArr|varr|cong|copf|Copf|copy|COPY|malt|male|macr|lvnE|cscr|ltri|sime|ltcc|simg|Cscr|siml|csub|Uuml|lsqb|lsim|uuml|csup|Lscr|lscr|utri|smid|lpar|cups|smte|lozf|darr|Lopf|Uscr|solb|lopf|sopf|Sopf|lneq|uscr|spar|dArr|lnap|Darr|dash|Sqrt|LJcy|ljcy|lHar|dHar|Upsi|upsi|diam|lesg|djcy|DJcy|leqq|dopf|Dopf|dscr|Dscr|dscy|ldsh|ldca|squf|DScy|sscr|Sscr|dsol|lcub|late|star|Star|Uopf|Larr|lArr|larr|uopf|dtri|dzcy|sube|subE|Lang|lang|Kscr|kscr|Kopf|kopf|KJcy|kjcy|KHcy|khcy|DZcy|ecir|edot|eDot|Jscr|jscr|succ|Jopf|jopf|Edot|uHar|emsp|ensp|Iuml|iuml|eopf|isin|Iscr|iscr|Eopf|epar|sung|epsi|escr|sup1|sup2|sup3|Iota|iota|supe|supE|Iopf|iopf|IOcy|iocy|Escr|esim|Esim|imof|Uarr|QUOT|uArr|uarr|euml|IEcy|iecy|Idot|Euml|euro|excl|Hscr|hscr|Hopf|hopf|TScy|tscy|Tscr|hbar|tscr|flat|tbrk|fnof|hArr|harr|half|fopf|Fopf|tdot|gvnE|fork|trie|gtcc|fscr|Fscr|gdot|gsim|Gscr|gscr|Gopf|gopf|gneq|Gdot|tosa|gnap|Topf|topf|geqq|toea|GJcy|gjcy|tint|gesl|mid|Sfr|ggg|top|ges|gla|glE|glj|geq|gne|gEl|gel|gnE|Gcy|gcy|gap|Tfr|tfr|Tcy|tcy|Hat|Tau|Ffr|tau|Tab|hfr|Hfr|ffr|Fcy|fcy|icy|Icy|iff|ETH|eth|ifr|Ifr|Eta|eta|int|Int|Sup|sup|ucy|Ucy|Sum|sum|jcy|ENG|ufr|Ufr|eng|Jcy|jfr|els|ell|egs|Efr|efr|Jfr|uml|kcy|Kcy|Ecy|ecy|kfr|Kfr|lap|Sub|sub|lat|lcy|Lcy|leg|Dot|dot|lEg|leq|les|squ|div|die|lfr|Lfr|lgE|Dfr|dfr|Del|deg|Dcy|dcy|lne|lnE|sol|loz|smt|Cup|lrm|cup|lsh|Lsh|sim|shy|map|Map|mcy|Mcy|mfr|Mfr|mho|gfr|Gfr|sfr|cir|Chi|chi|nap|Cfr|vcy|Vcy|cfr|Scy|scy|ncy|Ncy|vee|Vee|Cap|cap|nfr|scE|sce|Nfr|nge|ngE|nGg|vfr|Vfr|ngt|bot|nGt|nis|niv|Rsh|rsh|nle|nlE|bne|Bfr|bfr|nLl|nlt|nLt|Bcy|bcy|not|Not|rlm|wfr|Wfr|npr|nsc|num|ocy|ast|Ocy|ofr|xfr|Xfr|Ofr|ogt|ohm|apE|olt|Rho|ape|rho|Rfr|rfr|ord|REG|ang|reg|orv|And|and|AMP|Rcy|amp|Afr|ycy|Ycy|yen|yfr|Yfr|rcy|par|pcy|Pcy|pfr|Pfr|phi|Phi|afr|Acy|acy|zcy|Zcy|piv|acE|acd|zfr|Zfr|pre|prE|psi|Psi|qfr|Qfr|zwj|Or|ge|Gg|gt|gg|el|oS|lt|Lt|LT|Re|lg|gl|eg|ne|Im|it|le|DD|wp|wr|nu|Nu|dd|lE|Sc|sc|pi|Pi|ee|af|ll|Ll|rx|gE|xi|pm|Xi|ic|pr|Pr|in|ni|mp|mu|ac|Mu|or|ap|Gt|GT|ii);|&(Aacute|Agrave|Atilde|Ccedil|Eacute|Egrave|Iacute|Igrave|Ntilde|Oacute|Ograve|Oslash|Otilde|Uacute|Ugrave|Yacute|aacute|agrave|atilde|brvbar|ccedil|curren|divide|eacute|egrave|frac12|frac14|frac34|iacute|igrave|iquest|middot|ntilde|oacute|ograve|oslash|otilde|plusmn|uacute|ugrave|yacute|AElig|Acirc|Aring|Ecirc|Icirc|Ocirc|THORN|Ucirc|acirc|acute|aelig|aring|cedil|ecirc|icirc|iexcl|laquo|micro|ocirc|pound|raquo|szlig|thorn|times|ucirc|Auml|COPY|Euml|Iuml|Ouml|QUOT|Uuml|auml|cent|copy|euml|iuml|macr|nbsp|ordf|ordm|ouml|para|quot|sect|sup1|sup2|sup3|uuml|yuml|AMP|ETH|REG|amp|deg|eth|not|reg|shy|uml|yen|GT|LT|gt|lt)(?!;)([=a-zA-Z0-9]?)|&#([0-9]+)(;?)|&#[xX]([a-fA-F0-9]+)(;?)|&([0-9a-zA-Z]+)/g;
-	var decodeMap = {'aacute':'\xE1','Aacute':'\xC1','abreve':'\u0103','Abreve':'\u0102','ac':'\u223E','acd':'\u223F','acE':'\u223E\u0333','acirc':'\xE2','Acirc':'\xC2','acute':'\xB4','acy':'\u0430','Acy':'\u0410','aelig':'\xE6','AElig':'\xC6','af':'\u2061','afr':'\uD835\uDD1E','Afr':'\uD835\uDD04','agrave':'\xE0','Agrave':'\xC0','alefsym':'\u2135','aleph':'\u2135','alpha':'\u03B1','Alpha':'\u0391','amacr':'\u0101','Amacr':'\u0100','amalg':'\u2A3F','amp':'&','AMP':'&','and':'\u2227','And':'\u2A53','andand':'\u2A55','andd':'\u2A5C','andslope':'\u2A58','andv':'\u2A5A','ang':'\u2220','ange':'\u29A4','angle':'\u2220','angmsd':'\u2221','angmsdaa':'\u29A8','angmsdab':'\u29A9','angmsdac':'\u29AA','angmsdad':'\u29AB','angmsdae':'\u29AC','angmsdaf':'\u29AD','angmsdag':'\u29AE','angmsdah':'\u29AF','angrt':'\u221F','angrtvb':'\u22BE','angrtvbd':'\u299D','angsph':'\u2222','angst':'\xC5','angzarr':'\u237C','aogon':'\u0105','Aogon':'\u0104','aopf':'\uD835\uDD52','Aopf':'\uD835\uDD38','ap':'\u2248','apacir':'\u2A6F','ape':'\u224A','apE':'\u2A70','apid':'\u224B','apos':'\'','ApplyFunction':'\u2061','approx':'\u2248','approxeq':'\u224A','aring':'\xE5','Aring':'\xC5','ascr':'\uD835\uDCB6','Ascr':'\uD835\uDC9C','Assign':'\u2254','ast':'*','asymp':'\u2248','asympeq':'\u224D','atilde':'\xE3','Atilde':'\xC3','auml':'\xE4','Auml':'\xC4','awconint':'\u2233','awint':'\u2A11','backcong':'\u224C','backepsilon':'\u03F6','backprime':'\u2035','backsim':'\u223D','backsimeq':'\u22CD','Backslash':'\u2216','Barv':'\u2AE7','barvee':'\u22BD','barwed':'\u2305','Barwed':'\u2306','barwedge':'\u2305','bbrk':'\u23B5','bbrktbrk':'\u23B6','bcong':'\u224C','bcy':'\u0431','Bcy':'\u0411','bdquo':'\u201E','becaus':'\u2235','because':'\u2235','Because':'\u2235','bemptyv':'\u29B0','bepsi':'\u03F6','bernou':'\u212C','Bernoullis':'\u212C','beta':'\u03B2','Beta':'\u0392','beth':'\u2136','between':'\u226C','bfr':'\uD835\uDD1F','Bfr':'\uD835\uDD05','bigcap':'\u22C2','bigcirc':'\u25EF','bigcup':'\u22C3','bigodot':'\u2A00','bigoplus':'\u2A01','bigotimes':'\u2A02','bigsqcup':'\u2A06','bigstar':'\u2605','bigtriangledown':'\u25BD','bigtriangleup':'\u25B3','biguplus':'\u2A04','bigvee':'\u22C1','bigwedge':'\u22C0','bkarow':'\u290D','blacklozenge':'\u29EB','blacksquare':'\u25AA','blacktriangle':'\u25B4','blacktriangledown':'\u25BE','blacktriangleleft':'\u25C2','blacktriangleright':'\u25B8','blank':'\u2423','blk12':'\u2592','blk14':'\u2591','blk34':'\u2593','block':'\u2588','bne':'=\u20E5','bnequiv':'\u2261\u20E5','bnot':'\u2310','bNot':'\u2AED','bopf':'\uD835\uDD53','Bopf':'\uD835\uDD39','bot':'\u22A5','bottom':'\u22A5','bowtie':'\u22C8','boxbox':'\u29C9','boxdl':'\u2510','boxdL':'\u2555','boxDl':'\u2556','boxDL':'\u2557','boxdr':'\u250C','boxdR':'\u2552','boxDr':'\u2553','boxDR':'\u2554','boxh':'\u2500','boxH':'\u2550','boxhd':'\u252C','boxhD':'\u2565','boxHd':'\u2564','boxHD':'\u2566','boxhu':'\u2534','boxhU':'\u2568','boxHu':'\u2567','boxHU':'\u2569','boxminus':'\u229F','boxplus':'\u229E','boxtimes':'\u22A0','boxul':'\u2518','boxuL':'\u255B','boxUl':'\u255C','boxUL':'\u255D','boxur':'\u2514','boxuR':'\u2558','boxUr':'\u2559','boxUR':'\u255A','boxv':'\u2502','boxV':'\u2551','boxvh':'\u253C','boxvH':'\u256A','boxVh':'\u256B','boxVH':'\u256C','boxvl':'\u2524','boxvL':'\u2561','boxVl':'\u2562','boxVL':'\u2563','boxvr':'\u251C','boxvR':'\u255E','boxVr':'\u255F','boxVR':'\u2560','bprime':'\u2035','breve':'\u02D8','Breve':'\u02D8','brvbar':'\xA6','bscr':'\uD835\uDCB7','Bscr':'\u212C','bsemi':'\u204F','bsim':'\u223D','bsime':'\u22CD','bsol':'\\','bsolb':'\u29C5','bsolhsub':'\u27C8','bull':'\u2022','bullet':'\u2022','bump':'\u224E','bumpe':'\u224F','bumpE':'\u2AAE','bumpeq':'\u224F','Bumpeq':'\u224E','cacute':'\u0107','Cacute':'\u0106','cap':'\u2229','Cap':'\u22D2','capand':'\u2A44','capbrcup':'\u2A49','capcap':'\u2A4B','capcup':'\u2A47','capdot':'\u2A40','CapitalDifferentialD':'\u2145','caps':'\u2229\uFE00','caret':'\u2041','caron':'\u02C7','Cayleys':'\u212D','ccaps':'\u2A4D','ccaron':'\u010D','Ccaron':'\u010C','ccedil':'\xE7','Ccedil':'\xC7','ccirc':'\u0109','Ccirc':'\u0108','Cconint':'\u2230','ccups':'\u2A4C','ccupssm':'\u2A50','cdot':'\u010B','Cdot':'\u010A','cedil':'\xB8','Cedilla':'\xB8','cemptyv':'\u29B2','cent':'\xA2','centerdot':'\xB7','CenterDot':'\xB7','cfr':'\uD835\uDD20','Cfr':'\u212D','chcy':'\u0447','CHcy':'\u0427','check':'\u2713','checkmark':'\u2713','chi':'\u03C7','Chi':'\u03A7','cir':'\u25CB','circ':'\u02C6','circeq':'\u2257','circlearrowleft':'\u21BA','circlearrowright':'\u21BB','circledast':'\u229B','circledcirc':'\u229A','circleddash':'\u229D','CircleDot':'\u2299','circledR':'\xAE','circledS':'\u24C8','CircleMinus':'\u2296','CirclePlus':'\u2295','CircleTimes':'\u2297','cire':'\u2257','cirE':'\u29C3','cirfnint':'\u2A10','cirmid':'\u2AEF','cirscir':'\u29C2','ClockwiseContourIntegral':'\u2232','CloseCurlyDoubleQuote':'\u201D','CloseCurlyQuote':'\u2019','clubs':'\u2663','clubsuit':'\u2663','colon':':','Colon':'\u2237','colone':'\u2254','Colone':'\u2A74','coloneq':'\u2254','comma':',','commat':'@','comp':'\u2201','compfn':'\u2218','complement':'\u2201','complexes':'\u2102','cong':'\u2245','congdot':'\u2A6D','Congruent':'\u2261','conint':'\u222E','Conint':'\u222F','ContourIntegral':'\u222E','copf':'\uD835\uDD54','Copf':'\u2102','coprod':'\u2210','Coproduct':'\u2210','copy':'\xA9','COPY':'\xA9','copysr':'\u2117','CounterClockwiseContourIntegral':'\u2233','crarr':'\u21B5','cross':'\u2717','Cross':'\u2A2F','cscr':'\uD835\uDCB8','Cscr':'\uD835\uDC9E','csub':'\u2ACF','csube':'\u2AD1','csup':'\u2AD0','csupe':'\u2AD2','ctdot':'\u22EF','cudarrl':'\u2938','cudarrr':'\u2935','cuepr':'\u22DE','cuesc':'\u22DF','cularr':'\u21B6','cularrp':'\u293D','cup':'\u222A','Cup':'\u22D3','cupbrcap':'\u2A48','cupcap':'\u2A46','CupCap':'\u224D','cupcup':'\u2A4A','cupdot':'\u228D','cupor':'\u2A45','cups':'\u222A\uFE00','curarr':'\u21B7','curarrm':'\u293C','curlyeqprec':'\u22DE','curlyeqsucc':'\u22DF','curlyvee':'\u22CE','curlywedge':'\u22CF','curren':'\xA4','curvearrowleft':'\u21B6','curvearrowright':'\u21B7','cuvee':'\u22CE','cuwed':'\u22CF','cwconint':'\u2232','cwint':'\u2231','cylcty':'\u232D','dagger':'\u2020','Dagger':'\u2021','daleth':'\u2138','darr':'\u2193','dArr':'\u21D3','Darr':'\u21A1','dash':'\u2010','dashv':'\u22A3','Dashv':'\u2AE4','dbkarow':'\u290F','dblac':'\u02DD','dcaron':'\u010F','Dcaron':'\u010E','dcy':'\u0434','Dcy':'\u0414','dd':'\u2146','DD':'\u2145','ddagger':'\u2021','ddarr':'\u21CA','DDotrahd':'\u2911','ddotseq':'\u2A77','deg':'\xB0','Del':'\u2207','delta':'\u03B4','Delta':'\u0394','demptyv':'\u29B1','dfisht':'\u297F','dfr':'\uD835\uDD21','Dfr':'\uD835\uDD07','dHar':'\u2965','dharl':'\u21C3','dharr':'\u21C2','DiacriticalAcute':'\xB4','DiacriticalDot':'\u02D9','DiacriticalDoubleAcute':'\u02DD','DiacriticalGrave':'`','DiacriticalTilde':'\u02DC','diam':'\u22C4','diamond':'\u22C4','Diamond':'\u22C4','diamondsuit':'\u2666','diams':'\u2666','die':'\xA8','DifferentialD':'\u2146','digamma':'\u03DD','disin':'\u22F2','div':'\xF7','divide':'\xF7','divideontimes':'\u22C7','divonx':'\u22C7','djcy':'\u0452','DJcy':'\u0402','dlcorn':'\u231E','dlcrop':'\u230D','dollar':'$','dopf':'\uD835\uDD55','Dopf':'\uD835\uDD3B','dot':'\u02D9','Dot':'\xA8','DotDot':'\u20DC','doteq':'\u2250','doteqdot':'\u2251','DotEqual':'\u2250','dotminus':'\u2238','dotplus':'\u2214','dotsquare':'\u22A1','doublebarwedge':'\u2306','DoubleContourIntegral':'\u222F','DoubleDot':'\xA8','DoubleDownArrow':'\u21D3','DoubleLeftArrow':'\u21D0','DoubleLeftRightArrow':'\u21D4','DoubleLeftTee':'\u2AE4','DoubleLongLeftArrow':'\u27F8','DoubleLongLeftRightArrow':'\u27FA','DoubleLongRightArrow':'\u27F9','DoubleRightArrow':'\u21D2','DoubleRightTee':'\u22A8','DoubleUpArrow':'\u21D1','DoubleUpDownArrow':'\u21D5','DoubleVerticalBar':'\u2225','downarrow':'\u2193','Downarrow':'\u21D3','DownArrow':'\u2193','DownArrowBar':'\u2913','DownArrowUpArrow':'\u21F5','DownBreve':'\u0311','downdownarrows':'\u21CA','downharpoonleft':'\u21C3','downharpoonright':'\u21C2','DownLeftRightVector':'\u2950','DownLeftTeeVector':'\u295E','DownLeftVector':'\u21BD','DownLeftVectorBar':'\u2956','DownRightTeeVector':'\u295F','DownRightVector':'\u21C1','DownRightVectorBar':'\u2957','DownTee':'\u22A4','DownTeeArrow':'\u21A7','drbkarow':'\u2910','drcorn':'\u231F','drcrop':'\u230C','dscr':'\uD835\uDCB9','Dscr':'\uD835\uDC9F','dscy':'\u0455','DScy':'\u0405','dsol':'\u29F6','dstrok':'\u0111','Dstrok':'\u0110','dtdot':'\u22F1','dtri':'\u25BF','dtrif':'\u25BE','duarr':'\u21F5','duhar':'\u296F','dwangle':'\u29A6','dzcy':'\u045F','DZcy':'\u040F','dzigrarr':'\u27FF','eacute':'\xE9','Eacute':'\xC9','easter':'\u2A6E','ecaron':'\u011B','Ecaron':'\u011A','ecir':'\u2256','ecirc':'\xEA','Ecirc':'\xCA','ecolon':'\u2255','ecy':'\u044D','Ecy':'\u042D','eDDot':'\u2A77','edot':'\u0117','eDot':'\u2251','Edot':'\u0116','ee':'\u2147','efDot':'\u2252','efr':'\uD835\uDD22','Efr':'\uD835\uDD08','eg':'\u2A9A','egrave':'\xE8','Egrave':'\xC8','egs':'\u2A96','egsdot':'\u2A98','el':'\u2A99','Element':'\u2208','elinters':'\u23E7','ell':'\u2113','els':'\u2A95','elsdot':'\u2A97','emacr':'\u0113','Emacr':'\u0112','empty':'\u2205','emptyset':'\u2205','EmptySmallSquare':'\u25FB','emptyv':'\u2205','EmptyVerySmallSquare':'\u25AB','emsp':'\u2003','emsp13':'\u2004','emsp14':'\u2005','eng':'\u014B','ENG':'\u014A','ensp':'\u2002','eogon':'\u0119','Eogon':'\u0118','eopf':'\uD835\uDD56','Eopf':'\uD835\uDD3C','epar':'\u22D5','eparsl':'\u29E3','eplus':'\u2A71','epsi':'\u03B5','epsilon':'\u03B5','Epsilon':'\u0395','epsiv':'\u03F5','eqcirc':'\u2256','eqcolon':'\u2255','eqsim':'\u2242','eqslantgtr':'\u2A96','eqslantless':'\u2A95','Equal':'\u2A75','equals':'=','EqualTilde':'\u2242','equest':'\u225F','Equilibrium':'\u21CC','equiv':'\u2261','equivDD':'\u2A78','eqvparsl':'\u29E5','erarr':'\u2971','erDot':'\u2253','escr':'\u212F','Escr':'\u2130','esdot':'\u2250','esim':'\u2242','Esim':'\u2A73','eta':'\u03B7','Eta':'\u0397','eth':'\xF0','ETH':'\xD0','euml':'\xEB','Euml':'\xCB','euro':'\u20AC','excl':'!','exist':'\u2203','Exists':'\u2203','expectation':'\u2130','exponentiale':'\u2147','ExponentialE':'\u2147','fallingdotseq':'\u2252','fcy':'\u0444','Fcy':'\u0424','female':'\u2640','ffilig':'\uFB03','fflig':'\uFB00','ffllig':'\uFB04','ffr':'\uD835\uDD23','Ffr':'\uD835\uDD09','filig':'\uFB01','FilledSmallSquare':'\u25FC','FilledVerySmallSquare':'\u25AA','fjlig':'fj','flat':'\u266D','fllig':'\uFB02','fltns':'\u25B1','fnof':'\u0192','fopf':'\uD835\uDD57','Fopf':'\uD835\uDD3D','forall':'\u2200','ForAll':'\u2200','fork':'\u22D4','forkv':'\u2AD9','Fouriertrf':'\u2131','fpartint':'\u2A0D','frac12':'\xBD','frac13':'\u2153','frac14':'\xBC','frac15':'\u2155','frac16':'\u2159','frac18':'\u215B','frac23':'\u2154','frac25':'\u2156','frac34':'\xBE','frac35':'\u2157','frac38':'\u215C','frac45':'\u2158','frac56':'\u215A','frac58':'\u215D','frac78':'\u215E','frasl':'\u2044','frown':'\u2322','fscr':'\uD835\uDCBB','Fscr':'\u2131','gacute':'\u01F5','gamma':'\u03B3','Gamma':'\u0393','gammad':'\u03DD','Gammad':'\u03DC','gap':'\u2A86','gbreve':'\u011F','Gbreve':'\u011E','Gcedil':'\u0122','gcirc':'\u011D','Gcirc':'\u011C','gcy':'\u0433','Gcy':'\u0413','gdot':'\u0121','Gdot':'\u0120','ge':'\u2265','gE':'\u2267','gel':'\u22DB','gEl':'\u2A8C','geq':'\u2265','geqq':'\u2267','geqslant':'\u2A7E','ges':'\u2A7E','gescc':'\u2AA9','gesdot':'\u2A80','gesdoto':'\u2A82','gesdotol':'\u2A84','gesl':'\u22DB\uFE00','gesles':'\u2A94','gfr':'\uD835\uDD24','Gfr':'\uD835\uDD0A','gg':'\u226B','Gg':'\u22D9','ggg':'\u22D9','gimel':'\u2137','gjcy':'\u0453','GJcy':'\u0403','gl':'\u2277','gla':'\u2AA5','glE':'\u2A92','glj':'\u2AA4','gnap':'\u2A8A','gnapprox':'\u2A8A','gne':'\u2A88','gnE':'\u2269','gneq':'\u2A88','gneqq':'\u2269','gnsim':'\u22E7','gopf':'\uD835\uDD58','Gopf':'\uD835\uDD3E','grave':'`','GreaterEqual':'\u2265','GreaterEqualLess':'\u22DB','GreaterFullEqual':'\u2267','GreaterGreater':'\u2AA2','GreaterLess':'\u2277','GreaterSlantEqual':'\u2A7E','GreaterTilde':'\u2273','gscr':'\u210A','Gscr':'\uD835\uDCA2','gsim':'\u2273','gsime':'\u2A8E','gsiml':'\u2A90','gt':'>','Gt':'\u226B','GT':'>','gtcc':'\u2AA7','gtcir':'\u2A7A','gtdot':'\u22D7','gtlPar':'\u2995','gtquest':'\u2A7C','gtrapprox':'\u2A86','gtrarr':'\u2978','gtrdot':'\u22D7','gtreqless':'\u22DB','gtreqqless':'\u2A8C','gtrless':'\u2277','gtrsim':'\u2273','gvertneqq':'\u2269\uFE00','gvnE':'\u2269\uFE00','Hacek':'\u02C7','hairsp':'\u200A','half':'\xBD','hamilt':'\u210B','hardcy':'\u044A','HARDcy':'\u042A','harr':'\u2194','hArr':'\u21D4','harrcir':'\u2948','harrw':'\u21AD','Hat':'^','hbar':'\u210F','hcirc':'\u0125','Hcirc':'\u0124','hearts':'\u2665','heartsuit':'\u2665','hellip':'\u2026','hercon':'\u22B9','hfr':'\uD835\uDD25','Hfr':'\u210C','HilbertSpace':'\u210B','hksearow':'\u2925','hkswarow':'\u2926','hoarr':'\u21FF','homtht':'\u223B','hookleftarrow':'\u21A9','hookrightarrow':'\u21AA','hopf':'\uD835\uDD59','Hopf':'\u210D','horbar':'\u2015','HorizontalLine':'\u2500','hscr':'\uD835\uDCBD','Hscr':'\u210B','hslash':'\u210F','hstrok':'\u0127','Hstrok':'\u0126','HumpDownHump':'\u224E','HumpEqual':'\u224F','hybull':'\u2043','hyphen':'\u2010','iacute':'\xED','Iacute':'\xCD','ic':'\u2063','icirc':'\xEE','Icirc':'\xCE','icy':'\u0438','Icy':'\u0418','Idot':'\u0130','iecy':'\u0435','IEcy':'\u0415','iexcl':'\xA1','iff':'\u21D4','ifr':'\uD835\uDD26','Ifr':'\u2111','igrave':'\xEC','Igrave':'\xCC','ii':'\u2148','iiiint':'\u2A0C','iiint':'\u222D','iinfin':'\u29DC','iiota':'\u2129','ijlig':'\u0133','IJlig':'\u0132','Im':'\u2111','imacr':'\u012B','Imacr':'\u012A','image':'\u2111','ImaginaryI':'\u2148','imagline':'\u2110','imagpart':'\u2111','imath':'\u0131','imof':'\u22B7','imped':'\u01B5','Implies':'\u21D2','in':'\u2208','incare':'\u2105','infin':'\u221E','infintie':'\u29DD','inodot':'\u0131','int':'\u222B','Int':'\u222C','intcal':'\u22BA','integers':'\u2124','Integral':'\u222B','intercal':'\u22BA','Intersection':'\u22C2','intlarhk':'\u2A17','intprod':'\u2A3C','InvisibleComma':'\u2063','InvisibleTimes':'\u2062','iocy':'\u0451','IOcy':'\u0401','iogon':'\u012F','Iogon':'\u012E','iopf':'\uD835\uDD5A','Iopf':'\uD835\uDD40','iota':'\u03B9','Iota':'\u0399','iprod':'\u2A3C','iquest':'\xBF','iscr':'\uD835\uDCBE','Iscr':'\u2110','isin':'\u2208','isindot':'\u22F5','isinE':'\u22F9','isins':'\u22F4','isinsv':'\u22F3','isinv':'\u2208','it':'\u2062','itilde':'\u0129','Itilde':'\u0128','iukcy':'\u0456','Iukcy':'\u0406','iuml':'\xEF','Iuml':'\xCF','jcirc':'\u0135','Jcirc':'\u0134','jcy':'\u0439','Jcy':'\u0419','jfr':'\uD835\uDD27','Jfr':'\uD835\uDD0D','jmath':'\u0237','jopf':'\uD835\uDD5B','Jopf':'\uD835\uDD41','jscr':'\uD835\uDCBF','Jscr':'\uD835\uDCA5','jsercy':'\u0458','Jsercy':'\u0408','jukcy':'\u0454','Jukcy':'\u0404','kappa':'\u03BA','Kappa':'\u039A','kappav':'\u03F0','kcedil':'\u0137','Kcedil':'\u0136','kcy':'\u043A','Kcy':'\u041A','kfr':'\uD835\uDD28','Kfr':'\uD835\uDD0E','kgreen':'\u0138','khcy':'\u0445','KHcy':'\u0425','kjcy':'\u045C','KJcy':'\u040C','kopf':'\uD835\uDD5C','Kopf':'\uD835\uDD42','kscr':'\uD835\uDCC0','Kscr':'\uD835\uDCA6','lAarr':'\u21DA','lacute':'\u013A','Lacute':'\u0139','laemptyv':'\u29B4','lagran':'\u2112','lambda':'\u03BB','Lambda':'\u039B','lang':'\u27E8','Lang':'\u27EA','langd':'\u2991','langle':'\u27E8','lap':'\u2A85','Laplacetrf':'\u2112','laquo':'\xAB','larr':'\u2190','lArr':'\u21D0','Larr':'\u219E','larrb':'\u21E4','larrbfs':'\u291F','larrfs':'\u291D','larrhk':'\u21A9','larrlp':'\u21AB','larrpl':'\u2939','larrsim':'\u2973','larrtl':'\u21A2','lat':'\u2AAB','latail':'\u2919','lAtail':'\u291B','late':'\u2AAD','lates':'\u2AAD\uFE00','lbarr':'\u290C','lBarr':'\u290E','lbbrk':'\u2772','lbrace':'{','lbrack':'[','lbrke':'\u298B','lbrksld':'\u298F','lbrkslu':'\u298D','lcaron':'\u013E','Lcaron':'\u013D','lcedil':'\u013C','Lcedil':'\u013B','lceil':'\u2308','lcub':'{','lcy':'\u043B','Lcy':'\u041B','ldca':'\u2936','ldquo':'\u201C','ldquor':'\u201E','ldrdhar':'\u2967','ldrushar':'\u294B','ldsh':'\u21B2','le':'\u2264','lE':'\u2266','LeftAngleBracket':'\u27E8','leftarrow':'\u2190','Leftarrow':'\u21D0','LeftArrow':'\u2190','LeftArrowBar':'\u21E4','LeftArrowRightArrow':'\u21C6','leftarrowtail':'\u21A2','LeftCeiling':'\u2308','LeftDoubleBracket':'\u27E6','LeftDownTeeVector':'\u2961','LeftDownVector':'\u21C3','LeftDownVectorBar':'\u2959','LeftFloor':'\u230A','leftharpoondown':'\u21BD','leftharpoonup':'\u21BC','leftleftarrows':'\u21C7','leftrightarrow':'\u2194','Leftrightarrow':'\u21D4','LeftRightArrow':'\u2194','leftrightarrows':'\u21C6','leftrightharpoons':'\u21CB','leftrightsquigarrow':'\u21AD','LeftRightVector':'\u294E','LeftTee':'\u22A3','LeftTeeArrow':'\u21A4','LeftTeeVector':'\u295A','leftthreetimes':'\u22CB','LeftTriangle':'\u22B2','LeftTriangleBar':'\u29CF','LeftTriangleEqual':'\u22B4','LeftUpDownVector':'\u2951','LeftUpTeeVector':'\u2960','LeftUpVector':'\u21BF','LeftUpVectorBar':'\u2958','LeftVector':'\u21BC','LeftVectorBar':'\u2952','leg':'\u22DA','lEg':'\u2A8B','leq':'\u2264','leqq':'\u2266','leqslant':'\u2A7D','les':'\u2A7D','lescc':'\u2AA8','lesdot':'\u2A7F','lesdoto':'\u2A81','lesdotor':'\u2A83','lesg':'\u22DA\uFE00','lesges':'\u2A93','lessapprox':'\u2A85','lessdot':'\u22D6','lesseqgtr':'\u22DA','lesseqqgtr':'\u2A8B','LessEqualGreater':'\u22DA','LessFullEqual':'\u2266','LessGreater':'\u2276','lessgtr':'\u2276','LessLess':'\u2AA1','lesssim':'\u2272','LessSlantEqual':'\u2A7D','LessTilde':'\u2272','lfisht':'\u297C','lfloor':'\u230A','lfr':'\uD835\uDD29','Lfr':'\uD835\uDD0F','lg':'\u2276','lgE':'\u2A91','lHar':'\u2962','lhard':'\u21BD','lharu':'\u21BC','lharul':'\u296A','lhblk':'\u2584','ljcy':'\u0459','LJcy':'\u0409','ll':'\u226A','Ll':'\u22D8','llarr':'\u21C7','llcorner':'\u231E','Lleftarrow':'\u21DA','llhard':'\u296B','lltri':'\u25FA','lmidot':'\u0140','Lmidot':'\u013F','lmoust':'\u23B0','lmoustache':'\u23B0','lnap':'\u2A89','lnapprox':'\u2A89','lne':'\u2A87','lnE':'\u2268','lneq':'\u2A87','lneqq':'\u2268','lnsim':'\u22E6','loang':'\u27EC','loarr':'\u21FD','lobrk':'\u27E6','longleftarrow':'\u27F5','Longleftarrow':'\u27F8','LongLeftArrow':'\u27F5','longleftrightarrow':'\u27F7','Longleftrightarrow':'\u27FA','LongLeftRightArrow':'\u27F7','longmapsto':'\u27FC','longrightarrow':'\u27F6','Longrightarrow':'\u27F9','LongRightArrow':'\u27F6','looparrowleft':'\u21AB','looparrowright':'\u21AC','lopar':'\u2985','lopf':'\uD835\uDD5D','Lopf':'\uD835\uDD43','loplus':'\u2A2D','lotimes':'\u2A34','lowast':'\u2217','lowbar':'_','LowerLeftArrow':'\u2199','LowerRightArrow':'\u2198','loz':'\u25CA','lozenge':'\u25CA','lozf':'\u29EB','lpar':'(','lparlt':'\u2993','lrarr':'\u21C6','lrcorner':'\u231F','lrhar':'\u21CB','lrhard':'\u296D','lrm':'\u200E','lrtri':'\u22BF','lsaquo':'\u2039','lscr':'\uD835\uDCC1','Lscr':'\u2112','lsh':'\u21B0','Lsh':'\u21B0','lsim':'\u2272','lsime':'\u2A8D','lsimg':'\u2A8F','lsqb':'[','lsquo':'\u2018','lsquor':'\u201A','lstrok':'\u0142','Lstrok':'\u0141','lt':'<','Lt':'\u226A','LT':'<','ltcc':'\u2AA6','ltcir':'\u2A79','ltdot':'\u22D6','lthree':'\u22CB','ltimes':'\u22C9','ltlarr':'\u2976','ltquest':'\u2A7B','ltri':'\u25C3','ltrie':'\u22B4','ltrif':'\u25C2','ltrPar':'\u2996','lurdshar':'\u294A','luruhar':'\u2966','lvertneqq':'\u2268\uFE00','lvnE':'\u2268\uFE00','macr':'\xAF','male':'\u2642','malt':'\u2720','maltese':'\u2720','map':'\u21A6','Map':'\u2905','mapsto':'\u21A6','mapstodown':'\u21A7','mapstoleft':'\u21A4','mapstoup':'\u21A5','marker':'\u25AE','mcomma':'\u2A29','mcy':'\u043C','Mcy':'\u041C','mdash':'\u2014','mDDot':'\u223A','measuredangle':'\u2221','MediumSpace':'\u205F','Mellintrf':'\u2133','mfr':'\uD835\uDD2A','Mfr':'\uD835\uDD10','mho':'\u2127','micro':'\xB5','mid':'\u2223','midast':'*','midcir':'\u2AF0','middot':'\xB7','minus':'\u2212','minusb':'\u229F','minusd':'\u2238','minusdu':'\u2A2A','MinusPlus':'\u2213','mlcp':'\u2ADB','mldr':'\u2026','mnplus':'\u2213','models':'\u22A7','mopf':'\uD835\uDD5E','Mopf':'\uD835\uDD44','mp':'\u2213','mscr':'\uD835\uDCC2','Mscr':'\u2133','mstpos':'\u223E','mu':'\u03BC','Mu':'\u039C','multimap':'\u22B8','mumap':'\u22B8','nabla':'\u2207','nacute':'\u0144','Nacute':'\u0143','nang':'\u2220\u20D2','nap':'\u2249','napE':'\u2A70\u0338','napid':'\u224B\u0338','napos':'\u0149','napprox':'\u2249','natur':'\u266E','natural':'\u266E','naturals':'\u2115','nbsp':'\xA0','nbump':'\u224E\u0338','nbumpe':'\u224F\u0338','ncap':'\u2A43','ncaron':'\u0148','Ncaron':'\u0147','ncedil':'\u0146','Ncedil':'\u0145','ncong':'\u2247','ncongdot':'\u2A6D\u0338','ncup':'\u2A42','ncy':'\u043D','Ncy':'\u041D','ndash':'\u2013','ne':'\u2260','nearhk':'\u2924','nearr':'\u2197','neArr':'\u21D7','nearrow':'\u2197','nedot':'\u2250\u0338','NegativeMediumSpace':'\u200B','NegativeThickSpace':'\u200B','NegativeThinSpace':'\u200B','NegativeVeryThinSpace':'\u200B','nequiv':'\u2262','nesear':'\u2928','nesim':'\u2242\u0338','NestedGreaterGreater':'\u226B','NestedLessLess':'\u226A','NewLine':'\n','nexist':'\u2204','nexists':'\u2204','nfr':'\uD835\uDD2B','Nfr':'\uD835\uDD11','nge':'\u2271','ngE':'\u2267\u0338','ngeq':'\u2271','ngeqq':'\u2267\u0338','ngeqslant':'\u2A7E\u0338','nges':'\u2A7E\u0338','nGg':'\u22D9\u0338','ngsim':'\u2275','ngt':'\u226F','nGt':'\u226B\u20D2','ngtr':'\u226F','nGtv':'\u226B\u0338','nharr':'\u21AE','nhArr':'\u21CE','nhpar':'\u2AF2','ni':'\u220B','nis':'\u22FC','nisd':'\u22FA','niv':'\u220B','njcy':'\u045A','NJcy':'\u040A','nlarr':'\u219A','nlArr':'\u21CD','nldr':'\u2025','nle':'\u2270','nlE':'\u2266\u0338','nleftarrow':'\u219A','nLeftarrow':'\u21CD','nleftrightarrow':'\u21AE','nLeftrightarrow':'\u21CE','nleq':'\u2270','nleqq':'\u2266\u0338','nleqslant':'\u2A7D\u0338','nles':'\u2A7D\u0338','nless':'\u226E','nLl':'\u22D8\u0338','nlsim':'\u2274','nlt':'\u226E','nLt':'\u226A\u20D2','nltri':'\u22EA','nltrie':'\u22EC','nLtv':'\u226A\u0338','nmid':'\u2224','NoBreak':'\u2060','NonBreakingSpace':'\xA0','nopf':'\uD835\uDD5F','Nopf':'\u2115','not':'\xAC','Not':'\u2AEC','NotCongruent':'\u2262','NotCupCap':'\u226D','NotDoubleVerticalBar':'\u2226','NotElement':'\u2209','NotEqual':'\u2260','NotEqualTilde':'\u2242\u0338','NotExists':'\u2204','NotGreater':'\u226F','NotGreaterEqual':'\u2271','NotGreaterFullEqual':'\u2267\u0338','NotGreaterGreater':'\u226B\u0338','NotGreaterLess':'\u2279','NotGreaterSlantEqual':'\u2A7E\u0338','NotGreaterTilde':'\u2275','NotHumpDownHump':'\u224E\u0338','NotHumpEqual':'\u224F\u0338','notin':'\u2209','notindot':'\u22F5\u0338','notinE':'\u22F9\u0338','notinva':'\u2209','notinvb':'\u22F7','notinvc':'\u22F6','NotLeftTriangle':'\u22EA','NotLeftTriangleBar':'\u29CF\u0338','NotLeftTriangleEqual':'\u22EC','NotLess':'\u226E','NotLessEqual':'\u2270','NotLessGreater':'\u2278','NotLessLess':'\u226A\u0338','NotLessSlantEqual':'\u2A7D\u0338','NotLessTilde':'\u2274','NotNestedGreaterGreater':'\u2AA2\u0338','NotNestedLessLess':'\u2AA1\u0338','notni':'\u220C','notniva':'\u220C','notnivb':'\u22FE','notnivc':'\u22FD','NotPrecedes':'\u2280','NotPrecedesEqual':'\u2AAF\u0338','NotPrecedesSlantEqual':'\u22E0','NotReverseElement':'\u220C','NotRightTriangle':'\u22EB','NotRightTriangleBar':'\u29D0\u0338','NotRightTriangleEqual':'\u22ED','NotSquareSubset':'\u228F\u0338','NotSquareSubsetEqual':'\u22E2','NotSquareSuperset':'\u2290\u0338','NotSquareSupersetEqual':'\u22E3','NotSubset':'\u2282\u20D2','NotSubsetEqual':'\u2288','NotSucceeds':'\u2281','NotSucceedsEqual':'\u2AB0\u0338','NotSucceedsSlantEqual':'\u22E1','NotSucceedsTilde':'\u227F\u0338','NotSuperset':'\u2283\u20D2','NotSupersetEqual':'\u2289','NotTilde':'\u2241','NotTildeEqual':'\u2244','NotTildeFullEqual':'\u2247','NotTildeTilde':'\u2249','NotVerticalBar':'\u2224','npar':'\u2226','nparallel':'\u2226','nparsl':'\u2AFD\u20E5','npart':'\u2202\u0338','npolint':'\u2A14','npr':'\u2280','nprcue':'\u22E0','npre':'\u2AAF\u0338','nprec':'\u2280','npreceq':'\u2AAF\u0338','nrarr':'\u219B','nrArr':'\u21CF','nrarrc':'\u2933\u0338','nrarrw':'\u219D\u0338','nrightarrow':'\u219B','nRightarrow':'\u21CF','nrtri':'\u22EB','nrtrie':'\u22ED','nsc':'\u2281','nsccue':'\u22E1','nsce':'\u2AB0\u0338','nscr':'\uD835\uDCC3','Nscr':'\uD835\uDCA9','nshortmid':'\u2224','nshortparallel':'\u2226','nsim':'\u2241','nsime':'\u2244','nsimeq':'\u2244','nsmid':'\u2224','nspar':'\u2226','nsqsube':'\u22E2','nsqsupe':'\u22E3','nsub':'\u2284','nsube':'\u2288','nsubE':'\u2AC5\u0338','nsubset':'\u2282\u20D2','nsubseteq':'\u2288','nsubseteqq':'\u2AC5\u0338','nsucc':'\u2281','nsucceq':'\u2AB0\u0338','nsup':'\u2285','nsupe':'\u2289','nsupE':'\u2AC6\u0338','nsupset':'\u2283\u20D2','nsupseteq':'\u2289','nsupseteqq':'\u2AC6\u0338','ntgl':'\u2279','ntilde':'\xF1','Ntilde':'\xD1','ntlg':'\u2278','ntriangleleft':'\u22EA','ntrianglelefteq':'\u22EC','ntriangleright':'\u22EB','ntrianglerighteq':'\u22ED','nu':'\u03BD','Nu':'\u039D','num':'#','numero':'\u2116','numsp':'\u2007','nvap':'\u224D\u20D2','nvdash':'\u22AC','nvDash':'\u22AD','nVdash':'\u22AE','nVDash':'\u22AF','nvge':'\u2265\u20D2','nvgt':'>\u20D2','nvHarr':'\u2904','nvinfin':'\u29DE','nvlArr':'\u2902','nvle':'\u2264\u20D2','nvlt':'<\u20D2','nvltrie':'\u22B4\u20D2','nvrArr':'\u2903','nvrtrie':'\u22B5\u20D2','nvsim':'\u223C\u20D2','nwarhk':'\u2923','nwarr':'\u2196','nwArr':'\u21D6','nwarrow':'\u2196','nwnear':'\u2927','oacute':'\xF3','Oacute':'\xD3','oast':'\u229B','ocir':'\u229A','ocirc':'\xF4','Ocirc':'\xD4','ocy':'\u043E','Ocy':'\u041E','odash':'\u229D','odblac':'\u0151','Odblac':'\u0150','odiv':'\u2A38','odot':'\u2299','odsold':'\u29BC','oelig':'\u0153','OElig':'\u0152','ofcir':'\u29BF','ofr':'\uD835\uDD2C','Ofr':'\uD835\uDD12','ogon':'\u02DB','ograve':'\xF2','Ograve':'\xD2','ogt':'\u29C1','ohbar':'\u29B5','ohm':'\u03A9','oint':'\u222E','olarr':'\u21BA','olcir':'\u29BE','olcross':'\u29BB','oline':'\u203E','olt':'\u29C0','omacr':'\u014D','Omacr':'\u014C','omega':'\u03C9','Omega':'\u03A9','omicron':'\u03BF','Omicron':'\u039F','omid':'\u29B6','ominus':'\u2296','oopf':'\uD835\uDD60','Oopf':'\uD835\uDD46','opar':'\u29B7','OpenCurlyDoubleQuote':'\u201C','OpenCurlyQuote':'\u2018','operp':'\u29B9','oplus':'\u2295','or':'\u2228','Or':'\u2A54','orarr':'\u21BB','ord':'\u2A5D','order':'\u2134','orderof':'\u2134','ordf':'\xAA','ordm':'\xBA','origof':'\u22B6','oror':'\u2A56','orslope':'\u2A57','orv':'\u2A5B','oS':'\u24C8','oscr':'\u2134','Oscr':'\uD835\uDCAA','oslash':'\xF8','Oslash':'\xD8','osol':'\u2298','otilde':'\xF5','Otilde':'\xD5','otimes':'\u2297','Otimes':'\u2A37','otimesas':'\u2A36','ouml':'\xF6','Ouml':'\xD6','ovbar':'\u233D','OverBar':'\u203E','OverBrace':'\u23DE','OverBracket':'\u23B4','OverParenthesis':'\u23DC','par':'\u2225','para':'\xB6','parallel':'\u2225','parsim':'\u2AF3','parsl':'\u2AFD','part':'\u2202','PartialD':'\u2202','pcy':'\u043F','Pcy':'\u041F','percnt':'%','period':'.','permil':'\u2030','perp':'\u22A5','pertenk':'\u2031','pfr':'\uD835\uDD2D','Pfr':'\uD835\uDD13','phi':'\u03C6','Phi':'\u03A6','phiv':'\u03D5','phmmat':'\u2133','phone':'\u260E','pi':'\u03C0','Pi':'\u03A0','pitchfork':'\u22D4','piv':'\u03D6','planck':'\u210F','planckh':'\u210E','plankv':'\u210F','plus':'+','plusacir':'\u2A23','plusb':'\u229E','pluscir':'\u2A22','plusdo':'\u2214','plusdu':'\u2A25','pluse':'\u2A72','PlusMinus':'\xB1','plusmn':'\xB1','plussim':'\u2A26','plustwo':'\u2A27','pm':'\xB1','Poincareplane':'\u210C','pointint':'\u2A15','popf':'\uD835\uDD61','Popf':'\u2119','pound':'\xA3','pr':'\u227A','Pr':'\u2ABB','prap':'\u2AB7','prcue':'\u227C','pre':'\u2AAF','prE':'\u2AB3','prec':'\u227A','precapprox':'\u2AB7','preccurlyeq':'\u227C','Precedes':'\u227A','PrecedesEqual':'\u2AAF','PrecedesSlantEqual':'\u227C','PrecedesTilde':'\u227E','preceq':'\u2AAF','precnapprox':'\u2AB9','precneqq':'\u2AB5','precnsim':'\u22E8','precsim':'\u227E','prime':'\u2032','Prime':'\u2033','primes':'\u2119','prnap':'\u2AB9','prnE':'\u2AB5','prnsim':'\u22E8','prod':'\u220F','Product':'\u220F','profalar':'\u232E','profline':'\u2312','profsurf':'\u2313','prop':'\u221D','Proportion':'\u2237','Proportional':'\u221D','propto':'\u221D','prsim':'\u227E','prurel':'\u22B0','pscr':'\uD835\uDCC5','Pscr':'\uD835\uDCAB','psi':'\u03C8','Psi':'\u03A8','puncsp':'\u2008','qfr':'\uD835\uDD2E','Qfr':'\uD835\uDD14','qint':'\u2A0C','qopf':'\uD835\uDD62','Qopf':'\u211A','qprime':'\u2057','qscr':'\uD835\uDCC6','Qscr':'\uD835\uDCAC','quaternions':'\u210D','quatint':'\u2A16','quest':'?','questeq':'\u225F','quot':'"','QUOT':'"','rAarr':'\u21DB','race':'\u223D\u0331','racute':'\u0155','Racute':'\u0154','radic':'\u221A','raemptyv':'\u29B3','rang':'\u27E9','Rang':'\u27EB','rangd':'\u2992','range':'\u29A5','rangle':'\u27E9','raquo':'\xBB','rarr':'\u2192','rArr':'\u21D2','Rarr':'\u21A0','rarrap':'\u2975','rarrb':'\u21E5','rarrbfs':'\u2920','rarrc':'\u2933','rarrfs':'\u291E','rarrhk':'\u21AA','rarrlp':'\u21AC','rarrpl':'\u2945','rarrsim':'\u2974','rarrtl':'\u21A3','Rarrtl':'\u2916','rarrw':'\u219D','ratail':'\u291A','rAtail':'\u291C','ratio':'\u2236','rationals':'\u211A','rbarr':'\u290D','rBarr':'\u290F','RBarr':'\u2910','rbbrk':'\u2773','rbrace':'}','rbrack':']','rbrke':'\u298C','rbrksld':'\u298E','rbrkslu':'\u2990','rcaron':'\u0159','Rcaron':'\u0158','rcedil':'\u0157','Rcedil':'\u0156','rceil':'\u2309','rcub':'}','rcy':'\u0440','Rcy':'\u0420','rdca':'\u2937','rdldhar':'\u2969','rdquo':'\u201D','rdquor':'\u201D','rdsh':'\u21B3','Re':'\u211C','real':'\u211C','realine':'\u211B','realpart':'\u211C','reals':'\u211D','rect':'\u25AD','reg':'\xAE','REG':'\xAE','ReverseElement':'\u220B','ReverseEquilibrium':'\u21CB','ReverseUpEquilibrium':'\u296F','rfisht':'\u297D','rfloor':'\u230B','rfr':'\uD835\uDD2F','Rfr':'\u211C','rHar':'\u2964','rhard':'\u21C1','rharu':'\u21C0','rharul':'\u296C','rho':'\u03C1','Rho':'\u03A1','rhov':'\u03F1','RightAngleBracket':'\u27E9','rightarrow':'\u2192','Rightarrow':'\u21D2','RightArrow':'\u2192','RightArrowBar':'\u21E5','RightArrowLeftArrow':'\u21C4','rightarrowtail':'\u21A3','RightCeiling':'\u2309','RightDoubleBracket':'\u27E7','RightDownTeeVector':'\u295D','RightDownVector':'\u21C2','RightDownVectorBar':'\u2955','RightFloor':'\u230B','rightharpoondown':'\u21C1','rightharpoonup':'\u21C0','rightleftarrows':'\u21C4','rightleftharpoons':'\u21CC','rightrightarrows':'\u21C9','rightsquigarrow':'\u219D','RightTee':'\u22A2','RightTeeArrow':'\u21A6','RightTeeVector':'\u295B','rightthreetimes':'\u22CC','RightTriangle':'\u22B3','RightTriangleBar':'\u29D0','RightTriangleEqual':'\u22B5','RightUpDownVector':'\u294F','RightUpTeeVector':'\u295C','RightUpVector':'\u21BE','RightUpVectorBar':'\u2954','RightVector':'\u21C0','RightVectorBar':'\u2953','ring':'\u02DA','risingdotseq':'\u2253','rlarr':'\u21C4','rlhar':'\u21CC','rlm':'\u200F','rmoust':'\u23B1','rmoustache':'\u23B1','rnmid':'\u2AEE','roang':'\u27ED','roarr':'\u21FE','robrk':'\u27E7','ropar':'\u2986','ropf':'\uD835\uDD63','Ropf':'\u211D','roplus':'\u2A2E','rotimes':'\u2A35','RoundImplies':'\u2970','rpar':')','rpargt':'\u2994','rppolint':'\u2A12','rrarr':'\u21C9','Rrightarrow':'\u21DB','rsaquo':'\u203A','rscr':'\uD835\uDCC7','Rscr':'\u211B','rsh':'\u21B1','Rsh':'\u21B1','rsqb':']','rsquo':'\u2019','rsquor':'\u2019','rthree':'\u22CC','rtimes':'\u22CA','rtri':'\u25B9','rtrie':'\u22B5','rtrif':'\u25B8','rtriltri':'\u29CE','RuleDelayed':'\u29F4','ruluhar':'\u2968','rx':'\u211E','sacute':'\u015B','Sacute':'\u015A','sbquo':'\u201A','sc':'\u227B','Sc':'\u2ABC','scap':'\u2AB8','scaron':'\u0161','Scaron':'\u0160','sccue':'\u227D','sce':'\u2AB0','scE':'\u2AB4','scedil':'\u015F','Scedil':'\u015E','scirc':'\u015D','Scirc':'\u015C','scnap':'\u2ABA','scnE':'\u2AB6','scnsim':'\u22E9','scpolint':'\u2A13','scsim':'\u227F','scy':'\u0441','Scy':'\u0421','sdot':'\u22C5','sdotb':'\u22A1','sdote':'\u2A66','searhk':'\u2925','searr':'\u2198','seArr':'\u21D8','searrow':'\u2198','sect':'\xA7','semi':';','seswar':'\u2929','setminus':'\u2216','setmn':'\u2216','sext':'\u2736','sfr':'\uD835\uDD30','Sfr':'\uD835\uDD16','sfrown':'\u2322','sharp':'\u266F','shchcy':'\u0449','SHCHcy':'\u0429','shcy':'\u0448','SHcy':'\u0428','ShortDownArrow':'\u2193','ShortLeftArrow':'\u2190','shortmid':'\u2223','shortparallel':'\u2225','ShortRightArrow':'\u2192','ShortUpArrow':'\u2191','shy':'\xAD','sigma':'\u03C3','Sigma':'\u03A3','sigmaf':'\u03C2','sigmav':'\u03C2','sim':'\u223C','simdot':'\u2A6A','sime':'\u2243','simeq':'\u2243','simg':'\u2A9E','simgE':'\u2AA0','siml':'\u2A9D','simlE':'\u2A9F','simne':'\u2246','simplus':'\u2A24','simrarr':'\u2972','slarr':'\u2190','SmallCircle':'\u2218','smallsetminus':'\u2216','smashp':'\u2A33','smeparsl':'\u29E4','smid':'\u2223','smile':'\u2323','smt':'\u2AAA','smte':'\u2AAC','smtes':'\u2AAC\uFE00','softcy':'\u044C','SOFTcy':'\u042C','sol':'/','solb':'\u29C4','solbar':'\u233F','sopf':'\uD835\uDD64','Sopf':'\uD835\uDD4A','spades':'\u2660','spadesuit':'\u2660','spar':'\u2225','sqcap':'\u2293','sqcaps':'\u2293\uFE00','sqcup':'\u2294','sqcups':'\u2294\uFE00','Sqrt':'\u221A','sqsub':'\u228F','sqsube':'\u2291','sqsubset':'\u228F','sqsubseteq':'\u2291','sqsup':'\u2290','sqsupe':'\u2292','sqsupset':'\u2290','sqsupseteq':'\u2292','squ':'\u25A1','square':'\u25A1','Square':'\u25A1','SquareIntersection':'\u2293','SquareSubset':'\u228F','SquareSubsetEqual':'\u2291','SquareSuperset':'\u2290','SquareSupersetEqual':'\u2292','SquareUnion':'\u2294','squarf':'\u25AA','squf':'\u25AA','srarr':'\u2192','sscr':'\uD835\uDCC8','Sscr':'\uD835\uDCAE','ssetmn':'\u2216','ssmile':'\u2323','sstarf':'\u22C6','star':'\u2606','Star':'\u22C6','starf':'\u2605','straightepsilon':'\u03F5','straightphi':'\u03D5','strns':'\xAF','sub':'\u2282','Sub':'\u22D0','subdot':'\u2ABD','sube':'\u2286','subE':'\u2AC5','subedot':'\u2AC3','submult':'\u2AC1','subne':'\u228A','subnE':'\u2ACB','subplus':'\u2ABF','subrarr':'\u2979','subset':'\u2282','Subset':'\u22D0','subseteq':'\u2286','subseteqq':'\u2AC5','SubsetEqual':'\u2286','subsetneq':'\u228A','subsetneqq':'\u2ACB','subsim':'\u2AC7','subsub':'\u2AD5','subsup':'\u2AD3','succ':'\u227B','succapprox':'\u2AB8','succcurlyeq':'\u227D','Succeeds':'\u227B','SucceedsEqual':'\u2AB0','SucceedsSlantEqual':'\u227D','SucceedsTilde':'\u227F','succeq':'\u2AB0','succnapprox':'\u2ABA','succneqq':'\u2AB6','succnsim':'\u22E9','succsim':'\u227F','SuchThat':'\u220B','sum':'\u2211','Sum':'\u2211','sung':'\u266A','sup':'\u2283','Sup':'\u22D1','sup1':'\xB9','sup2':'\xB2','sup3':'\xB3','supdot':'\u2ABE','supdsub':'\u2AD8','supe':'\u2287','supE':'\u2AC6','supedot':'\u2AC4','Superset':'\u2283','SupersetEqual':'\u2287','suphsol':'\u27C9','suphsub':'\u2AD7','suplarr':'\u297B','supmult':'\u2AC2','supne':'\u228B','supnE':'\u2ACC','supplus':'\u2AC0','supset':'\u2283','Supset':'\u22D1','supseteq':'\u2287','supseteqq':'\u2AC6','supsetneq':'\u228B','supsetneqq':'\u2ACC','supsim':'\u2AC8','supsub':'\u2AD4','supsup':'\u2AD6','swarhk':'\u2926','swarr':'\u2199','swArr':'\u21D9','swarrow':'\u2199','swnwar':'\u292A','szlig':'\xDF','Tab':'\t','target':'\u2316','tau':'\u03C4','Tau':'\u03A4','tbrk':'\u23B4','tcaron':'\u0165','Tcaron':'\u0164','tcedil':'\u0163','Tcedil':'\u0162','tcy':'\u0442','Tcy':'\u0422','tdot':'\u20DB','telrec':'\u2315','tfr':'\uD835\uDD31','Tfr':'\uD835\uDD17','there4':'\u2234','therefore':'\u2234','Therefore':'\u2234','theta':'\u03B8','Theta':'\u0398','thetasym':'\u03D1','thetav':'\u03D1','thickapprox':'\u2248','thicksim':'\u223C','ThickSpace':'\u205F\u200A','thinsp':'\u2009','ThinSpace':'\u2009','thkap':'\u2248','thksim':'\u223C','thorn':'\xFE','THORN':'\xDE','tilde':'\u02DC','Tilde':'\u223C','TildeEqual':'\u2243','TildeFullEqual':'\u2245','TildeTilde':'\u2248','times':'\xD7','timesb':'\u22A0','timesbar':'\u2A31','timesd':'\u2A30','tint':'\u222D','toea':'\u2928','top':'\u22A4','topbot':'\u2336','topcir':'\u2AF1','topf':'\uD835\uDD65','Topf':'\uD835\uDD4B','topfork':'\u2ADA','tosa':'\u2929','tprime':'\u2034','trade':'\u2122','TRADE':'\u2122','triangle':'\u25B5','triangledown':'\u25BF','triangleleft':'\u25C3','trianglelefteq':'\u22B4','triangleq':'\u225C','triangleright':'\u25B9','trianglerighteq':'\u22B5','tridot':'\u25EC','trie':'\u225C','triminus':'\u2A3A','TripleDot':'\u20DB','triplus':'\u2A39','trisb':'\u29CD','tritime':'\u2A3B','trpezium':'\u23E2','tscr':'\uD835\uDCC9','Tscr':'\uD835\uDCAF','tscy':'\u0446','TScy':'\u0426','tshcy':'\u045B','TSHcy':'\u040B','tstrok':'\u0167','Tstrok':'\u0166','twixt':'\u226C','twoheadleftarrow':'\u219E','twoheadrightarrow':'\u21A0','uacute':'\xFA','Uacute':'\xDA','uarr':'\u2191','uArr':'\u21D1','Uarr':'\u219F','Uarrocir':'\u2949','ubrcy':'\u045E','Ubrcy':'\u040E','ubreve':'\u016D','Ubreve':'\u016C','ucirc':'\xFB','Ucirc':'\xDB','ucy':'\u0443','Ucy':'\u0423','udarr':'\u21C5','udblac':'\u0171','Udblac':'\u0170','udhar':'\u296E','ufisht':'\u297E','ufr':'\uD835\uDD32','Ufr':'\uD835\uDD18','ugrave':'\xF9','Ugrave':'\xD9','uHar':'\u2963','uharl':'\u21BF','uharr':'\u21BE','uhblk':'\u2580','ulcorn':'\u231C','ulcorner':'\u231C','ulcrop':'\u230F','ultri':'\u25F8','umacr':'\u016B','Umacr':'\u016A','uml':'\xA8','UnderBar':'_','UnderBrace':'\u23DF','UnderBracket':'\u23B5','UnderParenthesis':'\u23DD','Union':'\u22C3','UnionPlus':'\u228E','uogon':'\u0173','Uogon':'\u0172','uopf':'\uD835\uDD66','Uopf':'\uD835\uDD4C','uparrow':'\u2191','Uparrow':'\u21D1','UpArrow':'\u2191','UpArrowBar':'\u2912','UpArrowDownArrow':'\u21C5','updownarrow':'\u2195','Updownarrow':'\u21D5','UpDownArrow':'\u2195','UpEquilibrium':'\u296E','upharpoonleft':'\u21BF','upharpoonright':'\u21BE','uplus':'\u228E','UpperLeftArrow':'\u2196','UpperRightArrow':'\u2197','upsi':'\u03C5','Upsi':'\u03D2','upsih':'\u03D2','upsilon':'\u03C5','Upsilon':'\u03A5','UpTee':'\u22A5','UpTeeArrow':'\u21A5','upuparrows':'\u21C8','urcorn':'\u231D','urcorner':'\u231D','urcrop':'\u230E','uring':'\u016F','Uring':'\u016E','urtri':'\u25F9','uscr':'\uD835\uDCCA','Uscr':'\uD835\uDCB0','utdot':'\u22F0','utilde':'\u0169','Utilde':'\u0168','utri':'\u25B5','utrif':'\u25B4','uuarr':'\u21C8','uuml':'\xFC','Uuml':'\xDC','uwangle':'\u29A7','vangrt':'\u299C','varepsilon':'\u03F5','varkappa':'\u03F0','varnothing':'\u2205','varphi':'\u03D5','varpi':'\u03D6','varpropto':'\u221D','varr':'\u2195','vArr':'\u21D5','varrho':'\u03F1','varsigma':'\u03C2','varsubsetneq':'\u228A\uFE00','varsubsetneqq':'\u2ACB\uFE00','varsupsetneq':'\u228B\uFE00','varsupsetneqq':'\u2ACC\uFE00','vartheta':'\u03D1','vartriangleleft':'\u22B2','vartriangleright':'\u22B3','vBar':'\u2AE8','Vbar':'\u2AEB','vBarv':'\u2AE9','vcy':'\u0432','Vcy':'\u0412','vdash':'\u22A2','vDash':'\u22A8','Vdash':'\u22A9','VDash':'\u22AB','Vdashl':'\u2AE6','vee':'\u2228','Vee':'\u22C1','veebar':'\u22BB','veeeq':'\u225A','vellip':'\u22EE','verbar':'|','Verbar':'\u2016','vert':'|','Vert':'\u2016','VerticalBar':'\u2223','VerticalLine':'|','VerticalSeparator':'\u2758','VerticalTilde':'\u2240','VeryThinSpace':'\u200A','vfr':'\uD835\uDD33','Vfr':'\uD835\uDD19','vltri':'\u22B2','vnsub':'\u2282\u20D2','vnsup':'\u2283\u20D2','vopf':'\uD835\uDD67','Vopf':'\uD835\uDD4D','vprop':'\u221D','vrtri':'\u22B3','vscr':'\uD835\uDCCB','Vscr':'\uD835\uDCB1','vsubne':'\u228A\uFE00','vsubnE':'\u2ACB\uFE00','vsupne':'\u228B\uFE00','vsupnE':'\u2ACC\uFE00','Vvdash':'\u22AA','vzigzag':'\u299A','wcirc':'\u0175','Wcirc':'\u0174','wedbar':'\u2A5F','wedge':'\u2227','Wedge':'\u22C0','wedgeq':'\u2259','weierp':'\u2118','wfr':'\uD835\uDD34','Wfr':'\uD835\uDD1A','wopf':'\uD835\uDD68','Wopf':'\uD835\uDD4E','wp':'\u2118','wr':'\u2240','wreath':'\u2240','wscr':'\uD835\uDCCC','Wscr':'\uD835\uDCB2','xcap':'\u22C2','xcirc':'\u25EF','xcup':'\u22C3','xdtri':'\u25BD','xfr':'\uD835\uDD35','Xfr':'\uD835\uDD1B','xharr':'\u27F7','xhArr':'\u27FA','xi':'\u03BE','Xi':'\u039E','xlarr':'\u27F5','xlArr':'\u27F8','xmap':'\u27FC','xnis':'\u22FB','xodot':'\u2A00','xopf':'\uD835\uDD69','Xopf':'\uD835\uDD4F','xoplus':'\u2A01','xotime':'\u2A02','xrarr':'\u27F6','xrArr':'\u27F9','xscr':'\uD835\uDCCD','Xscr':'\uD835\uDCB3','xsqcup':'\u2A06','xuplus':'\u2A04','xutri':'\u25B3','xvee':'\u22C1','xwedge':'\u22C0','yacute':'\xFD','Yacute':'\xDD','yacy':'\u044F','YAcy':'\u042F','ycirc':'\u0177','Ycirc':'\u0176','ycy':'\u044B','Ycy':'\u042B','yen':'\xA5','yfr':'\uD835\uDD36','Yfr':'\uD835\uDD1C','yicy':'\u0457','YIcy':'\u0407','yopf':'\uD835\uDD6A','Yopf':'\uD835\uDD50','yscr':'\uD835\uDCCE','Yscr':'\uD835\uDCB4','yucy':'\u044E','YUcy':'\u042E','yuml':'\xFF','Yuml':'\u0178','zacute':'\u017A','Zacute':'\u0179','zcaron':'\u017E','Zcaron':'\u017D','zcy':'\u0437','Zcy':'\u0417','zdot':'\u017C','Zdot':'\u017B','zeetrf':'\u2128','ZeroWidthSpace':'\u200B','zeta':'\u03B6','Zeta':'\u0396','zfr':'\uD835\uDD37','Zfr':'\u2128','zhcy':'\u0436','ZHcy':'\u0416','zigrarr':'\u21DD','zopf':'\uD835\uDD6B','Zopf':'\u2124','zscr':'\uD835\uDCCF','Zscr':'\uD835\uDCB5','zwj':'\u200D','zwnj':'\u200C'};
-	var decodeMapLegacy = {'aacute':'\xE1','Aacute':'\xC1','acirc':'\xE2','Acirc':'\xC2','acute':'\xB4','aelig':'\xE6','AElig':'\xC6','agrave':'\xE0','Agrave':'\xC0','amp':'&','AMP':'&','aring':'\xE5','Aring':'\xC5','atilde':'\xE3','Atilde':'\xC3','auml':'\xE4','Auml':'\xC4','brvbar':'\xA6','ccedil':'\xE7','Ccedil':'\xC7','cedil':'\xB8','cent':'\xA2','copy':'\xA9','COPY':'\xA9','curren':'\xA4','deg':'\xB0','divide':'\xF7','eacute':'\xE9','Eacute':'\xC9','ecirc':'\xEA','Ecirc':'\xCA','egrave':'\xE8','Egrave':'\xC8','eth':'\xF0','ETH':'\xD0','euml':'\xEB','Euml':'\xCB','frac12':'\xBD','frac14':'\xBC','frac34':'\xBE','gt':'>','GT':'>','iacute':'\xED','Iacute':'\xCD','icirc':'\xEE','Icirc':'\xCE','iexcl':'\xA1','igrave':'\xEC','Igrave':'\xCC','iquest':'\xBF','iuml':'\xEF','Iuml':'\xCF','laquo':'\xAB','lt':'<','LT':'<','macr':'\xAF','micro':'\xB5','middot':'\xB7','nbsp':'\xA0','not':'\xAC','ntilde':'\xF1','Ntilde':'\xD1','oacute':'\xF3','Oacute':'\xD3','ocirc':'\xF4','Ocirc':'\xD4','ograve':'\xF2','Ograve':'\xD2','ordf':'\xAA','ordm':'\xBA','oslash':'\xF8','Oslash':'\xD8','otilde':'\xF5','Otilde':'\xD5','ouml':'\xF6','Ouml':'\xD6','para':'\xB6','plusmn':'\xB1','pound':'\xA3','quot':'"','QUOT':'"','raquo':'\xBB','reg':'\xAE','REG':'\xAE','sect':'\xA7','shy':'\xAD','sup1':'\xB9','sup2':'\xB2','sup3':'\xB3','szlig':'\xDF','thorn':'\xFE','THORN':'\xDE','times':'\xD7','uacute':'\xFA','Uacute':'\xDA','ucirc':'\xFB','Ucirc':'\xDB','ugrave':'\xF9','Ugrave':'\xD9','uml':'\xA8','uuml':'\xFC','Uuml':'\xDC','yacute':'\xFD','Yacute':'\xDD','yen':'\xA5','yuml':'\xFF'};
-	var decodeMapNumeric = {'0':'\uFFFD','128':'\u20AC','130':'\u201A','131':'\u0192','132':'\u201E','133':'\u2026','134':'\u2020','135':'\u2021','136':'\u02C6','137':'\u2030','138':'\u0160','139':'\u2039','140':'\u0152','142':'\u017D','145':'\u2018','146':'\u2019','147':'\u201C','148':'\u201D','149':'\u2022','150':'\u2013','151':'\u2014','152':'\u02DC','153':'\u2122','154':'\u0161','155':'\u203A','156':'\u0153','158':'\u017E','159':'\u0178'};
-	var invalidReferenceCodePoints = [1,2,3,4,5,6,7,8,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,64976,64977,64978,64979,64980,64981,64982,64983,64984,64985,64986,64987,64988,64989,64990,64991,64992,64993,64994,64995,64996,64997,64998,64999,65000,65001,65002,65003,65004,65005,65006,65007,65534,65535,131070,131071,196606,196607,262142,262143,327678,327679,393214,393215,458750,458751,524286,524287,589822,589823,655358,655359,720894,720895,786430,786431,851966,851967,917502,917503,983038,983039,1048574,1048575,1114110,1114111];
+	const regexInvalidEntity = /&#(?:[xX][^a-fA-F0-9]|[^0-9xX])/;
+	const regexInvalidRawCodePoint = /[\0-\x08\x0B\x0E-\x1F\x7F-\x9F\uFDD0-\uFDEF\uFFFE\uFFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F\uDBBF\uDBFF][\uDFFE\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+	const regexDecode = /&(CounterClockwiseContourIntegral|DoubleLongLeftRightArrow|ClockwiseContourIntegral|NotNestedGreaterGreater|NotSquareSupersetEqual|DiacriticalDoubleAcute|NotRightTriangleEqual|NotSucceedsSlantEqual|NotPrecedesSlantEqual|CloseCurlyDoubleQuote|NegativeVeryThinSpace|DoubleContourIntegral|FilledVerySmallSquare|CapitalDifferentialD|OpenCurlyDoubleQuote|EmptyVerySmallSquare|NestedGreaterGreater|DoubleLongRightArrow|NotLeftTriangleEqual|NotGreaterSlantEqual|ReverseUpEquilibrium|DoubleLeftRightArrow|NotSquareSubsetEqual|NotDoubleVerticalBar|RightArrowLeftArrow|NotGreaterFullEqual|NotRightTriangleBar|SquareSupersetEqual|DownLeftRightVector|DoubleLongLeftArrow|leftrightsquigarrow|LeftArrowRightArrow|NegativeMediumSpace|blacktriangleright|RightDownVectorBar|PrecedesSlantEqual|RightDoubleBracket|SucceedsSlantEqual|NotLeftTriangleBar|RightTriangleEqual|SquareIntersection|RightDownTeeVector|ReverseEquilibrium|NegativeThickSpace|longleftrightarrow|Longleftrightarrow|LongLeftRightArrow|DownRightTeeVector|DownRightVectorBar|GreaterSlantEqual|SquareSubsetEqual|LeftDownVectorBar|LeftDoubleBracket|VerticalSeparator|rightleftharpoons|NotGreaterGreater|NotSquareSuperset|blacktriangleleft|blacktriangledown|NegativeThinSpace|LeftDownTeeVector|NotLessSlantEqual|leftrightharpoons|DoubleUpDownArrow|DoubleVerticalBar|LeftTriangleEqual|FilledSmallSquare|twoheadrightarrow|NotNestedLessLess|DownLeftTeeVector|DownLeftVectorBar|RightAngleBracket|NotTildeFullEqual|NotReverseElement|RightUpDownVector|DiacriticalTilde|NotSucceedsTilde|circlearrowright|NotPrecedesEqual|rightharpoondown|DoubleRightArrow|NotSucceedsEqual|NonBreakingSpace|NotRightTriangle|LessEqualGreater|RightUpTeeVector|LeftAngleBracket|GreaterFullEqual|DownArrowUpArrow|RightUpVectorBar|twoheadleftarrow|GreaterEqualLess|downharpoonright|RightTriangleBar|ntrianglerighteq|NotSupersetEqual|LeftUpDownVector|DiacriticalAcute|rightrightarrows|vartriangleright|UpArrowDownArrow|DiacriticalGrave|UnderParenthesis|EmptySmallSquare|LeftUpVectorBar|leftrightarrows|DownRightVector|downharpoonleft|trianglerighteq|ShortRightArrow|OverParenthesis|DoubleLeftArrow|DoubleDownArrow|NotSquareSubset|bigtriangledown|ntrianglelefteq|UpperRightArrow|curvearrowright|vartriangleleft|NotLeftTriangle|nleftrightarrow|LowerRightArrow|NotHumpDownHump|NotGreaterTilde|rightthreetimes|LeftUpTeeVector|NotGreaterEqual|straightepsilon|LeftTriangleBar|rightsquigarrow|ContourIntegral|rightleftarrows|CloseCurlyQuote|RightDownVector|LeftRightVector|nLeftrightarrow|leftharpoondown|circlearrowleft|SquareSuperset|OpenCurlyQuote|hookrightarrow|HorizontalLine|DiacriticalDot|NotLessGreater|ntriangleright|DoubleRightTee|InvisibleComma|InvisibleTimes|LowerLeftArrow|DownLeftVector|NotSubsetEqual|curvearrowleft|trianglelefteq|NotVerticalBar|TildeFullEqual|downdownarrows|NotGreaterLess|RightTeeVector|ZeroWidthSpace|looparrowright|LongRightArrow|doublebarwedge|ShortLeftArrow|ShortDownArrow|RightVectorBar|GreaterGreater|ReverseElement|rightharpoonup|LessSlantEqual|leftthreetimes|upharpoonright|rightarrowtail|LeftDownVector|Longrightarrow|NestedLessLess|UpperLeftArrow|nshortparallel|leftleftarrows|leftrightarrow|Leftrightarrow|LeftRightArrow|longrightarrow|upharpoonleft|RightArrowBar|ApplyFunction|LeftTeeVector|leftarrowtail|NotEqualTilde|varsubsetneqq|varsupsetneqq|RightTeeArrow|SucceedsEqual|SucceedsTilde|LeftVectorBar|SupersetEqual|hookleftarrow|DifferentialD|VerticalTilde|VeryThinSpace|blacktriangle|bigtriangleup|LessFullEqual|divideontimes|leftharpoonup|UpEquilibrium|ntriangleleft|RightTriangle|measuredangle|shortparallel|longleftarrow|Longleftarrow|LongLeftArrow|DoubleLeftTee|Poincareplane|PrecedesEqual|triangleright|DoubleUpArrow|RightUpVector|fallingdotseq|looparrowleft|PrecedesTilde|NotTildeEqual|NotTildeTilde|smallsetminus|Proportional|triangleleft|triangledown|UnderBracket|NotHumpEqual|exponentiale|ExponentialE|NotLessTilde|HilbertSpace|RightCeiling|blacklozenge|varsupsetneq|HumpDownHump|GreaterEqual|VerticalLine|LeftTeeArrow|NotLessEqual|DownTeeArrow|LeftTriangle|varsubsetneq|Intersection|NotCongruent|DownArrowBar|LeftUpVector|LeftArrowBar|risingdotseq|GreaterTilde|RoundImplies|SquareSubset|ShortUpArrow|NotSuperset|quaternions|precnapprox|backepsilon|preccurlyeq|OverBracket|blacksquare|MediumSpace|VerticalBar|circledcirc|circleddash|CircleMinus|CircleTimes|LessGreater|curlyeqprec|curlyeqsucc|diamondsuit|UpDownArrow|Updownarrow|RuleDelayed|Rrightarrow|updownarrow|RightVector|nRightarrow|nrightarrow|eqslantless|LeftCeiling|Equilibrium|SmallCircle|expectation|NotSucceeds|thickapprox|GreaterLess|SquareUnion|NotPrecedes|NotLessLess|straightphi|succnapprox|succcurlyeq|SubsetEqual|sqsupseteq|Proportion|Laplacetrf|ImaginaryI|supsetneqq|NotGreater|gtreqqless|NotElement|ThickSpace|TildeEqual|TildeTilde|Fouriertrf|rmoustache|EqualTilde|eqslantgtr|UnderBrace|LeftVector|UpArrowBar|nLeftarrow|nsubseteqq|subsetneqq|nsupseteqq|nleftarrow|succapprox|lessapprox|UpTeeArrow|upuparrows|curlywedge|lesseqqgtr|varepsilon|varnothing|RightFloor|complement|CirclePlus|sqsubseteq|Lleftarrow|circledast|RightArrow|Rightarrow|rightarrow|lmoustache|Bernoullis|precapprox|mapstoleft|mapstodown|longmapsto|dotsquare|downarrow|DoubleDot|nsubseteq|supsetneq|leftarrow|nsupseteq|subsetneq|ThinSpace|ngeqslant|subseteqq|HumpEqual|NotSubset|triangleq|NotCupCap|lesseqgtr|heartsuit|TripleDot|Leftarrow|Coproduct|Congruent|varpropto|complexes|gvertneqq|LeftArrow|LessTilde|supseteqq|MinusPlus|CircleDot|nleqslant|NotExists|gtreqless|nparallel|UnionPlus|LeftFloor|checkmark|CenterDot|centerdot|Mellintrf|gtrapprox|bigotimes|OverBrace|spadesuit|therefore|pitchfork|rationals|PlusMinus|Backslash|Therefore|DownBreve|backsimeq|backprime|DownArrow|nshortmid|Downarrow|lvertneqq|eqvparsl|imagline|imagpart|infintie|integers|Integral|intercal|LessLess|Uarrocir|intlarhk|sqsupset|angmsdaf|sqsubset|llcorner|vartheta|cupbrcap|lnapprox|Superset|SuchThat|succnsim|succneqq|angmsdag|biguplus|curlyvee|trpezium|Succeeds|NotTilde|bigwedge|angmsdah|angrtvbd|triminus|cwconint|fpartint|lrcorner|smeparsl|subseteq|urcorner|lurdshar|laemptyv|DDotrahd|approxeq|ldrushar|awconint|mapstoup|backcong|shortmid|triangle|geqslant|gesdotol|timesbar|circledR|circledS|setminus|multimap|naturals|scpolint|ncongdot|RightTee|boxminus|gnapprox|boxtimes|andslope|thicksim|angmsdaa|varsigma|cirfnint|rtriltri|angmsdab|rppolint|angmsdac|barwedge|drbkarow|clubsuit|thetasym|bsolhsub|capbrcup|dzigrarr|doteqdot|DotEqual|dotminus|UnderBar|NotEqual|realpart|otimesas|ulcorner|hksearow|hkswarow|parallel|PartialD|elinters|emptyset|plusacir|bbrktbrk|angmsdad|pointint|bigoplus|angmsdae|Precedes|bigsqcup|varkappa|notindot|supseteq|precneqq|precnsim|profalar|profline|profsurf|leqslant|lesdotor|raemptyv|subplus|notnivb|notnivc|subrarr|zigrarr|vzigzag|submult|subedot|Element|between|cirscir|larrbfs|larrsim|lotimes|lbrksld|lbrkslu|lozenge|ldrdhar|dbkarow|bigcirc|epsilon|simrarr|simplus|ltquest|Epsilon|luruhar|gtquest|maltese|npolint|eqcolon|npreceq|bigodot|ddagger|gtrless|bnequiv|harrcir|ddotseq|equivDD|backsim|demptyv|nsqsube|nsqsupe|Upsilon|nsubset|upsilon|minusdu|nsucceq|swarrow|nsupset|coloneq|searrow|boxplus|napprox|natural|asympeq|alefsym|congdot|nearrow|bigstar|diamond|supplus|tritime|LeftTee|nvinfin|triplus|NewLine|nvltrie|nvrtrie|nwarrow|nexists|Diamond|ruluhar|Implies|supmult|angzarr|suplarr|suphsub|questeq|because|digamma|Because|olcross|bemptyv|omicron|Omicron|rotimes|NoBreak|intprod|angrtvb|orderof|uwangle|suphsol|lesdoto|orslope|DownTee|realine|cudarrl|rdldhar|OverBar|supedot|lessdot|supdsub|topfork|succsim|rbrkslu|rbrksld|pertenk|cudarrr|isindot|planckh|lessgtr|pluscir|gesdoto|plussim|plustwo|lesssim|cularrp|rarrsim|Cayleys|notinva|notinvb|notinvc|UpArrow|Uparrow|uparrow|NotLess|dwangle|precsim|Product|curarrm|Cconint|dotplus|rarrbfs|ccupssm|Cedilla|cemptyv|notniva|quatint|frac35|frac38|frac45|frac56|frac58|frac78|tridot|xoplus|gacute|gammad|Gammad|lfisht|lfloor|bigcup|sqsupe|gbreve|Gbreve|lharul|sqsube|sqcups|Gcedil|apacir|llhard|lmidot|Lmidot|lmoust|andand|sqcaps|approx|Abreve|spades|circeq|tprime|divide|topcir|Assign|topbot|gesdot|divonx|xuplus|timesd|gesles|atilde|solbar|SOFTcy|loplus|timesb|lowast|lowbar|dlcorn|dlcrop|softcy|dollar|lparlt|thksim|lrhard|Atilde|lsaquo|smashp|bigvee|thinsp|wreath|bkarow|lsquor|lstrok|Lstrok|lthree|ltimes|ltlarr|DotDot|simdot|ltrPar|weierp|xsqcup|angmsd|sigmav|sigmaf|zeetrf|Zcaron|zcaron|mapsto|vsupne|thetav|cirmid|marker|mcomma|Zacute|vsubnE|there4|gtlPar|vsubne|bottom|gtrarr|SHCHcy|shchcy|midast|midcir|middot|minusb|minusd|gtrdot|bowtie|sfrown|mnplus|models|colone|seswar|Colone|mstpos|searhk|gtrsim|nacute|Nacute|boxbox|telrec|hairsp|Tcedil|nbumpe|scnsim|ncaron|Ncaron|ncedil|Ncedil|hamilt|Scedil|nearhk|hardcy|HARDcy|tcedil|Tcaron|commat|nequiv|nesear|tcaron|target|hearts|nexist|varrho|scedil|Scaron|scaron|hellip|Sacute|sacute|hercon|swnwar|compfn|rtimes|rthree|rsquor|rsaquo|zacute|wedgeq|homtht|barvee|barwed|Barwed|rpargt|horbar|conint|swarhk|roplus|nltrie|hslash|hstrok|Hstrok|rmoust|Conint|bprime|hybull|hyphen|iacute|Iacute|supsup|supsub|supsim|varphi|coprod|brvbar|agrave|Supset|supset|igrave|Igrave|notinE|Agrave|iiiint|iinfin|copysr|wedbar|Verbar|vangrt|becaus|incare|verbar|inodot|bullet|drcorn|intcal|drcrop|cularr|vellip|Utilde|bumpeq|cupcap|dstrok|Dstrok|CupCap|cupcup|cupdot|eacute|Eacute|supdot|iquest|easter|ecaron|Ecaron|ecolon|isinsv|utilde|itilde|Itilde|curarr|succeq|Bumpeq|cacute|ulcrop|nparsl|Cacute|nprcue|egrave|Egrave|nrarrc|nrarrw|subsup|subsub|nrtrie|jsercy|nsccue|Jsercy|kappav|kcedil|Kcedil|subsim|ulcorn|nsimeq|egsdot|veebar|kgreen|capand|elsdot|Subset|subset|curren|aacute|lacute|Lacute|emptyv|ntilde|Ntilde|lagran|lambda|Lambda|capcap|Ugrave|langle|subdot|emsp13|numero|emsp14|nvdash|nvDash|nVdash|nVDash|ugrave|ufisht|nvHarr|larrfs|nvlArr|larrhk|larrlp|larrpl|nvrArr|Udblac|nwarhk|larrtl|nwnear|oacute|Oacute|latail|lAtail|sstarf|lbrace|odblac|Odblac|lbrack|udblac|odsold|eparsl|lcaron|Lcaron|ograve|Ograve|lcedil|Lcedil|Aacute|ssmile|ssetmn|squarf|ldquor|capcup|ominus|cylcty|rharul|eqcirc|dagger|rfloor|rfisht|Dagger|daleth|equals|origof|capdot|equest|dcaron|Dcaron|rdquor|oslash|Oslash|otilde|Otilde|otimes|Otimes|urcrop|Ubreve|ubreve|Yacute|Uacute|uacute|Rcedil|rcedil|urcorn|parsim|Rcaron|Vdashl|rcaron|Tstrok|percnt|period|permil|Exists|yacute|rbrack|rbrace|phmmat|ccaron|Ccaron|planck|ccedil|plankv|tstrok|female|plusdo|plusdu|ffilig|plusmn|ffllig|Ccedil|rAtail|dfisht|bernou|ratail|Rarrtl|rarrtl|angsph|rarrpl|rarrlp|rarrhk|xwedge|xotime|forall|ForAll|Vvdash|vsupnE|preceq|bigcap|frac12|frac13|frac14|primes|rarrfs|prnsim|frac15|Square|frac16|square|lesdot|frac18|frac23|propto|prurel|rarrap|rangle|puncsp|frac25|Racute|qprime|racute|lesges|frac34|abreve|AElig|eqsim|utdot|setmn|urtri|Equal|Uring|seArr|uring|searr|dashv|Dashv|mumap|nabla|iogon|Iogon|sdote|sdotb|scsim|napid|napos|equiv|natur|Acirc|dblac|erarr|nbump|iprod|erDot|ucirc|awint|esdot|angrt|ncong|isinE|scnap|Scirc|scirc|ndash|isins|Ubrcy|nearr|neArr|isinv|nedot|ubrcy|acute|Ycirc|iukcy|Iukcy|xutri|nesim|caret|jcirc|Jcirc|caron|twixt|ddarr|sccue|exist|jmath|sbquo|ngeqq|angst|ccaps|lceil|ngsim|UpTee|delta|Delta|rtrif|nharr|nhArr|nhpar|rtrie|jukcy|Jukcy|kappa|rsquo|Kappa|nlarr|nlArr|TSHcy|rrarr|aogon|Aogon|fflig|xrarr|tshcy|ccirc|nleqq|filig|upsih|nless|dharl|nlsim|fjlig|ropar|nltri|dharr|robrk|roarr|fllig|fltns|roang|rnmid|subnE|subne|lAarr|trisb|Ccirc|acirc|ccups|blank|VDash|forkv|Vdash|langd|cedil|blk12|blk14|laquo|strns|diams|notin|vDash|larrb|blk34|block|disin|uplus|vdash|vBarv|aelig|starf|Wedge|check|xrArr|lates|lbarr|lBarr|notni|lbbrk|bcong|frasl|lbrke|frown|vrtri|vprop|vnsup|gamma|Gamma|wedge|xodot|bdquo|srarr|doteq|ldquo|boxdl|boxdL|gcirc|Gcirc|boxDl|boxDL|boxdr|boxdR|boxDr|TRADE|trade|rlhar|boxDR|vnsub|npart|vltri|rlarr|boxhd|boxhD|nprec|gescc|nrarr|nrArr|boxHd|boxHD|boxhu|boxhU|nrtri|boxHu|clubs|boxHU|times|colon|Colon|gimel|xlArr|Tilde|nsime|tilde|nsmid|nspar|THORN|thorn|xlarr|nsube|nsubE|thkap|xhArr|comma|nsucc|boxul|boxuL|nsupe|nsupE|gneqq|gnsim|boxUl|boxUL|grave|boxur|boxuR|boxUr|boxUR|lescc|angle|bepsi|boxvh|varpi|boxvH|numsp|Theta|gsime|gsiml|theta|boxVh|boxVH|boxvl|gtcir|gtdot|boxvL|boxVl|boxVL|crarr|cross|Cross|nvsim|boxvr|nwarr|nwArr|sqsup|dtdot|Uogon|lhard|lharu|dtrif|ocirc|Ocirc|lhblk|duarr|odash|sqsub|Hacek|sqcup|llarr|duhar|oelig|OElig|ofcir|boxvR|uogon|lltri|boxVr|csube|uuarr|ohbar|csupe|ctdot|olarr|olcir|harrw|oline|sqcap|omacr|Omacr|omega|Omega|boxVR|aleph|lneqq|lnsim|loang|loarr|rharu|lobrk|hcirc|operp|oplus|rhard|Hcirc|orarr|Union|order|ecirc|Ecirc|cuepr|szlig|cuesc|breve|reals|eDDot|Breve|hoarr|lopar|utrif|rdquo|Umacr|umacr|efDot|swArr|ultri|alpha|rceil|ovbar|swarr|Wcirc|wcirc|smtes|smile|bsemi|lrarr|aring|parsl|lrhar|bsime|uhblk|lrtri|cupor|Aring|uharr|uharl|slarr|rbrke|bsolb|lsime|rbbrk|RBarr|lsimg|phone|rBarr|rbarr|icirc|lsquo|Icirc|emacr|Emacr|ratio|simne|plusb|simlE|simgE|simeq|pluse|ltcir|ltdot|empty|xharr|xdtri|iexcl|Alpha|ltrie|rarrw|pound|ltrif|xcirc|bumpe|prcue|bumpE|asymp|amacr|cuvee|Sigma|sigma|iiint|udhar|iiota|ijlig|IJlig|supnE|imacr|Imacr|prime|Prime|image|prnap|eogon|Eogon|rarrc|mdash|mDDot|cuwed|imath|supne|imped|Amacr|udarr|prsim|micro|rarrb|cwint|raquo|infin|eplus|range|rangd|Ucirc|radic|minus|amalg|veeeq|rAarr|epsiv|ycirc|quest|sharp|quot|zwnj|Qscr|race|qscr|Qopf|qopf|qint|rang|Rang|Zscr|zscr|Zopf|zopf|rarr|rArr|Rarr|Pscr|pscr|prop|prod|prnE|prec|ZHcy|zhcy|prap|Zeta|zeta|Popf|popf|Zdot|plus|zdot|Yuml|yuml|phiv|YUcy|yucy|Yscr|yscr|perp|Yopf|yopf|part|para|YIcy|Ouml|rcub|yicy|YAcy|rdca|ouml|osol|Oscr|rdsh|yacy|real|oscr|xvee|andd|rect|andv|Xscr|oror|ordm|ordf|xscr|ange|aopf|Aopf|rHar|Xopf|opar|Oopf|xopf|xnis|rhov|oopf|omid|xmap|oint|apid|apos|ogon|ascr|Ascr|odot|odiv|xcup|xcap|ocir|oast|nvlt|nvle|nvgt|nvge|nvap|Wscr|wscr|auml|ntlg|ntgl|nsup|nsub|nsim|Nscr|nscr|nsce|Wopf|ring|npre|wopf|npar|Auml|Barv|bbrk|Nopf|nopf|nmid|nLtv|beta|ropf|Ropf|Beta|beth|nles|rpar|nleq|bnot|bNot|nldr|NJcy|rscr|Rscr|Vscr|vscr|rsqb|njcy|bopf|nisd|Bopf|rtri|Vopf|nGtv|ngtr|vopf|boxh|boxH|boxv|nges|ngeq|boxV|bscr|scap|Bscr|bsim|Vert|vert|bsol|bull|bump|caps|cdot|ncup|scnE|ncap|nbsp|napE|Cdot|cent|sdot|Vbar|nang|vBar|chcy|Mscr|mscr|sect|semi|CHcy|Mopf|mopf|sext|circ|cire|mldr|mlcp|cirE|comp|shcy|SHcy|vArr|varr|cong|copf|Copf|copy|COPY|malt|male|macr|lvnE|cscr|ltri|sime|ltcc|simg|Cscr|siml|csub|Uuml|lsqb|lsim|uuml|csup|Lscr|lscr|utri|smid|lpar|cups|smte|lozf|darr|Lopf|Uscr|solb|lopf|sopf|Sopf|lneq|uscr|spar|dArr|lnap|Darr|dash|Sqrt|LJcy|ljcy|lHar|dHar|Upsi|upsi|diam|lesg|djcy|DJcy|leqq|dopf|Dopf|dscr|Dscr|dscy|ldsh|ldca|squf|DScy|sscr|Sscr|dsol|lcub|late|star|Star|Uopf|Larr|lArr|larr|uopf|dtri|dzcy|sube|subE|Lang|lang|Kscr|kscr|Kopf|kopf|KJcy|kjcy|KHcy|khcy|DZcy|ecir|edot|eDot|Jscr|jscr|succ|Jopf|jopf|Edot|uHar|emsp|ensp|Iuml|iuml|eopf|isin|Iscr|iscr|Eopf|epar|sung|epsi|escr|sup1|sup2|sup3|Iota|iota|supe|supE|Iopf|iopf|IOcy|iocy|Escr|esim|Esim|imof|Uarr|QUOT|uArr|uarr|euml|IEcy|iecy|Idot|Euml|euro|excl|Hscr|hscr|Hopf|hopf|TScy|tscy|Tscr|hbar|tscr|flat|tbrk|fnof|hArr|harr|half|fopf|Fopf|tdot|gvnE|fork|trie|gtcc|fscr|Fscr|gdot|gsim|Gscr|gscr|Gopf|gopf|gneq|Gdot|tosa|gnap|Topf|topf|geqq|toea|GJcy|gjcy|tint|gesl|mid|Sfr|ggg|top|ges|gla|glE|glj|geq|gne|gEl|gel|gnE|Gcy|gcy|gap|Tfr|tfr|Tcy|tcy|Hat|Tau|Ffr|tau|Tab|hfr|Hfr|ffr|Fcy|fcy|icy|Icy|iff|ETH|eth|ifr|Ifr|Eta|eta|int|Int|Sup|sup|ucy|Ucy|Sum|sum|jcy|ENG|ufr|Ufr|eng|Jcy|jfr|els|ell|egs|Efr|efr|Jfr|uml|kcy|Kcy|Ecy|ecy|kfr|Kfr|lap|Sub|sub|lat|lcy|Lcy|leg|Dot|dot|lEg|leq|les|squ|div|die|lfr|Lfr|lgE|Dfr|dfr|Del|deg|Dcy|dcy|lne|lnE|sol|loz|smt|Cup|lrm|cup|lsh|Lsh|sim|shy|map|Map|mcy|Mcy|mfr|Mfr|mho|gfr|Gfr|sfr|cir|Chi|chi|nap|Cfr|vcy|Vcy|cfr|Scy|scy|ncy|Ncy|vee|Vee|Cap|cap|nfr|scE|sce|Nfr|nge|ngE|nGg|vfr|Vfr|ngt|bot|nGt|nis|niv|Rsh|rsh|nle|nlE|bne|Bfr|bfr|nLl|nlt|nLt|Bcy|bcy|not|Not|rlm|wfr|Wfr|npr|nsc|num|ocy|ast|Ocy|ofr|xfr|Xfr|Ofr|ogt|ohm|apE|olt|Rho|ape|rho|Rfr|rfr|ord|REG|ang|reg|orv|And|and|AMP|Rcy|amp|Afr|ycy|Ycy|yen|yfr|Yfr|rcy|par|pcy|Pcy|pfr|Pfr|phi|Phi|afr|Acy|acy|zcy|Zcy|piv|acE|acd|zfr|Zfr|pre|prE|psi|Psi|qfr|Qfr|zwj|Or|ge|Gg|gt|gg|el|oS|lt|Lt|LT|Re|lg|gl|eg|ne|Im|it|le|DD|wp|wr|nu|Nu|dd|lE|Sc|sc|pi|Pi|ee|af|ll|Ll|rx|gE|xi|pm|Xi|ic|pr|Pr|in|ni|mp|mu|ac|Mu|or|ap|Gt|GT|ii);|&(Aacute|Agrave|Atilde|Ccedil|Eacute|Egrave|Iacute|Igrave|Ntilde|Oacute|Ograve|Oslash|Otilde|Uacute|Ugrave|Yacute|aacute|agrave|atilde|brvbar|ccedil|curren|divide|eacute|egrave|frac12|frac14|frac34|iacute|igrave|iquest|middot|ntilde|oacute|ograve|oslash|otilde|plusmn|uacute|ugrave|yacute|AElig|Acirc|Aring|Ecirc|Icirc|Ocirc|THORN|Ucirc|acirc|acute|aelig|aring|cedil|ecirc|icirc|iexcl|laquo|micro|ocirc|pound|raquo|szlig|thorn|times|ucirc|Auml|COPY|Euml|Iuml|Ouml|QUOT|Uuml|auml|cent|copy|euml|iuml|macr|nbsp|ordf|ordm|ouml|para|quot|sect|sup1|sup2|sup3|uuml|yuml|AMP|ETH|REG|amp|deg|eth|not|reg|shy|uml|yen|GT|LT|gt|lt)(?!;)([=a-zA-Z0-9]?)|&#([0-9]+)(;?)|&#[xX]([a-fA-F0-9]+)(;?)|&([0-9a-zA-Z]+)/g;
+	const decodeMap = {'aacute':'\xE1','Aacute':'\xC1','abreve':'\u0103','Abreve':'\u0102','ac':'\u223E','acd':'\u223F','acE':'\u223E\u0333','acirc':'\xE2','Acirc':'\xC2','acute':'\xB4','acy':'\u0430','Acy':'\u0410','aelig':'\xE6','AElig':'\xC6','af':'\u2061','afr':'\uD835\uDD1E','Afr':'\uD835\uDD04','agrave':'\xE0','Agrave':'\xC0','alefsym':'\u2135','aleph':'\u2135','alpha':'\u03B1','Alpha':'\u0391','amacr':'\u0101','Amacr':'\u0100','amalg':'\u2A3F','amp':'&','AMP':'&','and':'\u2227','And':'\u2A53','andand':'\u2A55','andd':'\u2A5C','andslope':'\u2A58','andv':'\u2A5A','ang':'\u2220','ange':'\u29A4','angle':'\u2220','angmsd':'\u2221','angmsdaa':'\u29A8','angmsdab':'\u29A9','angmsdac':'\u29AA','angmsdad':'\u29AB','angmsdae':'\u29AC','angmsdaf':'\u29AD','angmsdag':'\u29AE','angmsdah':'\u29AF','angrt':'\u221F','angrtvb':'\u22BE','angrtvbd':'\u299D','angsph':'\u2222','angst':'\xC5','angzarr':'\u237C','aogon':'\u0105','Aogon':'\u0104','aopf':'\uD835\uDD52','Aopf':'\uD835\uDD38','ap':'\u2248','apacir':'\u2A6F','ape':'\u224A','apE':'\u2A70','apid':'\u224B','apos':'\'','ApplyFunction':'\u2061','approx':'\u2248','approxeq':'\u224A','aring':'\xE5','Aring':'\xC5','ascr':'\uD835\uDCB6','Ascr':'\uD835\uDC9C','Assign':'\u2254','ast':'*','asymp':'\u2248','asympeq':'\u224D','atilde':'\xE3','Atilde':'\xC3','auml':'\xE4','Auml':'\xC4','awconint':'\u2233','awint':'\u2A11','backcong':'\u224C','backepsilon':'\u03F6','backprime':'\u2035','backsim':'\u223D','backsimeq':'\u22CD','Backslash':'\u2216','Barv':'\u2AE7','barvee':'\u22BD','barwed':'\u2305','Barwed':'\u2306','barwedge':'\u2305','bbrk':'\u23B5','bbrktbrk':'\u23B6','bcong':'\u224C','bcy':'\u0431','Bcy':'\u0411','bdquo':'\u201E','becaus':'\u2235','because':'\u2235','Because':'\u2235','bemptyv':'\u29B0','bepsi':'\u03F6','bernou':'\u212C','Bernoullis':'\u212C','beta':'\u03B2','Beta':'\u0392','beth':'\u2136','between':'\u226C','bfr':'\uD835\uDD1F','Bfr':'\uD835\uDD05','bigcap':'\u22C2','bigcirc':'\u25EF','bigcup':'\u22C3','bigodot':'\u2A00','bigoplus':'\u2A01','bigotimes':'\u2A02','bigsqcup':'\u2A06','bigstar':'\u2605','bigtriangledown':'\u25BD','bigtriangleup':'\u25B3','biguplus':'\u2A04','bigvee':'\u22C1','bigwedge':'\u22C0','bkarow':'\u290D','blacklozenge':'\u29EB','blacksquare':'\u25AA','blacktriangle':'\u25B4','blacktriangledown':'\u25BE','blacktriangleleft':'\u25C2','blacktriangleright':'\u25B8','blank':'\u2423','blk12':'\u2592','blk14':'\u2591','blk34':'\u2593','block':'\u2588','bne':'=\u20E5','bnequiv':'\u2261\u20E5','bnot':'\u2310','bNot':'\u2AED','bopf':'\uD835\uDD53','Bopf':'\uD835\uDD39','bot':'\u22A5','bottom':'\u22A5','bowtie':'\u22C8','boxbox':'\u29C9','boxdl':'\u2510','boxdL':'\u2555','boxDl':'\u2556','boxDL':'\u2557','boxdr':'\u250C','boxdR':'\u2552','boxDr':'\u2553','boxDR':'\u2554','boxh':'\u2500','boxH':'\u2550','boxhd':'\u252C','boxhD':'\u2565','boxHd':'\u2564','boxHD':'\u2566','boxhu':'\u2534','boxhU':'\u2568','boxHu':'\u2567','boxHU':'\u2569','boxminus':'\u229F','boxplus':'\u229E','boxtimes':'\u22A0','boxul':'\u2518','boxuL':'\u255B','boxUl':'\u255C','boxUL':'\u255D','boxur':'\u2514','boxuR':'\u2558','boxUr':'\u2559','boxUR':'\u255A','boxv':'\u2502','boxV':'\u2551','boxvh':'\u253C','boxvH':'\u256A','boxVh':'\u256B','boxVH':'\u256C','boxvl':'\u2524','boxvL':'\u2561','boxVl':'\u2562','boxVL':'\u2563','boxvr':'\u251C','boxvR':'\u255E','boxVr':'\u255F','boxVR':'\u2560','bprime':'\u2035','breve':'\u02D8','Breve':'\u02D8','brvbar':'\xA6','bscr':'\uD835\uDCB7','Bscr':'\u212C','bsemi':'\u204F','bsim':'\u223D','bsime':'\u22CD','bsol':'\\','bsolb':'\u29C5','bsolhsub':'\u27C8','bull':'\u2022','bullet':'\u2022','bump':'\u224E','bumpe':'\u224F','bumpE':'\u2AAE','bumpeq':'\u224F','Bumpeq':'\u224E','cacute':'\u0107','Cacute':'\u0106','cap':'\u2229','Cap':'\u22D2','capand':'\u2A44','capbrcup':'\u2A49','capcap':'\u2A4B','capcup':'\u2A47','capdot':'\u2A40','CapitalDifferentialD':'\u2145','caps':'\u2229\uFE00','caret':'\u2041','caron':'\u02C7','Cayleys':'\u212D','ccaps':'\u2A4D','ccaron':'\u010D','Ccaron':'\u010C','ccedil':'\xE7','Ccedil':'\xC7','ccirc':'\u0109','Ccirc':'\u0108','Cconint':'\u2230','ccups':'\u2A4C','ccupssm':'\u2A50','cdot':'\u010B','Cdot':'\u010A','cedil':'\xB8','Cedilla':'\xB8','cemptyv':'\u29B2','cent':'\xA2','centerdot':'\xB7','CenterDot':'\xB7','cfr':'\uD835\uDD20','Cfr':'\u212D','chcy':'\u0447','CHcy':'\u0427','check':'\u2713','checkmark':'\u2713','chi':'\u03C7','Chi':'\u03A7','cir':'\u25CB','circ':'\u02C6','circeq':'\u2257','circlearrowleft':'\u21BA','circlearrowright':'\u21BB','circledast':'\u229B','circledcirc':'\u229A','circleddash':'\u229D','CircleDot':'\u2299','circledR':'\xAE','circledS':'\u24C8','CircleMinus':'\u2296','CirclePlus':'\u2295','CircleTimes':'\u2297','cire':'\u2257','cirE':'\u29C3','cirfnint':'\u2A10','cirmid':'\u2AEF','cirscir':'\u29C2','ClockwiseContourIntegral':'\u2232','CloseCurlyDoubleQuote':'\u201D','CloseCurlyQuote':'\u2019','clubs':'\u2663','clubsuit':'\u2663','colon':':','Colon':'\u2237','colone':'\u2254','Colone':'\u2A74','coloneq':'\u2254','comma':',','commat':'@','comp':'\u2201','compfn':'\u2218','complement':'\u2201','complexes':'\u2102','cong':'\u2245','congdot':'\u2A6D','Congruent':'\u2261','conint':'\u222E','Conint':'\u222F','ContourIntegral':'\u222E','copf':'\uD835\uDD54','Copf':'\u2102','coprod':'\u2210','Coproduct':'\u2210','copy':'\xA9','COPY':'\xA9','copysr':'\u2117','CounterClockwiseContourIntegral':'\u2233','crarr':'\u21B5','cross':'\u2717','Cross':'\u2A2F','cscr':'\uD835\uDCB8','Cscr':'\uD835\uDC9E','csub':'\u2ACF','csube':'\u2AD1','csup':'\u2AD0','csupe':'\u2AD2','ctdot':'\u22EF','cudarrl':'\u2938','cudarrr':'\u2935','cuepr':'\u22DE','cuesc':'\u22DF','cularr':'\u21B6','cularrp':'\u293D','cup':'\u222A','Cup':'\u22D3','cupbrcap':'\u2A48','cupcap':'\u2A46','CupCap':'\u224D','cupcup':'\u2A4A','cupdot':'\u228D','cupor':'\u2A45','cups':'\u222A\uFE00','curarr':'\u21B7','curarrm':'\u293C','curlyeqprec':'\u22DE','curlyeqsucc':'\u22DF','curlyvee':'\u22CE','curlywedge':'\u22CF','curren':'\xA4','curvearrowleft':'\u21B6','curvearrowright':'\u21B7','cuvee':'\u22CE','cuwed':'\u22CF','cwconint':'\u2232','cwint':'\u2231','cylcty':'\u232D','dagger':'\u2020','Dagger':'\u2021','daleth':'\u2138','darr':'\u2193','dArr':'\u21D3','Darr':'\u21A1','dash':'\u2010','dashv':'\u22A3','Dashv':'\u2AE4','dbkarow':'\u290F','dblac':'\u02DD','dcaron':'\u010F','Dcaron':'\u010E','dcy':'\u0434','Dcy':'\u0414','dd':'\u2146','DD':'\u2145','ddagger':'\u2021','ddarr':'\u21CA','DDotrahd':'\u2911','ddotseq':'\u2A77','deg':'\xB0','Del':'\u2207','delta':'\u03B4','Delta':'\u0394','demptyv':'\u29B1','dfisht':'\u297F','dfr':'\uD835\uDD21','Dfr':'\uD835\uDD07','dHar':'\u2965','dharl':'\u21C3','dharr':'\u21C2','DiacriticalAcute':'\xB4','DiacriticalDot':'\u02D9','DiacriticalDoubleAcute':'\u02DD','DiacriticalGrave':'`','DiacriticalTilde':'\u02DC','diam':'\u22C4','diamond':'\u22C4','Diamond':'\u22C4','diamondsuit':'\u2666','diams':'\u2666','die':'\xA8','DifferentialD':'\u2146','digamma':'\u03DD','disin':'\u22F2','div':'\xF7','divide':'\xF7','divideontimes':'\u22C7','divonx':'\u22C7','djcy':'\u0452','DJcy':'\u0402','dlcorn':'\u231E','dlcrop':'\u230D','dollar':'$','dopf':'\uD835\uDD55','Dopf':'\uD835\uDD3B','dot':'\u02D9','Dot':'\xA8','DotDot':'\u20DC','doteq':'\u2250','doteqdot':'\u2251','DotEqual':'\u2250','dotminus':'\u2238','dotplus':'\u2214','dotsquare':'\u22A1','doublebarwedge':'\u2306','DoubleContourIntegral':'\u222F','DoubleDot':'\xA8','DoubleDownArrow':'\u21D3','DoubleLeftArrow':'\u21D0','DoubleLeftRightArrow':'\u21D4','DoubleLeftTee':'\u2AE4','DoubleLongLeftArrow':'\u27F8','DoubleLongLeftRightArrow':'\u27FA','DoubleLongRightArrow':'\u27F9','DoubleRightArrow':'\u21D2','DoubleRightTee':'\u22A8','DoubleUpArrow':'\u21D1','DoubleUpDownArrow':'\u21D5','DoubleVerticalBar':'\u2225','downarrow':'\u2193','Downarrow':'\u21D3','DownArrow':'\u2193','DownArrowBar':'\u2913','DownArrowUpArrow':'\u21F5','DownBreve':'\u0311','downdownarrows':'\u21CA','downharpoonleft':'\u21C3','downharpoonright':'\u21C2','DownLeftRightVector':'\u2950','DownLeftTeeVector':'\u295E','DownLeftVector':'\u21BD','DownLeftVectorBar':'\u2956','DownRightTeeVector':'\u295F','DownRightVector':'\u21C1','DownRightVectorBar':'\u2957','DownTee':'\u22A4','DownTeeArrow':'\u21A7','drbkarow':'\u2910','drcorn':'\u231F','drcrop':'\u230C','dscr':'\uD835\uDCB9','Dscr':'\uD835\uDC9F','dscy':'\u0455','DScy':'\u0405','dsol':'\u29F6','dstrok':'\u0111','Dstrok':'\u0110','dtdot':'\u22F1','dtri':'\u25BF','dtrif':'\u25BE','duarr':'\u21F5','duhar':'\u296F','dwangle':'\u29A6','dzcy':'\u045F','DZcy':'\u040F','dzigrarr':'\u27FF','eacute':'\xE9','Eacute':'\xC9','easter':'\u2A6E','ecaron':'\u011B','Ecaron':'\u011A','ecir':'\u2256','ecirc':'\xEA','Ecirc':'\xCA','ecolon':'\u2255','ecy':'\u044D','Ecy':'\u042D','eDDot':'\u2A77','edot':'\u0117','eDot':'\u2251','Edot':'\u0116','ee':'\u2147','efDot':'\u2252','efr':'\uD835\uDD22','Efr':'\uD835\uDD08','eg':'\u2A9A','egrave':'\xE8','Egrave':'\xC8','egs':'\u2A96','egsdot':'\u2A98','el':'\u2A99','Element':'\u2208','elinters':'\u23E7','ell':'\u2113','els':'\u2A95','elsdot':'\u2A97','emacr':'\u0113','Emacr':'\u0112','empty':'\u2205','emptyset':'\u2205','EmptySmallSquare':'\u25FB','emptyv':'\u2205','EmptyVerySmallSquare':'\u25AB','emsp':'\u2003','emsp13':'\u2004','emsp14':'\u2005','eng':'\u014B','ENG':'\u014A','ensp':'\u2002','eogon':'\u0119','Eogon':'\u0118','eopf':'\uD835\uDD56','Eopf':'\uD835\uDD3C','epar':'\u22D5','eparsl':'\u29E3','eplus':'\u2A71','epsi':'\u03B5','epsilon':'\u03B5','Epsilon':'\u0395','epsiv':'\u03F5','eqcirc':'\u2256','eqcolon':'\u2255','eqsim':'\u2242','eqslantgtr':'\u2A96','eqslantless':'\u2A95','Equal':'\u2A75','equals':'=','EqualTilde':'\u2242','equest':'\u225F','Equilibrium':'\u21CC','equiv':'\u2261','equivDD':'\u2A78','eqvparsl':'\u29E5','erarr':'\u2971','erDot':'\u2253','escr':'\u212F','Escr':'\u2130','esdot':'\u2250','esim':'\u2242','Esim':'\u2A73','eta':'\u03B7','Eta':'\u0397','eth':'\xF0','ETH':'\xD0','euml':'\xEB','Euml':'\xCB','euro':'\u20AC','excl':'!','exist':'\u2203','Exists':'\u2203','expectation':'\u2130','exponentiale':'\u2147','ExponentialE':'\u2147','fallingdotseq':'\u2252','fcy':'\u0444','Fcy':'\u0424','female':'\u2640','ffilig':'\uFB03','fflig':'\uFB00','ffllig':'\uFB04','ffr':'\uD835\uDD23','Ffr':'\uD835\uDD09','filig':'\uFB01','FilledSmallSquare':'\u25FC','FilledVerySmallSquare':'\u25AA','fjlig':'fj','flat':'\u266D','fllig':'\uFB02','fltns':'\u25B1','fnof':'\u0192','fopf':'\uD835\uDD57','Fopf':'\uD835\uDD3D','forall':'\u2200','ForAll':'\u2200','fork':'\u22D4','forkv':'\u2AD9','Fouriertrf':'\u2131','fpartint':'\u2A0D','frac12':'\xBD','frac13':'\u2153','frac14':'\xBC','frac15':'\u2155','frac16':'\u2159','frac18':'\u215B','frac23':'\u2154','frac25':'\u2156','frac34':'\xBE','frac35':'\u2157','frac38':'\u215C','frac45':'\u2158','frac56':'\u215A','frac58':'\u215D','frac78':'\u215E','frasl':'\u2044','frown':'\u2322','fscr':'\uD835\uDCBB','Fscr':'\u2131','gacute':'\u01F5','gamma':'\u03B3','Gamma':'\u0393','gammad':'\u03DD','Gammad':'\u03DC','gap':'\u2A86','gbreve':'\u011F','Gbreve':'\u011E','Gcedil':'\u0122','gcirc':'\u011D','Gcirc':'\u011C','gcy':'\u0433','Gcy':'\u0413','gdot':'\u0121','Gdot':'\u0120','ge':'\u2265','gE':'\u2267','gel':'\u22DB','gEl':'\u2A8C','geq':'\u2265','geqq':'\u2267','geqslant':'\u2A7E','ges':'\u2A7E','gescc':'\u2AA9','gesdot':'\u2A80','gesdoto':'\u2A82','gesdotol':'\u2A84','gesl':'\u22DB\uFE00','gesles':'\u2A94','gfr':'\uD835\uDD24','Gfr':'\uD835\uDD0A','gg':'\u226B','Gg':'\u22D9','ggg':'\u22D9','gimel':'\u2137','gjcy':'\u0453','GJcy':'\u0403','gl':'\u2277','gla':'\u2AA5','glE':'\u2A92','glj':'\u2AA4','gnap':'\u2A8A','gnapprox':'\u2A8A','gne':'\u2A88','gnE':'\u2269','gneq':'\u2A88','gneqq':'\u2269','gnsim':'\u22E7','gopf':'\uD835\uDD58','Gopf':'\uD835\uDD3E','grave':'`','GreaterEqual':'\u2265','GreaterEqualLess':'\u22DB','GreaterFullEqual':'\u2267','GreaterGreater':'\u2AA2','GreaterLess':'\u2277','GreaterSlantEqual':'\u2A7E','GreaterTilde':'\u2273','gscr':'\u210A','Gscr':'\uD835\uDCA2','gsim':'\u2273','gsime':'\u2A8E','gsiml':'\u2A90','gt':'>','Gt':'\u226B','GT':'>','gtcc':'\u2AA7','gtcir':'\u2A7A','gtdot':'\u22D7','gtlPar':'\u2995','gtquest':'\u2A7C','gtrapprox':'\u2A86','gtrarr':'\u2978','gtrdot':'\u22D7','gtreqless':'\u22DB','gtreqqless':'\u2A8C','gtrless':'\u2277','gtrsim':'\u2273','gvertneqq':'\u2269\uFE00','gvnE':'\u2269\uFE00','Hacek':'\u02C7','hairsp':'\u200A','half':'\xBD','hamilt':'\u210B','hardcy':'\u044A','HARDcy':'\u042A','harr':'\u2194','hArr':'\u21D4','harrcir':'\u2948','harrw':'\u21AD','Hat':'^','hbar':'\u210F','hcirc':'\u0125','Hcirc':'\u0124','hearts':'\u2665','heartsuit':'\u2665','hellip':'\u2026','hercon':'\u22B9','hfr':'\uD835\uDD25','Hfr':'\u210C','HilbertSpace':'\u210B','hksearow':'\u2925','hkswarow':'\u2926','hoarr':'\u21FF','homtht':'\u223B','hookleftarrow':'\u21A9','hookrightarrow':'\u21AA','hopf':'\uD835\uDD59','Hopf':'\u210D','horbar':'\u2015','HorizontalLine':'\u2500','hscr':'\uD835\uDCBD','Hscr':'\u210B','hslash':'\u210F','hstrok':'\u0127','Hstrok':'\u0126','HumpDownHump':'\u224E','HumpEqual':'\u224F','hybull':'\u2043','hyphen':'\u2010','iacute':'\xED','Iacute':'\xCD','ic':'\u2063','icirc':'\xEE','Icirc':'\xCE','icy':'\u0438','Icy':'\u0418','Idot':'\u0130','iecy':'\u0435','IEcy':'\u0415','iexcl':'\xA1','iff':'\u21D4','ifr':'\uD835\uDD26','Ifr':'\u2111','igrave':'\xEC','Igrave':'\xCC','ii':'\u2148','iiiint':'\u2A0C','iiint':'\u222D','iinfin':'\u29DC','iiota':'\u2129','ijlig':'\u0133','IJlig':'\u0132','Im':'\u2111','imacr':'\u012B','Imacr':'\u012A','image':'\u2111','ImaginaryI':'\u2148','imagline':'\u2110','imagpart':'\u2111','imath':'\u0131','imof':'\u22B7','imped':'\u01B5','Implies':'\u21D2','in':'\u2208','incare':'\u2105','infin':'\u221E','infintie':'\u29DD','inodot':'\u0131','int':'\u222B','Int':'\u222C','intcal':'\u22BA','integers':'\u2124','Integral':'\u222B','intercal':'\u22BA','Intersection':'\u22C2','intlarhk':'\u2A17','intprod':'\u2A3C','InvisibleComma':'\u2063','InvisibleTimes':'\u2062','iocy':'\u0451','IOcy':'\u0401','iogon':'\u012F','Iogon':'\u012E','iopf':'\uD835\uDD5A','Iopf':'\uD835\uDD40','iota':'\u03B9','Iota':'\u0399','iprod':'\u2A3C','iquest':'\xBF','iscr':'\uD835\uDCBE','Iscr':'\u2110','isin':'\u2208','isindot':'\u22F5','isinE':'\u22F9','isins':'\u22F4','isinsv':'\u22F3','isinv':'\u2208','it':'\u2062','itilde':'\u0129','Itilde':'\u0128','iukcy':'\u0456','Iukcy':'\u0406','iuml':'\xEF','Iuml':'\xCF','jcirc':'\u0135','Jcirc':'\u0134','jcy':'\u0439','Jcy':'\u0419','jfr':'\uD835\uDD27','Jfr':'\uD835\uDD0D','jmath':'\u0237','jopf':'\uD835\uDD5B','Jopf':'\uD835\uDD41','jscr':'\uD835\uDCBF','Jscr':'\uD835\uDCA5','jsercy':'\u0458','Jsercy':'\u0408','jukcy':'\u0454','Jukcy':'\u0404','kappa':'\u03BA','Kappa':'\u039A','kappav':'\u03F0','kcedil':'\u0137','Kcedil':'\u0136','kcy':'\u043A','Kcy':'\u041A','kfr':'\uD835\uDD28','Kfr':'\uD835\uDD0E','kgreen':'\u0138','khcy':'\u0445','KHcy':'\u0425','kjcy':'\u045C','KJcy':'\u040C','kopf':'\uD835\uDD5C','Kopf':'\uD835\uDD42','kscr':'\uD835\uDCC0','Kscr':'\uD835\uDCA6','lAarr':'\u21DA','lacute':'\u013A','Lacute':'\u0139','laemptyv':'\u29B4','lagran':'\u2112','lambda':'\u03BB','Lambda':'\u039B','lang':'\u27E8','Lang':'\u27EA','langd':'\u2991','langle':'\u27E8','lap':'\u2A85','Laplacetrf':'\u2112','laquo':'\xAB','larr':'\u2190','lArr':'\u21D0','Larr':'\u219E','larrb':'\u21E4','larrbfs':'\u291F','larrfs':'\u291D','larrhk':'\u21A9','larrlp':'\u21AB','larrpl':'\u2939','larrsim':'\u2973','larrtl':'\u21A2','lat':'\u2AAB','latail':'\u2919','lAtail':'\u291B','late':'\u2AAD','lates':'\u2AAD\uFE00','lbarr':'\u290C','lBarr':'\u290E','lbbrk':'\u2772','lbrace':'{','lbrack':'[','lbrke':'\u298B','lbrksld':'\u298F','lbrkslu':'\u298D','lcaron':'\u013E','Lcaron':'\u013D','lcedil':'\u013C','Lcedil':'\u013B','lceil':'\u2308','lcub':'{','lcy':'\u043B','Lcy':'\u041B','ldca':'\u2936','ldquo':'\u201C','ldquor':'\u201E','ldrdhar':'\u2967','ldrushar':'\u294B','ldsh':'\u21B2','le':'\u2264','lE':'\u2266','LeftAngleBracket':'\u27E8','leftarrow':'\u2190','Leftarrow':'\u21D0','LeftArrow':'\u2190','LeftArrowBar':'\u21E4','LeftArrowRightArrow':'\u21C6','leftarrowtail':'\u21A2','LeftCeiling':'\u2308','LeftDoubleBracket':'\u27E6','LeftDownTeeVector':'\u2961','LeftDownVector':'\u21C3','LeftDownVectorBar':'\u2959','LeftFloor':'\u230A','leftharpoondown':'\u21BD','leftharpoonup':'\u21BC','leftleftarrows':'\u21C7','leftrightarrow':'\u2194','Leftrightarrow':'\u21D4','LeftRightArrow':'\u2194','leftrightarrows':'\u21C6','leftrightharpoons':'\u21CB','leftrightsquigarrow':'\u21AD','LeftRightVector':'\u294E','LeftTee':'\u22A3','LeftTeeArrow':'\u21A4','LeftTeeVector':'\u295A','leftthreetimes':'\u22CB','LeftTriangle':'\u22B2','LeftTriangleBar':'\u29CF','LeftTriangleEqual':'\u22B4','LeftUpDownVector':'\u2951','LeftUpTeeVector':'\u2960','LeftUpVector':'\u21BF','LeftUpVectorBar':'\u2958','LeftVector':'\u21BC','LeftVectorBar':'\u2952','leg':'\u22DA','lEg':'\u2A8B','leq':'\u2264','leqq':'\u2266','leqslant':'\u2A7D','les':'\u2A7D','lescc':'\u2AA8','lesdot':'\u2A7F','lesdoto':'\u2A81','lesdotor':'\u2A83','lesg':'\u22DA\uFE00','lesges':'\u2A93','lessapprox':'\u2A85','lessdot':'\u22D6','lesseqgtr':'\u22DA','lesseqqgtr':'\u2A8B','LessEqualGreater':'\u22DA','LessFullEqual':'\u2266','LessGreater':'\u2276','lessgtr':'\u2276','LessLess':'\u2AA1','lesssim':'\u2272','LessSlantEqual':'\u2A7D','LessTilde':'\u2272','lfisht':'\u297C','lfloor':'\u230A','lfr':'\uD835\uDD29','Lfr':'\uD835\uDD0F','lg':'\u2276','lgE':'\u2A91','lHar':'\u2962','lhard':'\u21BD','lharu':'\u21BC','lharul':'\u296A','lhblk':'\u2584','ljcy':'\u0459','LJcy':'\u0409','ll':'\u226A','Ll':'\u22D8','llarr':'\u21C7','llcorner':'\u231E','Lleftarrow':'\u21DA','llhard':'\u296B','lltri':'\u25FA','lmidot':'\u0140','Lmidot':'\u013F','lmoust':'\u23B0','lmoustache':'\u23B0','lnap':'\u2A89','lnapprox':'\u2A89','lne':'\u2A87','lnE':'\u2268','lneq':'\u2A87','lneqq':'\u2268','lnsim':'\u22E6','loang':'\u27EC','loarr':'\u21FD','lobrk':'\u27E6','longleftarrow':'\u27F5','Longleftarrow':'\u27F8','LongLeftArrow':'\u27F5','longleftrightarrow':'\u27F7','Longleftrightarrow':'\u27FA','LongLeftRightArrow':'\u27F7','longmapsto':'\u27FC','longrightarrow':'\u27F6','Longrightarrow':'\u27F9','LongRightArrow':'\u27F6','looparrowleft':'\u21AB','looparrowright':'\u21AC','lopar':'\u2985','lopf':'\uD835\uDD5D','Lopf':'\uD835\uDD43','loplus':'\u2A2D','lotimes':'\u2A34','lowast':'\u2217','lowbar':'_','LowerLeftArrow':'\u2199','LowerRightArrow':'\u2198','loz':'\u25CA','lozenge':'\u25CA','lozf':'\u29EB','lpar':'(','lparlt':'\u2993','lrarr':'\u21C6','lrcorner':'\u231F','lrhar':'\u21CB','lrhard':'\u296D','lrm':'\u200E','lrtri':'\u22BF','lsaquo':'\u2039','lscr':'\uD835\uDCC1','Lscr':'\u2112','lsh':'\u21B0','Lsh':'\u21B0','lsim':'\u2272','lsime':'\u2A8D','lsimg':'\u2A8F','lsqb':'[','lsquo':'\u2018','lsquor':'\u201A','lstrok':'\u0142','Lstrok':'\u0141','lt':'<','Lt':'\u226A','LT':'<','ltcc':'\u2AA6','ltcir':'\u2A79','ltdot':'\u22D6','lthree':'\u22CB','ltimes':'\u22C9','ltlarr':'\u2976','ltquest':'\u2A7B','ltri':'\u25C3','ltrie':'\u22B4','ltrif':'\u25C2','ltrPar':'\u2996','lurdshar':'\u294A','luruhar':'\u2966','lvertneqq':'\u2268\uFE00','lvnE':'\u2268\uFE00','macr':'\xAF','male':'\u2642','malt':'\u2720','maltese':'\u2720','map':'\u21A6','Map':'\u2905','mapsto':'\u21A6','mapstodown':'\u21A7','mapstoleft':'\u21A4','mapstoup':'\u21A5','marker':'\u25AE','mcomma':'\u2A29','mcy':'\u043C','Mcy':'\u041C','mdash':'\u2014','mDDot':'\u223A','measuredangle':'\u2221','MediumSpace':'\u205F','Mellintrf':'\u2133','mfr':'\uD835\uDD2A','Mfr':'\uD835\uDD10','mho':'\u2127','micro':'\xB5','mid':'\u2223','midast':'*','midcir':'\u2AF0','middot':'\xB7','minus':'\u2212','minusb':'\u229F','minusd':'\u2238','minusdu':'\u2A2A','MinusPlus':'\u2213','mlcp':'\u2ADB','mldr':'\u2026','mnplus':'\u2213','models':'\u22A7','mopf':'\uD835\uDD5E','Mopf':'\uD835\uDD44','mp':'\u2213','mscr':'\uD835\uDCC2','Mscr':'\u2133','mstpos':'\u223E','mu':'\u03BC','Mu':'\u039C','multimap':'\u22B8','mumap':'\u22B8','nabla':'\u2207','nacute':'\u0144','Nacute':'\u0143','nang':'\u2220\u20D2','nap':'\u2249','napE':'\u2A70\u0338','napid':'\u224B\u0338','napos':'\u0149','napprox':'\u2249','natur':'\u266E','natural':'\u266E','naturals':'\u2115','nbsp':'\xA0','nbump':'\u224E\u0338','nbumpe':'\u224F\u0338','ncap':'\u2A43','ncaron':'\u0148','Ncaron':'\u0147','ncedil':'\u0146','Ncedil':'\u0145','ncong':'\u2247','ncongdot':'\u2A6D\u0338','ncup':'\u2A42','ncy':'\u043D','Ncy':'\u041D','ndash':'\u2013','ne':'\u2260','nearhk':'\u2924','nearr':'\u2197','neArr':'\u21D7','nearrow':'\u2197','nedot':'\u2250\u0338','NegativeMediumSpace':'\u200B','NegativeThickSpace':'\u200B','NegativeThinSpace':'\u200B','NegativeVeryThinSpace':'\u200B','nequiv':'\u2262','nesear':'\u2928','nesim':'\u2242\u0338','NestedGreaterGreater':'\u226B','NestedLessLess':'\u226A','NewLine':'\n','nexist':'\u2204','nexists':'\u2204','nfr':'\uD835\uDD2B','Nfr':'\uD835\uDD11','nge':'\u2271','ngE':'\u2267\u0338','ngeq':'\u2271','ngeqq':'\u2267\u0338','ngeqslant':'\u2A7E\u0338','nges':'\u2A7E\u0338','nGg':'\u22D9\u0338','ngsim':'\u2275','ngt':'\u226F','nGt':'\u226B\u20D2','ngtr':'\u226F','nGtv':'\u226B\u0338','nharr':'\u21AE','nhArr':'\u21CE','nhpar':'\u2AF2','ni':'\u220B','nis':'\u22FC','nisd':'\u22FA','niv':'\u220B','njcy':'\u045A','NJcy':'\u040A','nlarr':'\u219A','nlArr':'\u21CD','nldr':'\u2025','nle':'\u2270','nlE':'\u2266\u0338','nleftarrow':'\u219A','nLeftarrow':'\u21CD','nleftrightarrow':'\u21AE','nLeftrightarrow':'\u21CE','nleq':'\u2270','nleqq':'\u2266\u0338','nleqslant':'\u2A7D\u0338','nles':'\u2A7D\u0338','nless':'\u226E','nLl':'\u22D8\u0338','nlsim':'\u2274','nlt':'\u226E','nLt':'\u226A\u20D2','nltri':'\u22EA','nltrie':'\u22EC','nLtv':'\u226A\u0338','nmid':'\u2224','NoBreak':'\u2060','NonBreakingSpace':'\xA0','nopf':'\uD835\uDD5F','Nopf':'\u2115','not':'\xAC','Not':'\u2AEC','NotCongruent':'\u2262','NotCupCap':'\u226D','NotDoubleVerticalBar':'\u2226','NotElement':'\u2209','NotEqual':'\u2260','NotEqualTilde':'\u2242\u0338','NotExists':'\u2204','NotGreater':'\u226F','NotGreaterEqual':'\u2271','NotGreaterFullEqual':'\u2267\u0338','NotGreaterGreater':'\u226B\u0338','NotGreaterLess':'\u2279','NotGreaterSlantEqual':'\u2A7E\u0338','NotGreaterTilde':'\u2275','NotHumpDownHump':'\u224E\u0338','NotHumpEqual':'\u224F\u0338','notin':'\u2209','notindot':'\u22F5\u0338','notinE':'\u22F9\u0338','notinva':'\u2209','notinvb':'\u22F7','notinvc':'\u22F6','NotLeftTriangle':'\u22EA','NotLeftTriangleBar':'\u29CF\u0338','NotLeftTriangleEqual':'\u22EC','NotLess':'\u226E','NotLessEqual':'\u2270','NotLessGreater':'\u2278','NotLessLess':'\u226A\u0338','NotLessSlantEqual':'\u2A7D\u0338','NotLessTilde':'\u2274','NotNestedGreaterGreater':'\u2AA2\u0338','NotNestedLessLess':'\u2AA1\u0338','notni':'\u220C','notniva':'\u220C','notnivb':'\u22FE','notnivc':'\u22FD','NotPrecedes':'\u2280','NotPrecedesEqual':'\u2AAF\u0338','NotPrecedesSlantEqual':'\u22E0','NotReverseElement':'\u220C','NotRightTriangle':'\u22EB','NotRightTriangleBar':'\u29D0\u0338','NotRightTriangleEqual':'\u22ED','NotSquareSubset':'\u228F\u0338','NotSquareSubsetEqual':'\u22E2','NotSquareSuperset':'\u2290\u0338','NotSquareSupersetEqual':'\u22E3','NotSubset':'\u2282\u20D2','NotSubsetEqual':'\u2288','NotSucceeds':'\u2281','NotSucceedsEqual':'\u2AB0\u0338','NotSucceedsSlantEqual':'\u22E1','NotSucceedsTilde':'\u227F\u0338','NotSuperset':'\u2283\u20D2','NotSupersetEqual':'\u2289','NotTilde':'\u2241','NotTildeEqual':'\u2244','NotTildeFullEqual':'\u2247','NotTildeTilde':'\u2249','NotVerticalBar':'\u2224','npar':'\u2226','nparallel':'\u2226','nparsl':'\u2AFD\u20E5','npart':'\u2202\u0338','npolint':'\u2A14','npr':'\u2280','nprcue':'\u22E0','npre':'\u2AAF\u0338','nprec':'\u2280','npreceq':'\u2AAF\u0338','nrarr':'\u219B','nrArr':'\u21CF','nrarrc':'\u2933\u0338','nrarrw':'\u219D\u0338','nrightarrow':'\u219B','nRightarrow':'\u21CF','nrtri':'\u22EB','nrtrie':'\u22ED','nsc':'\u2281','nsccue':'\u22E1','nsce':'\u2AB0\u0338','nscr':'\uD835\uDCC3','Nscr':'\uD835\uDCA9','nshortmid':'\u2224','nshortparallel':'\u2226','nsim':'\u2241','nsime':'\u2244','nsimeq':'\u2244','nsmid':'\u2224','nspar':'\u2226','nsqsube':'\u22E2','nsqsupe':'\u22E3','nsub':'\u2284','nsube':'\u2288','nsubE':'\u2AC5\u0338','nsubset':'\u2282\u20D2','nsubseteq':'\u2288','nsubseteqq':'\u2AC5\u0338','nsucc':'\u2281','nsucceq':'\u2AB0\u0338','nsup':'\u2285','nsupe':'\u2289','nsupE':'\u2AC6\u0338','nsupset':'\u2283\u20D2','nsupseteq':'\u2289','nsupseteqq':'\u2AC6\u0338','ntgl':'\u2279','ntilde':'\xF1','Ntilde':'\xD1','ntlg':'\u2278','ntriangleleft':'\u22EA','ntrianglelefteq':'\u22EC','ntriangleright':'\u22EB','ntrianglerighteq':'\u22ED','nu':'\u03BD','Nu':'\u039D','num':'#','numero':'\u2116','numsp':'\u2007','nvap':'\u224D\u20D2','nvdash':'\u22AC','nvDash':'\u22AD','nVdash':'\u22AE','nVDash':'\u22AF','nvge':'\u2265\u20D2','nvgt':'>\u20D2','nvHarr':'\u2904','nvinfin':'\u29DE','nvlArr':'\u2902','nvle':'\u2264\u20D2','nvlt':'<\u20D2','nvltrie':'\u22B4\u20D2','nvrArr':'\u2903','nvrtrie':'\u22B5\u20D2','nvsim':'\u223C\u20D2','nwarhk':'\u2923','nwarr':'\u2196','nwArr':'\u21D6','nwarrow':'\u2196','nwnear':'\u2927','oacute':'\xF3','Oacute':'\xD3','oast':'\u229B','ocir':'\u229A','ocirc':'\xF4','Ocirc':'\xD4','ocy':'\u043E','Ocy':'\u041E','odash':'\u229D','odblac':'\u0151','Odblac':'\u0150','odiv':'\u2A38','odot':'\u2299','odsold':'\u29BC','oelig':'\u0153','OElig':'\u0152','ofcir':'\u29BF','ofr':'\uD835\uDD2C','Ofr':'\uD835\uDD12','ogon':'\u02DB','ograve':'\xF2','Ograve':'\xD2','ogt':'\u29C1','ohbar':'\u29B5','ohm':'\u03A9','oint':'\u222E','olarr':'\u21BA','olcir':'\u29BE','olcross':'\u29BB','oline':'\u203E','olt':'\u29C0','omacr':'\u014D','Omacr':'\u014C','omega':'\u03C9','Omega':'\u03A9','omicron':'\u03BF','Omicron':'\u039F','omid':'\u29B6','ominus':'\u2296','oopf':'\uD835\uDD60','Oopf':'\uD835\uDD46','opar':'\u29B7','OpenCurlyDoubleQuote':'\u201C','OpenCurlyQuote':'\u2018','operp':'\u29B9','oplus':'\u2295','or':'\u2228','Or':'\u2A54','orarr':'\u21BB','ord':'\u2A5D','order':'\u2134','orderof':'\u2134','ordf':'\xAA','ordm':'\xBA','origof':'\u22B6','oror':'\u2A56','orslope':'\u2A57','orv':'\u2A5B','oS':'\u24C8','oscr':'\u2134','Oscr':'\uD835\uDCAA','oslash':'\xF8','Oslash':'\xD8','osol':'\u2298','otilde':'\xF5','Otilde':'\xD5','otimes':'\u2297','Otimes':'\u2A37','otimesas':'\u2A36','ouml':'\xF6','Ouml':'\xD6','ovbar':'\u233D','OverBar':'\u203E','OverBrace':'\u23DE','OverBracket':'\u23B4','OverParenthesis':'\u23DC','par':'\u2225','para':'\xB6','parallel':'\u2225','parsim':'\u2AF3','parsl':'\u2AFD','part':'\u2202','PartialD':'\u2202','pcy':'\u043F','Pcy':'\u041F','percnt':'%','period':'.','permil':'\u2030','perp':'\u22A5','pertenk':'\u2031','pfr':'\uD835\uDD2D','Pfr':'\uD835\uDD13','phi':'\u03C6','Phi':'\u03A6','phiv':'\u03D5','phmmat':'\u2133','phone':'\u260E','pi':'\u03C0','Pi':'\u03A0','pitchfork':'\u22D4','piv':'\u03D6','planck':'\u210F','planckh':'\u210E','plankv':'\u210F','plus':'+','plusacir':'\u2A23','plusb':'\u229E','pluscir':'\u2A22','plusdo':'\u2214','plusdu':'\u2A25','pluse':'\u2A72','PlusMinus':'\xB1','plusmn':'\xB1','plussim':'\u2A26','plustwo':'\u2A27','pm':'\xB1','Poincareplane':'\u210C','pointint':'\u2A15','popf':'\uD835\uDD61','Popf':'\u2119','pound':'\xA3','pr':'\u227A','Pr':'\u2ABB','prap':'\u2AB7','prcue':'\u227C','pre':'\u2AAF','prE':'\u2AB3','prec':'\u227A','precapprox':'\u2AB7','preccurlyeq':'\u227C','Precedes':'\u227A','PrecedesEqual':'\u2AAF','PrecedesSlantEqual':'\u227C','PrecedesTilde':'\u227E','preceq':'\u2AAF','precnapprox':'\u2AB9','precneqq':'\u2AB5','precnsim':'\u22E8','precsim':'\u227E','prime':'\u2032','Prime':'\u2033','primes':'\u2119','prnap':'\u2AB9','prnE':'\u2AB5','prnsim':'\u22E8','prod':'\u220F','Product':'\u220F','profalar':'\u232E','profline':'\u2312','profsurf':'\u2313','prop':'\u221D','Proportion':'\u2237','Proportional':'\u221D','propto':'\u221D','prsim':'\u227E','prurel':'\u22B0','pscr':'\uD835\uDCC5','Pscr':'\uD835\uDCAB','psi':'\u03C8','Psi':'\u03A8','puncsp':'\u2008','qfr':'\uD835\uDD2E','Qfr':'\uD835\uDD14','qint':'\u2A0C','qopf':'\uD835\uDD62','Qopf':'\u211A','qprime':'\u2057','qscr':'\uD835\uDCC6','Qscr':'\uD835\uDCAC','quaternions':'\u210D','quatint':'\u2A16','quest':'?','questeq':'\u225F','quot':'"','QUOT':'"','rAarr':'\u21DB','race':'\u223D\u0331','racute':'\u0155','Racute':'\u0154','radic':'\u221A','raemptyv':'\u29B3','rang':'\u27E9','Rang':'\u27EB','rangd':'\u2992','range':'\u29A5','rangle':'\u27E9','raquo':'\xBB','rarr':'\u2192','rArr':'\u21D2','Rarr':'\u21A0','rarrap':'\u2975','rarrb':'\u21E5','rarrbfs':'\u2920','rarrc':'\u2933','rarrfs':'\u291E','rarrhk':'\u21AA','rarrlp':'\u21AC','rarrpl':'\u2945','rarrsim':'\u2974','rarrtl':'\u21A3','Rarrtl':'\u2916','rarrw':'\u219D','ratail':'\u291A','rAtail':'\u291C','ratio':'\u2236','rationals':'\u211A','rbarr':'\u290D','rBarr':'\u290F','RBarr':'\u2910','rbbrk':'\u2773','rbrace':'}','rbrack':']','rbrke':'\u298C','rbrksld':'\u298E','rbrkslu':'\u2990','rcaron':'\u0159','Rcaron':'\u0158','rcedil':'\u0157','Rcedil':'\u0156','rceil':'\u2309','rcub':'}','rcy':'\u0440','Rcy':'\u0420','rdca':'\u2937','rdldhar':'\u2969','rdquo':'\u201D','rdquor':'\u201D','rdsh':'\u21B3','Re':'\u211C','real':'\u211C','realine':'\u211B','realpart':'\u211C','reals':'\u211D','rect':'\u25AD','reg':'\xAE','REG':'\xAE','ReverseElement':'\u220B','ReverseEquilibrium':'\u21CB','ReverseUpEquilibrium':'\u296F','rfisht':'\u297D','rfloor':'\u230B','rfr':'\uD835\uDD2F','Rfr':'\u211C','rHar':'\u2964','rhard':'\u21C1','rharu':'\u21C0','rharul':'\u296C','rho':'\u03C1','Rho':'\u03A1','rhov':'\u03F1','RightAngleBracket':'\u27E9','rightarrow':'\u2192','Rightarrow':'\u21D2','RightArrow':'\u2192','RightArrowBar':'\u21E5','RightArrowLeftArrow':'\u21C4','rightarrowtail':'\u21A3','RightCeiling':'\u2309','RightDoubleBracket':'\u27E7','RightDownTeeVector':'\u295D','RightDownVector':'\u21C2','RightDownVectorBar':'\u2955','RightFloor':'\u230B','rightharpoondown':'\u21C1','rightharpoonup':'\u21C0','rightleftarrows':'\u21C4','rightleftharpoons':'\u21CC','rightrightarrows':'\u21C9','rightsquigarrow':'\u219D','RightTee':'\u22A2','RightTeeArrow':'\u21A6','RightTeeVector':'\u295B','rightthreetimes':'\u22CC','RightTriangle':'\u22B3','RightTriangleBar':'\u29D0','RightTriangleEqual':'\u22B5','RightUpDownVector':'\u294F','RightUpTeeVector':'\u295C','RightUpVector':'\u21BE','RightUpVectorBar':'\u2954','RightVector':'\u21C0','RightVectorBar':'\u2953','ring':'\u02DA','risingdotseq':'\u2253','rlarr':'\u21C4','rlhar':'\u21CC','rlm':'\u200F','rmoust':'\u23B1','rmoustache':'\u23B1','rnmid':'\u2AEE','roang':'\u27ED','roarr':'\u21FE','robrk':'\u27E7','ropar':'\u2986','ropf':'\uD835\uDD63','Ropf':'\u211D','roplus':'\u2A2E','rotimes':'\u2A35','RoundImplies':'\u2970','rpar':')','rpargt':'\u2994','rppolint':'\u2A12','rrarr':'\u21C9','Rrightarrow':'\u21DB','rsaquo':'\u203A','rscr':'\uD835\uDCC7','Rscr':'\u211B','rsh':'\u21B1','Rsh':'\u21B1','rsqb':']','rsquo':'\u2019','rsquor':'\u2019','rthree':'\u22CC','rtimes':'\u22CA','rtri':'\u25B9','rtrie':'\u22B5','rtrif':'\u25B8','rtriltri':'\u29CE','RuleDelayed':'\u29F4','ruluhar':'\u2968','rx':'\u211E','sacute':'\u015B','Sacute':'\u015A','sbquo':'\u201A','sc':'\u227B','Sc':'\u2ABC','scap':'\u2AB8','scaron':'\u0161','Scaron':'\u0160','sccue':'\u227D','sce':'\u2AB0','scE':'\u2AB4','scedil':'\u015F','Scedil':'\u015E','scirc':'\u015D','Scirc':'\u015C','scnap':'\u2ABA','scnE':'\u2AB6','scnsim':'\u22E9','scpolint':'\u2A13','scsim':'\u227F','scy':'\u0441','Scy':'\u0421','sdot':'\u22C5','sdotb':'\u22A1','sdote':'\u2A66','searhk':'\u2925','searr':'\u2198','seArr':'\u21D8','searrow':'\u2198','sect':'\xA7','semi':';','seswar':'\u2929','setminus':'\u2216','setmn':'\u2216','sext':'\u2736','sfr':'\uD835\uDD30','Sfr':'\uD835\uDD16','sfrown':'\u2322','sharp':'\u266F','shchcy':'\u0449','SHCHcy':'\u0429','shcy':'\u0448','SHcy':'\u0428','ShortDownArrow':'\u2193','ShortLeftArrow':'\u2190','shortmid':'\u2223','shortparallel':'\u2225','ShortRightArrow':'\u2192','ShortUpArrow':'\u2191','shy':'\xAD','sigma':'\u03C3','Sigma':'\u03A3','sigmaf':'\u03C2','sigmav':'\u03C2','sim':'\u223C','simdot':'\u2A6A','sime':'\u2243','simeq':'\u2243','simg':'\u2A9E','simgE':'\u2AA0','siml':'\u2A9D','simlE':'\u2A9F','simne':'\u2246','simplus':'\u2A24','simrarr':'\u2972','slarr':'\u2190','SmallCircle':'\u2218','smallsetminus':'\u2216','smashp':'\u2A33','smeparsl':'\u29E4','smid':'\u2223','smile':'\u2323','smt':'\u2AAA','smte':'\u2AAC','smtes':'\u2AAC\uFE00','softcy':'\u044C','SOFTcy':'\u042C','sol':'/','solb':'\u29C4','solbar':'\u233F','sopf':'\uD835\uDD64','Sopf':'\uD835\uDD4A','spades':'\u2660','spadesuit':'\u2660','spar':'\u2225','sqcap':'\u2293','sqcaps':'\u2293\uFE00','sqcup':'\u2294','sqcups':'\u2294\uFE00','Sqrt':'\u221A','sqsub':'\u228F','sqsube':'\u2291','sqsubset':'\u228F','sqsubseteq':'\u2291','sqsup':'\u2290','sqsupe':'\u2292','sqsupset':'\u2290','sqsupseteq':'\u2292','squ':'\u25A1','square':'\u25A1','Square':'\u25A1','SquareIntersection':'\u2293','SquareSubset':'\u228F','SquareSubsetEqual':'\u2291','SquareSuperset':'\u2290','SquareSupersetEqual':'\u2292','SquareUnion':'\u2294','squarf':'\u25AA','squf':'\u25AA','srarr':'\u2192','sscr':'\uD835\uDCC8','Sscr':'\uD835\uDCAE','ssetmn':'\u2216','ssmile':'\u2323','sstarf':'\u22C6','star':'\u2606','Star':'\u22C6','starf':'\u2605','straightepsilon':'\u03F5','straightphi':'\u03D5','strns':'\xAF','sub':'\u2282','Sub':'\u22D0','subdot':'\u2ABD','sube':'\u2286','subE':'\u2AC5','subedot':'\u2AC3','submult':'\u2AC1','subne':'\u228A','subnE':'\u2ACB','subplus':'\u2ABF','subrarr':'\u2979','subset':'\u2282','Subset':'\u22D0','subseteq':'\u2286','subseteqq':'\u2AC5','SubsetEqual':'\u2286','subsetneq':'\u228A','subsetneqq':'\u2ACB','subsim':'\u2AC7','subsub':'\u2AD5','subsup':'\u2AD3','succ':'\u227B','succapprox':'\u2AB8','succcurlyeq':'\u227D','Succeeds':'\u227B','SucceedsEqual':'\u2AB0','SucceedsSlantEqual':'\u227D','SucceedsTilde':'\u227F','succeq':'\u2AB0','succnapprox':'\u2ABA','succneqq':'\u2AB6','succnsim':'\u22E9','succsim':'\u227F','SuchThat':'\u220B','sum':'\u2211','Sum':'\u2211','sung':'\u266A','sup':'\u2283','Sup':'\u22D1','sup1':'\xB9','sup2':'\xB2','sup3':'\xB3','supdot':'\u2ABE','supdsub':'\u2AD8','supe':'\u2287','supE':'\u2AC6','supedot':'\u2AC4','Superset':'\u2283','SupersetEqual':'\u2287','suphsol':'\u27C9','suphsub':'\u2AD7','suplarr':'\u297B','supmult':'\u2AC2','supne':'\u228B','supnE':'\u2ACC','supplus':'\u2AC0','supset':'\u2283','Supset':'\u22D1','supseteq':'\u2287','supseteqq':'\u2AC6','supsetneq':'\u228B','supsetneqq':'\u2ACC','supsim':'\u2AC8','supsub':'\u2AD4','supsup':'\u2AD6','swarhk':'\u2926','swarr':'\u2199','swArr':'\u21D9','swarrow':'\u2199','swnwar':'\u292A','szlig':'\xDF','Tab':'\t','target':'\u2316','tau':'\u03C4','Tau':'\u03A4','tbrk':'\u23B4','tcaron':'\u0165','Tcaron':'\u0164','tcedil':'\u0163','Tcedil':'\u0162','tcy':'\u0442','Tcy':'\u0422','tdot':'\u20DB','telrec':'\u2315','tfr':'\uD835\uDD31','Tfr':'\uD835\uDD17','there4':'\u2234','therefore':'\u2234','Therefore':'\u2234','theta':'\u03B8','Theta':'\u0398','thetasym':'\u03D1','thetav':'\u03D1','thickapprox':'\u2248','thicksim':'\u223C','ThickSpace':'\u205F\u200A','thinsp':'\u2009','ThinSpace':'\u2009','thkap':'\u2248','thksim':'\u223C','thorn':'\xFE','THORN':'\xDE','tilde':'\u02DC','Tilde':'\u223C','TildeEqual':'\u2243','TildeFullEqual':'\u2245','TildeTilde':'\u2248','times':'\xD7','timesb':'\u22A0','timesbar':'\u2A31','timesd':'\u2A30','tint':'\u222D','toea':'\u2928','top':'\u22A4','topbot':'\u2336','topcir':'\u2AF1','topf':'\uD835\uDD65','Topf':'\uD835\uDD4B','topfork':'\u2ADA','tosa':'\u2929','tprime':'\u2034','trade':'\u2122','TRADE':'\u2122','triangle':'\u25B5','triangledown':'\u25BF','triangleleft':'\u25C3','trianglelefteq':'\u22B4','triangleq':'\u225C','triangleright':'\u25B9','trianglerighteq':'\u22B5','tridot':'\u25EC','trie':'\u225C','triminus':'\u2A3A','TripleDot':'\u20DB','triplus':'\u2A39','trisb':'\u29CD','tritime':'\u2A3B','trpezium':'\u23E2','tscr':'\uD835\uDCC9','Tscr':'\uD835\uDCAF','tscy':'\u0446','TScy':'\u0426','tshcy':'\u045B','TSHcy':'\u040B','tstrok':'\u0167','Tstrok':'\u0166','twixt':'\u226C','twoheadleftarrow':'\u219E','twoheadrightarrow':'\u21A0','uacute':'\xFA','Uacute':'\xDA','uarr':'\u2191','uArr':'\u21D1','Uarr':'\u219F','Uarrocir':'\u2949','ubrcy':'\u045E','Ubrcy':'\u040E','ubreve':'\u016D','Ubreve':'\u016C','ucirc':'\xFB','Ucirc':'\xDB','ucy':'\u0443','Ucy':'\u0423','udarr':'\u21C5','udblac':'\u0171','Udblac':'\u0170','udhar':'\u296E','ufisht':'\u297E','ufr':'\uD835\uDD32','Ufr':'\uD835\uDD18','ugrave':'\xF9','Ugrave':'\xD9','uHar':'\u2963','uharl':'\u21BF','uharr':'\u21BE','uhblk':'\u2580','ulcorn':'\u231C','ulcorner':'\u231C','ulcrop':'\u230F','ultri':'\u25F8','umacr':'\u016B','Umacr':'\u016A','uml':'\xA8','UnderBar':'_','UnderBrace':'\u23DF','UnderBracket':'\u23B5','UnderParenthesis':'\u23DD','Union':'\u22C3','UnionPlus':'\u228E','uogon':'\u0173','Uogon':'\u0172','uopf':'\uD835\uDD66','Uopf':'\uD835\uDD4C','uparrow':'\u2191','Uparrow':'\u21D1','UpArrow':'\u2191','UpArrowBar':'\u2912','UpArrowDownArrow':'\u21C5','updownarrow':'\u2195','Updownarrow':'\u21D5','UpDownArrow':'\u2195','UpEquilibrium':'\u296E','upharpoonleft':'\u21BF','upharpoonright':'\u21BE','uplus':'\u228E','UpperLeftArrow':'\u2196','UpperRightArrow':'\u2197','upsi':'\u03C5','Upsi':'\u03D2','upsih':'\u03D2','upsilon':'\u03C5','Upsilon':'\u03A5','UpTee':'\u22A5','UpTeeArrow':'\u21A5','upuparrows':'\u21C8','urcorn':'\u231D','urcorner':'\u231D','urcrop':'\u230E','uring':'\u016F','Uring':'\u016E','urtri':'\u25F9','uscr':'\uD835\uDCCA','Uscr':'\uD835\uDCB0','utdot':'\u22F0','utilde':'\u0169','Utilde':'\u0168','utri':'\u25B5','utrif':'\u25B4','uuarr':'\u21C8','uuml':'\xFC','Uuml':'\xDC','uwangle':'\u29A7','vangrt':'\u299C','varepsilon':'\u03F5','varkappa':'\u03F0','varnothing':'\u2205','varphi':'\u03D5','varpi':'\u03D6','varpropto':'\u221D','varr':'\u2195','vArr':'\u21D5','varrho':'\u03F1','varsigma':'\u03C2','varsubsetneq':'\u228A\uFE00','varsubsetneqq':'\u2ACB\uFE00','varsupsetneq':'\u228B\uFE00','varsupsetneqq':'\u2ACC\uFE00','vartheta':'\u03D1','vartriangleleft':'\u22B2','vartriangleright':'\u22B3','vBar':'\u2AE8','Vbar':'\u2AEB','vBarv':'\u2AE9','vcy':'\u0432','Vcy':'\u0412','vdash':'\u22A2','vDash':'\u22A8','Vdash':'\u22A9','VDash':'\u22AB','Vdashl':'\u2AE6','vee':'\u2228','Vee':'\u22C1','veebar':'\u22BB','veeeq':'\u225A','vellip':'\u22EE','verbar':'|','Verbar':'\u2016','vert':'|','Vert':'\u2016','VerticalBar':'\u2223','VerticalLine':'|','VerticalSeparator':'\u2758','VerticalTilde':'\u2240','VeryThinSpace':'\u200A','vfr':'\uD835\uDD33','Vfr':'\uD835\uDD19','vltri':'\u22B2','vnsub':'\u2282\u20D2','vnsup':'\u2283\u20D2','vopf':'\uD835\uDD67','Vopf':'\uD835\uDD4D','vprop':'\u221D','vrtri':'\u22B3','vscr':'\uD835\uDCCB','Vscr':'\uD835\uDCB1','vsubne':'\u228A\uFE00','vsubnE':'\u2ACB\uFE00','vsupne':'\u228B\uFE00','vsupnE':'\u2ACC\uFE00','Vvdash':'\u22AA','vzigzag':'\u299A','wcirc':'\u0175','Wcirc':'\u0174','wedbar':'\u2A5F','wedge':'\u2227','Wedge':'\u22C0','wedgeq':'\u2259','weierp':'\u2118','wfr':'\uD835\uDD34','Wfr':'\uD835\uDD1A','wopf':'\uD835\uDD68','Wopf':'\uD835\uDD4E','wp':'\u2118','wr':'\u2240','wreath':'\u2240','wscr':'\uD835\uDCCC','Wscr':'\uD835\uDCB2','xcap':'\u22C2','xcirc':'\u25EF','xcup':'\u22C3','xdtri':'\u25BD','xfr':'\uD835\uDD35','Xfr':'\uD835\uDD1B','xharr':'\u27F7','xhArr':'\u27FA','xi':'\u03BE','Xi':'\u039E','xlarr':'\u27F5','xlArr':'\u27F8','xmap':'\u27FC','xnis':'\u22FB','xodot':'\u2A00','xopf':'\uD835\uDD69','Xopf':'\uD835\uDD4F','xoplus':'\u2A01','xotime':'\u2A02','xrarr':'\u27F6','xrArr':'\u27F9','xscr':'\uD835\uDCCD','Xscr':'\uD835\uDCB3','xsqcup':'\u2A06','xuplus':'\u2A04','xutri':'\u25B3','xvee':'\u22C1','xwedge':'\u22C0','yacute':'\xFD','Yacute':'\xDD','yacy':'\u044F','YAcy':'\u042F','ycirc':'\u0177','Ycirc':'\u0176','ycy':'\u044B','Ycy':'\u042B','yen':'\xA5','yfr':'\uD835\uDD36','Yfr':'\uD835\uDD1C','yicy':'\u0457','YIcy':'\u0407','yopf':'\uD835\uDD6A','Yopf':'\uD835\uDD50','yscr':'\uD835\uDCCE','Yscr':'\uD835\uDCB4','yucy':'\u044E','YUcy':'\u042E','yuml':'\xFF','Yuml':'\u0178','zacute':'\u017A','Zacute':'\u0179','zcaron':'\u017E','Zcaron':'\u017D','zcy':'\u0437','Zcy':'\u0417','zdot':'\u017C','Zdot':'\u017B','zeetrf':'\u2128','ZeroWidthSpace':'\u200B','zeta':'\u03B6','Zeta':'\u0396','zfr':'\uD835\uDD37','Zfr':'\u2128','zhcy':'\u0436','ZHcy':'\u0416','zigrarr':'\u21DD','zopf':'\uD835\uDD6B','Zopf':'\u2124','zscr':'\uD835\uDCCF','Zscr':'\uD835\uDCB5','zwj':'\u200D','zwnj':'\u200C'};
+	const decodeMapLegacy = {'aacute':'\xE1','Aacute':'\xC1','acirc':'\xE2','Acirc':'\xC2','acute':'\xB4','aelig':'\xE6','AElig':'\xC6','agrave':'\xE0','Agrave':'\xC0','amp':'&','AMP':'&','aring':'\xE5','Aring':'\xC5','atilde':'\xE3','Atilde':'\xC3','auml':'\xE4','Auml':'\xC4','brvbar':'\xA6','ccedil':'\xE7','Ccedil':'\xC7','cedil':'\xB8','cent':'\xA2','copy':'\xA9','COPY':'\xA9','curren':'\xA4','deg':'\xB0','divide':'\xF7','eacute':'\xE9','Eacute':'\xC9','ecirc':'\xEA','Ecirc':'\xCA','egrave':'\xE8','Egrave':'\xC8','eth':'\xF0','ETH':'\xD0','euml':'\xEB','Euml':'\xCB','frac12':'\xBD','frac14':'\xBC','frac34':'\xBE','gt':'>','GT':'>','iacute':'\xED','Iacute':'\xCD','icirc':'\xEE','Icirc':'\xCE','iexcl':'\xA1','igrave':'\xEC','Igrave':'\xCC','iquest':'\xBF','iuml':'\xEF','Iuml':'\xCF','laquo':'\xAB','lt':'<','LT':'<','macr':'\xAF','micro':'\xB5','middot':'\xB7','nbsp':'\xA0','not':'\xAC','ntilde':'\xF1','Ntilde':'\xD1','oacute':'\xF3','Oacute':'\xD3','ocirc':'\xF4','Ocirc':'\xD4','ograve':'\xF2','Ograve':'\xD2','ordf':'\xAA','ordm':'\xBA','oslash':'\xF8','Oslash':'\xD8','otilde':'\xF5','Otilde':'\xD5','ouml':'\xF6','Ouml':'\xD6','para':'\xB6','plusmn':'\xB1','pound':'\xA3','quot':'"','QUOT':'"','raquo':'\xBB','reg':'\xAE','REG':'\xAE','sect':'\xA7','shy':'\xAD','sup1':'\xB9','sup2':'\xB2','sup3':'\xB3','szlig':'\xDF','thorn':'\xFE','THORN':'\xDE','times':'\xD7','uacute':'\xFA','Uacute':'\xDA','ucirc':'\xFB','Ucirc':'\xDB','ugrave':'\xF9','Ugrave':'\xD9','uml':'\xA8','uuml':'\xFC','Uuml':'\xDC','yacute':'\xFD','Yacute':'\xDD','yen':'\xA5','yuml':'\xFF'};
+	const decodeMapNumeric = {'0':'\uFFFD','128':'\u20AC','130':'\u201A','131':'\u0192','132':'\u201E','133':'\u2026','134':'\u2020','135':'\u2021','136':'\u02C6','137':'\u2030','138':'\u0160','139':'\u2039','140':'\u0152','142':'\u017D','145':'\u2018','146':'\u2019','147':'\u201C','148':'\u201D','149':'\u2022','150':'\u2013','151':'\u2014','152':'\u02DC','153':'\u2122','154':'\u0161','155':'\u203A','156':'\u0153','158':'\u017E','159':'\u0178'};
+	const invalidReferenceCodePoints = [1,2,3,4,5,6,7,8,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,64976,64977,64978,64979,64980,64981,64982,64983,64984,64985,64986,64987,64988,64989,64990,64991,64992,64993,64994,64995,64996,64997,64998,64999,65000,65001,65002,65003,65004,65005,65006,65007,65534,65535,131070,131071,196606,196607,262142,262143,327678,327679,393214,393215,458750,458751,524286,524287,589822,589823,655358,655359,720894,720895,786430,786431,851966,851967,917502,917503,983038,983039,1048574,1048575,1114110,1114111];
 
 	/*--------------------------------------------------------------------------*/
 
-	var stringFromCharCode = String.fromCharCode;
+	const stringFromCharCode = String.fromCharCode;
 
-	var object = {};
-	var hasOwnProperty = object.hasOwnProperty;
-	var has = function(object, propertyName) {
+	const object = {};
+	const {hasOwnProperty} = object;
+	const has = function(object, propertyName) {
 		return hasOwnProperty.call(object, propertyName);
 	};
 
-	var contains = function(array, value) {
-		var index = -1;
-		var length = array.length;
+	const contains = function(array, value) {
+		let index = -1;
+		const {length} = array;
 		while (++index < length) {
 			if (array[index] == value) {
 				return true;
@@ -13331,12 +13380,12 @@ module.exports = function hasSymbols() {
 		return false;
 	};
 
-	var merge = function(options, defaults) {
+	const merge = function(options, defaults) {
 		if (!options) {
 			return defaults;
 		}
-		var result = {};
-		var key;
+		const result = {};
+		let key;
 		for (key in defaults) {
 			// A `hasOwnProperty` check is not needed here, since only recognized
 			// option names are used anyway. Any others are ignored.
@@ -13346,8 +13395,8 @@ module.exports = function hasSymbols() {
 	};
 
 	// Modified version of `ucs2encode`; see https://mths.be/punycode.
-	var codePointToSymbol = function(codePoint, strict) {
-		var output = '';
+	const codePointToSymbol = function(codePoint, strict) {
+		let output = '';
 		if ((codePoint >= 0xD800 && codePoint <= 0xDFFF) || codePoint > 0x10FFFF) {
 			// See issue #4:
 			// “Otherwise, if the number is in the range 0xD800 to 0xDFFF or is
@@ -13376,32 +13425,32 @@ module.exports = function hasSymbols() {
 		return output;
 	};
 
-	var hexEscape = function(codePoint) {
-		return '&#x' + codePoint.toString(16).toUpperCase() + ';';
+	const hexEscape = function(codePoint) {
+		return `&#x${  codePoint.toString(16).toUpperCase()  };`;
 	};
 
-	var decEscape = function(codePoint) {
-		return '&#' + codePoint + ';';
+	const decEscape = function(codePoint) {
+		return `&#${  codePoint  };`;
 	};
 
 	var parseError = function(message) {
-		throw Error('Parse error: ' + message);
+		throw Error(`Parse error: ${  message}`);
 	};
 
 	/*--------------------------------------------------------------------------*/
 
 	var encode = function(string, options) {
 		options = merge(options, encode.options);
-		var strict = options.strict;
+		const {strict} = options;
 		if (strict && regexInvalidRawCodePoint.test(string)) {
 			parseError('forbidden code point');
 		}
-		var encodeEverything = options.encodeEverything;
-		var useNamedReferences = options.useNamedReferences;
-		var allowUnsafeSymbols = options.allowUnsafeSymbols;
-		var escapeCodePoint = options.decimal ? decEscape : hexEscape;
+		const {encodeEverything} = options;
+		const {useNamedReferences} = options;
+		const {allowUnsafeSymbols} = options;
+		const escapeCodePoint = options.decimal ? decEscape : hexEscape;
 
-		var escapeBmpSymbol = function(symbol) {
+		const escapeBmpSymbol = function(symbol) {
 			return escapeCodePoint(symbol.charCodeAt(0));
 		};
 
@@ -13410,7 +13459,7 @@ module.exports = function hasSymbols() {
 			string = string.replace(regexAsciiWhitelist, function(symbol) {
 				// Use named references if requested & possible.
 				if (useNamedReferences && has(encodeMap, symbol)) {
-					return '&' + encodeMap[symbol] + ';';
+					return `&${  encodeMap[symbol]  };`;
 				}
 				return escapeBmpSymbol(symbol);
 			});
@@ -13427,7 +13476,7 @@ module.exports = function hasSymbols() {
 				// Encode non-ASCII symbols that can be replaced with a named reference.
 				string = string.replace(regexEncodeNonAscii, function(string) {
 					// Note: there is no need to check `has(encodeMap, string)` here.
-					return '&' + encodeMap[string] + ';';
+					return `&${  encodeMap[string]  };`;
 				});
 			}
 			// Note: any remaining non-ASCII symbols are handled outside of the `if`.
@@ -13436,7 +13485,7 @@ module.exports = function hasSymbols() {
 			// Encode `<>"'&` using named character references.
 			if (!allowUnsafeSymbols) {
 				string = string.replace(regexEscape, function(string) {
-					return '&' + encodeMap[string] + ';'; // no need to check `has()` here
+					return `&${  encodeMap[string]  };`; // no need to check `has()` here
 				});
 			}
 			// Shorten escapes that represent two symbols, of which at least one is
@@ -13447,7 +13496,7 @@ module.exports = function hasSymbols() {
 			// Encode non-ASCII symbols that can be replaced with a named reference.
 			string = string.replace(regexEncodeNonAscii, function(string) {
 				// Note: there is no need to check `has(encodeMap, string)` here.
-				return '&' + encodeMap[string] + ';';
+				return `&${  encodeMap[string]  };`;
 			});
 		} else if (!allowUnsafeSymbols) {
 			// Encode `<>"'&` using hexadecimal escapes, now that they’re not handled
@@ -13458,9 +13507,9 @@ module.exports = function hasSymbols() {
 			// Encode astral symbols.
 			.replace(regexAstralSymbols, function($0) {
 				// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-				var high = $0.charCodeAt(0);
-				var low = $0.charCodeAt(1);
-				var codePoint = (high - 0xD800) * 0x400 + low - 0xDC00 + 0x10000;
+				const high = $0.charCodeAt(0);
+				const low = $0.charCodeAt(1);
+				const codePoint = (high - 0xD800) * 0x400 + low - 0xDC00 + 0x10000;
 				return escapeCodePoint(codePoint);
 			})
 			// Encode any remaining BMP symbols that are not printable ASCII symbols
@@ -13478,17 +13527,17 @@ module.exports = function hasSymbols() {
 
 	var decode = function(html, options) {
 		options = merge(options, decode.options);
-		var strict = options.strict;
+		const {strict} = options;
 		if (strict && regexInvalidEntity.test(html)) {
 			parseError('malformed character reference');
 		}
 		return html.replace(regexDecode, function($0, $1, $2, $3, $4, $5, $6, $7, $8) {
-			var codePoint;
-			var semicolon;
-			var decDigits;
-			var hexDigits;
-			var reference;
-			var next;
+			let codePoint;
+			let semicolon;
+			let decDigits;
+			let hexDigits;
+			let reference;
+			let next;
 
 			if ($1) {
 				reference = $1;
@@ -13507,7 +13556,7 @@ module.exports = function hasSymbols() {
 						parseError('`&` did not start a character reference');
 					}
 					return $0;
-				} else {
+				} 
 					if (strict) {
 						parseError(
 							'named character reference was not terminated by a semicolon'
@@ -13515,7 +13564,7 @@ module.exports = function hasSymbols() {
 					}
 					// Note: there is no need to check `has(decodeMapLegacy, reference)`.
 					return decodeMapLegacy[reference] + (next || '');
-				}
+				
 			}
 
 			if ($4) {
@@ -13556,7 +13605,7 @@ module.exports = function hasSymbols() {
 		'strict': false
 	};
 
-	var escape = function(string) {
+	const escape = function(string) {
 		return string.replace(regexEscape, function($0) {
 			// Note: there is no need to check `has(escapeMap, $0)` here.
 			return escapeMap[$0];
@@ -13565,7 +13614,7 @@ module.exports = function hasSymbols() {
 
 	/*--------------------------------------------------------------------------*/
 
-	var he = {
+	const he = {
 		'version': '1.2.0',
 		'encode': encode,
 		'decode': decode,
@@ -13585,7 +13634,7 @@ module.exports = function hasSymbols() {
 		if (freeModule) { // in Node.js, io.js, or RingoJS v0.8.0+
 			freeModule.exports = he;
 		} else { // in Narwhal or RingoJS v0.7.0-
-			for (var key in he) {
+			for (const key in he) {
 				has(he, key) && (freeExports[key] = he[key]);
 			}
 		}
@@ -13598,14 +13647,14 @@ module.exports = function hasSymbols() {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],55:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
+  let e; let m
+  const eLen = (nBytes * 8) - mLen - 1
+  const eMax = (1 << eLen) - 1
+  const eBias = eMax >> 1
+  let nBits = -7
+  let i = isLE ? (nBytes - 1) : 0
+  const d = isLE ? -1 : 1
+  let s = buffer[offset + i]
 
   i += d
 
@@ -13624,21 +13673,21 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   } else if (e === eMax) {
     return m ? NaN : ((s ? -1 : 1) * Infinity)
   } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
+    m += Math.pow(2, mLen)
+    e -= eBias
   }
   return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
 }
 
 exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+  let e; let m; let c
+  let eLen = (nBytes * 8) - mLen - 1
+  const eMax = (1 << eLen) - 1
+  const eBias = eMax >> 1
+  const rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  let i = isLE ? 0 : (nBytes - 1)
+  const d = isLE ? 1 : -1
+  const s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
 
   value = Math.abs(value)
 
@@ -13666,7 +13715,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
       e = eMax
     } else if (e + eBias >= 1) {
       m = ((value * c) - 1) * Math.pow(2, mLen)
-      e = e + eBias
+      e += eBias
     } else {
       m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
       e = 0
@@ -13700,7 +13749,7 @@ if (typeof Object.create === 'function') {
   // old school shim for old browsers
   module.exports = function inherits(ctor, superCtor) {
     ctor.super_ = superCtor
-    var TempCtor = function () {}
+    const TempCtor = function () {}
     TempCtor.prototype = superCtor.prototype
     ctor.prototype = new TempCtor()
     ctor.prototype.constructor = ctor
@@ -13731,7 +13780,7 @@ function isSlowBuffer (obj) {
 }
 
 },{}],58:[function(require,module,exports){
-var toString = {}.toString;
+const {toString} = {};
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
@@ -13739,9 +13788,9 @@ module.exports = Array.isArray || function (arr) {
 
 },{}],59:[function(require,module,exports){
 (function (process){
-var path = require('path');
-var fs = require('fs');
-var _0777 = parseInt('0777', 8);
+const path = require('path');
+const fs = require('fs');
+const _0777 = 0o0777;
 
 module.exports = mkdirP.mkdirp = mkdirP.mkdirP = mkdirP;
 
@@ -13754,15 +13803,15 @@ function mkdirP (p, opts, f, made) {
         opts = { mode: opts };
     }
     
-    var mode = opts.mode;
-    var xfs = opts.fs || fs;
+    let {mode} = opts;
+    const xfs = opts.fs || fs;
     
     if (mode === undefined) {
         mode = _0777 & (~process.umask());
     }
     if (!made) made = null;
     
-    var cb = f || function () {};
+    const cb = f || function () {};
     p = path.resolve(p);
     
     xfs.mkdir(p, mode, function (er) {
@@ -13798,8 +13847,8 @@ mkdirP.sync = function sync (p, opts, made) {
         opts = { mode: opts };
     }
     
-    var mode = opts.mode;
-    var xfs = opts.fs || fs;
+    let {mode} = opts;
+    const xfs = opts.fs || fs;
     
     if (mode === undefined) {
         mode = _0777 & (~process.umask());
@@ -13844,12 +13893,12 @@ mkdirP.sync = function sync (p, opts, made) {
  * Helpers.
  */
 
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
+const s = 1000;
+const m = s * 60;
+const h = m * 60;
+const d = h * 24;
+const w = d * 7;
+const y = d * 365.25;
 
 /**
  * Parse or format the given `val`.
@@ -13867,15 +13916,15 @@ var y = d * 365.25;
 
 module.exports = function(val, options) {
   options = options || {};
-  var type = typeof val;
+  const type = typeof val;
   if (type === 'string' && val.length > 0) {
     return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
+  } if (type === 'number' && isNaN(val) === false) {
     return options.long ? fmtLong(val) : fmtShort(val);
   }
   throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
+    `val is not a non-empty string or a valid number. val=${ 
+      JSON.stringify(val)}`
   );
 };
 
@@ -13892,14 +13941,14 @@ function parse(str) {
   if (str.length > 100) {
     return;
   }
-  var match = /^((?:\d+)?\-?\d?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+  const match = /^((?:\d+)?\-?\d?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
     str
   );
   if (!match) {
     return;
   }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
+  const n = parseFloat(match[1]);
+  const type = (match[2] || 'ms').toLowerCase();
   switch (type) {
     case 'years':
     case 'year':
@@ -13953,20 +14002,20 @@ function parse(str) {
  */
 
 function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
+  const msAbs = Math.abs(ms);
   if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
+    return `${Math.round(ms / d)  }d`;
   }
   if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
+    return `${Math.round(ms / h)  }h`;
   }
   if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
+    return `${Math.round(ms / m)  }m`;
   }
   if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
+    return `${Math.round(ms / s)  }s`;
   }
-  return ms + 'ms';
+  return `${ms  }ms`;
 }
 
 /**
@@ -13978,7 +14027,7 @@ function fmtShort(ms) {
  */
 
 function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
+  const msAbs = Math.abs(ms);
   if (msAbs >= d) {
     return plural(ms, msAbs, d, 'day');
   }
@@ -13991,7 +14040,7 @@ function fmtLong(ms) {
   if (msAbs >= s) {
     return plural(ms, msAbs, s, 'second');
   }
-  return ms + ' ms';
+  return `${ms  } ms`;
 }
 
 /**
@@ -13999,23 +14048,23 @@ function fmtLong(ms) {
  */
 
 function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+  const isPlural = msAbs >= n * 1.5;
+  return `${Math.round(ms / n)  } ${  name  }${isPlural ? 's' : ''}`;
 }
 
 },{}],61:[function(require,module,exports){
 'use strict';
 
-var keysShim;
+let keysShim;
 if (!Object.keys) {
 	// modified from https://github.com/es-shims/es5-shim
-	var has = Object.prototype.hasOwnProperty;
-	var toStr = Object.prototype.toString;
-	var isArgs = require('./isArguments'); // eslint-disable-line global-require
-	var isEnumerable = Object.prototype.propertyIsEnumerable;
-	var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
-	var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
-	var dontEnums = [
+	const has = Object.prototype.hasOwnProperty;
+	const toStr = Object.prototype.toString;
+	const isArgs = require('./isArguments'); // eslint-disable-line global-require
+	const isEnumerable = Object.prototype.propertyIsEnumerable;
+	const hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
+	const hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
+	const dontEnums = [
 		'toString',
 		'toLocaleString',
 		'valueOf',
@@ -14024,11 +14073,11 @@ if (!Object.keys) {
 		'propertyIsEnumerable',
 		'constructor'
 	];
-	var equalsConstructorPrototype = function (o) {
-		var ctor = o.constructor;
+	const equalsConstructorPrototype = function (o) {
+		const ctor = o.constructor;
 		return ctor && ctor.prototype === o;
 	};
-	var excludedKeys = {
+	const excludedKeys = {
 		$applicationCache: true,
 		$console: true,
 		$external: true,
@@ -14051,12 +14100,12 @@ if (!Object.keys) {
 		$webkitStorageInfo: true,
 		$window: true
 	};
-	var hasAutomationEqualityBug = (function () {
+	const hasAutomationEqualityBug = (function () {
 		/* global window */
 		if (typeof window === 'undefined') { return false; }
-		for (var k in window) {
+		for (const k in window) {
 			try {
-				if (!excludedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
+				if (!excludedKeys[`$${  k}`] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
 					try {
 						equalsConstructorPrototype(window[k]);
 					} catch (e) {
@@ -14069,7 +14118,7 @@ if (!Object.keys) {
 		}
 		return false;
 	}());
-	var equalsConstructorPrototypeIfNotBuggy = function (o) {
+	const equalsConstructorPrototypeIfNotBuggy = function (o) {
 		/* global window */
 		if (typeof window === 'undefined' || !hasAutomationEqualityBug) {
 			return equalsConstructorPrototype(o);
@@ -14082,29 +14131,29 @@ if (!Object.keys) {
 	};
 
 	keysShim = function keys(object) {
-		var isObject = object !== null && typeof object === 'object';
-		var isFunction = toStr.call(object) === '[object Function]';
-		var isArguments = isArgs(object);
-		var isString = isObject && toStr.call(object) === '[object String]';
-		var theKeys = [];
+		const isObject = object !== null && typeof object === 'object';
+		const isFunction = toStr.call(object) === '[object Function]';
+		const isArguments = isArgs(object);
+		const isString = isObject && toStr.call(object) === '[object String]';
+		const theKeys = [];
 
 		if (!isObject && !isFunction && !isArguments) {
 			throw new TypeError('Object.keys called on a non-object');
 		}
 
-		var skipProto = hasProtoEnumBug && isFunction;
+		const skipProto = hasProtoEnumBug && isFunction;
 		if (isString && object.length > 0 && !has.call(object, 0)) {
-			for (var i = 0; i < object.length; ++i) {
+			for (let i = 0; i < object.length; ++i) {
 				theKeys.push(String(i));
 			}
 		}
 
 		if (isArguments && object.length > 0) {
-			for (var j = 0; j < object.length; ++j) {
+			for (let j = 0; j < object.length; ++j) {
 				theKeys.push(String(j));
 			}
 		} else {
-			for (var name in object) {
+			for (const name in object) {
 				if (!(skipProto && name === 'prototype') && has.call(object, name)) {
 					theKeys.push(String(name));
 				}
@@ -14112,9 +14161,9 @@ if (!Object.keys) {
 		}
 
 		if (hasDontEnumBug) {
-			var skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
+			const skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
 
-			for (var k = 0; k < dontEnums.length; ++k) {
+			for (let k = 0; k < dontEnums.length; ++k) {
 				if (!(skipConstructor && dontEnums[k] === 'constructor') && has.call(object, dontEnums[k])) {
 					theKeys.push(dontEnums[k]);
 				}
@@ -14128,19 +14177,19 @@ module.exports = keysShim;
 },{"./isArguments":63}],62:[function(require,module,exports){
 'use strict';
 
-var slice = Array.prototype.slice;
-var isArgs = require('./isArguments');
+const {slice} = Array.prototype;
+const isArgs = require('./isArguments');
 
-var origKeys = Object.keys;
-var keysShim = origKeys ? function keys(o) { return origKeys(o); } : require('./implementation');
+const origKeys = Object.keys;
+const keysShim = origKeys ? function keys(o) { return origKeys(o); } : require('./implementation');
 
-var originalKeys = Object.keys;
+const originalKeys = Object.keys;
 
 keysShim.shim = function shimObjectKeys() {
 	if (Object.keys) {
-		var keysWorksWithArguments = (function () {
+		const keysWorksWithArguments = (function () {
 			// Safari 5.0 bug
-			var args = Object.keys(arguments);
+			const args = Object.keys(arguments);
 			return args && args.length === arguments.length;
 		}(1, 2));
 		if (!keysWorksWithArguments) {
@@ -14162,11 +14211,11 @@ module.exports = keysShim;
 },{"./implementation":61,"./isArguments":63}],63:[function(require,module,exports){
 'use strict';
 
-var toStr = Object.prototype.toString;
+const toStr = Object.prototype.toString;
 
 module.exports = function isArguments(value) {
-	var str = toStr.call(value);
-	var isArgs = str === '[object Arguments]';
+	const str = toStr.call(value);
+	let isArgs = str === '[object Arguments]';
 	if (!isArgs) {
 		isArgs = str !== '[object Array]' &&
 			value !== null &&
@@ -14182,25 +14231,25 @@ module.exports = function isArguments(value) {
 'use strict';
 
 // modified from https://github.com/es-shims/es6-shim
-var keys = require('object-keys');
-var bind = require('function-bind');
-var canBeObject = function (obj) {
+const keys = require('object-keys');
+const bind = require('function-bind');
+const canBeObject = function (obj) {
 	return typeof obj !== 'undefined' && obj !== null;
 };
-var hasSymbols = require('has-symbols/shams')();
-var toObject = Object;
-var push = bind.call(Function.call, Array.prototype.push);
-var propIsEnumerable = bind.call(Function.call, Object.prototype.propertyIsEnumerable);
-var originalGetSymbols = hasSymbols ? Object.getOwnPropertySymbols : null;
+const hasSymbols = require('has-symbols/shams')();
+const toObject = Object;
+const push = bind.call(Function.call, Array.prototype.push);
+const propIsEnumerable = bind.call(Function.call, Object.prototype.propertyIsEnumerable);
+const originalGetSymbols = hasSymbols ? Object.getOwnPropertySymbols : null;
 
 module.exports = function assign(target, source1) {
 	if (!canBeObject(target)) { throw new TypeError('target must be an object'); }
-	var objTarget = toObject(target);
-	var s, source, i, props, syms, value, key;
+	const objTarget = toObject(target);
+	let s; let source; let i; let props; let syms; let value; let key;
 	for (s = 1; s < arguments.length; ++s) {
 		source = toObject(arguments[s]);
 		props = keys(source);
-		var getSymbols = hasSymbols && (Object.getOwnPropertySymbols || originalGetSymbols);
+		const getSymbols = hasSymbols && (Object.getOwnPropertySymbols || originalGetSymbols);
 		if (getSymbols) {
 			syms = getSymbols(source);
 			for (i = 0; i < syms.length; ++i) {
@@ -14224,18 +14273,18 @@ module.exports = function assign(target, source1) {
 },{"function-bind":52,"has-symbols/shams":53,"object-keys":62}],65:[function(require,module,exports){
 'use strict';
 
-var defineProperties = require('define-properties');
+const defineProperties = require('define-properties');
 
-var implementation = require('./implementation');
-var getPolyfill = require('./polyfill');
-var shim = require('./shim');
+const implementation = require('./implementation');
+const getPolyfill = require('./polyfill');
+const shim = require('./shim');
 
-var polyfill = getPolyfill();
+const polyfill = getPolyfill();
 
 defineProperties(polyfill, {
-	getPolyfill: getPolyfill,
-	implementation: implementation,
-	shim: shim
+	getPolyfill,
+	implementation,
+	shim
 });
 
 module.exports = polyfill;
@@ -14243,35 +14292,35 @@ module.exports = polyfill;
 },{"./implementation":64,"./polyfill":66,"./shim":67,"define-properties":47}],66:[function(require,module,exports){
 'use strict';
 
-var implementation = require('./implementation');
+const implementation = require('./implementation');
 
-var lacksProperEnumerationOrder = function () {
+const lacksProperEnumerationOrder = function () {
 	if (!Object.assign) {
 		return false;
 	}
 	// v8, specifically in node 4.x, has a bug with incorrect property enumeration order
 	// note: this does not detect the bug unless there's 20 characters
-	var str = 'abcdefghijklmnopqrst';
-	var letters = str.split('');
-	var map = {};
-	for (var i = 0; i < letters.length; ++i) {
+	const str = 'abcdefghijklmnopqrst';
+	const letters = str.split('');
+	const map = {};
+	for (let i = 0; i < letters.length; ++i) {
 		map[letters[i]] = letters[i];
 	}
-	var obj = Object.assign({}, map);
-	var actual = '';
-	for (var k in obj) {
+	const obj = Object.assign({}, map);
+	let actual = '';
+	for (const k in obj) {
 		actual += k;
 	}
 	return str !== actual;
 };
 
-var assignHasPendingExceptions = function () {
+const assignHasPendingExceptions = function () {
 	if (!Object.assign || !Object.preventExtensions) {
 		return false;
 	}
 	// Firefox 37 still has "pending exception" logic in its Object.assign implementation,
 	// which is 72% slower than our shim, and Firefox 40's native implementation.
-	var thrower = Object.preventExtensions({ 1: 2 });
+	const thrower = Object.preventExtensions({ 1: 2 });
 	try {
 		Object.assign(thrower, 'xy');
 	} catch (e) {
@@ -14296,15 +14345,15 @@ module.exports = function getPolyfill() {
 },{"./implementation":64}],67:[function(require,module,exports){
 'use strict';
 
-var define = require('define-properties');
-var getPolyfill = require('./polyfill');
+const define = require('define-properties');
+const getPolyfill = require('./polyfill');
 
 module.exports = function shimAssign() {
-	var polyfill = getPolyfill();
+	const polyfill = getPolyfill();
 	define(
 		Object,
 		{ assign: polyfill },
-		{ assign: function () { return Object.assign !== polyfill; } }
+		{ assign () { return Object.assign !== polyfill; } }
 	);
 	return polyfill;
 };
@@ -14316,7 +14365,7 @@ module.exports = function shimAssign() {
 if (!process.version ||
     process.version.indexOf('v0.') === 0 ||
     process.version.indexOf('v1.') === 0 && process.version.indexOf('v1.8.') !== 0) {
-  module.exports = { nextTick: nextTick };
+  module.exports = { nextTick };
 } else {
   module.exports = process
 }
@@ -14325,8 +14374,8 @@ function nextTick(fn, arg1, arg2, arg3) {
   if (typeof fn !== 'function') {
     throw new TypeError('"callback" argument must be a function');
   }
-  var len = arguments.length;
-  var args, i;
+  const len = arguments.length;
+  let args; let i;
   switch (len) {
   case 0:
   case 1:
@@ -14359,15 +14408,15 @@ function nextTick(fn, arg1, arg2, arg3) {
 }).call(this,require('_process'))
 },{"_process":69}],69:[function(require,module,exports){
 // shim for using process in browser
-var process = module.exports = {};
+const process = module.exports = {};
 
 // cached from whatever global is present so that test runners that stub it
 // don't break things.  But we need to wrap it in a try catch in case it is
 // wrapped in strict mode code which doesn't define any globals.  It's inside a
 // function because try/catches deoptimize in certain engines.
 
-var cachedSetTimeout;
-var cachedClearTimeout;
+let cachedSetTimeout;
+let cachedClearTimeout;
 
 function defaultSetTimout() {
     throw new Error('setTimeout has not been defined');
@@ -14397,7 +14446,7 @@ function defaultClearTimeout () {
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
+        // normal enviroments in sane situations
         return setTimeout(fun, 0);
     }
     // if setTimeout wasn't available but was latter defined
@@ -14422,7 +14471,7 @@ function runTimeout(fun) {
 }
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
+        // normal enviroments in sane situations
         return clearTimeout(marker);
     }
     // if clearTimeout wasn't available but was latter defined
@@ -14447,10 +14496,10 @@ function runClearTimeout(marker) {
 
 
 }
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
+let queue = [];
+let draining = false;
+let currentQueue;
+let queueIndex = -1;
 
 function cleanUpNextTick() {
     if (!draining || !currentQueue) {
@@ -14471,10 +14520,10 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = runTimeout(cleanUpNextTick);
+    const timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
-    var len = queue.length;
+    let len = queue.length;
     while(len) {
         currentQueue = queue;
         queue = [];
@@ -14492,9 +14541,9 @@ function drainQueue() {
 }
 
 process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
+    const args = new Array(arguments.length - 1);
     if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
+        for (let i = 1; i < arguments.length; i++) {
             args[i - 1] = arguments[i];
         }
     }
@@ -14575,37 +14624,37 @@ module.exports = require('./lib/_stream_duplex.js');
 
 'use strict';
 
-/*<replacement>*/
+/* <replacement> */
 
-var pna = require('process-nextick-args');
-/*</replacement>*/
+const pna = require('process-nextick-args');
+/* </replacement> */
 
-/*<replacement>*/
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
+/* <replacement> */
+const objectKeys = Object.keys || function (obj) {
+  const keys = [];
+  for (const key in obj) {
     keys.push(key);
   }return keys;
 };
-/*</replacement>*/
+/* </replacement> */
 
 module.exports = Duplex;
 
-/*<replacement>*/
-var util = require('core-util-is');
+/* <replacement> */
+const util = require('core-util-is');
 util.inherits = require('inherits');
-/*</replacement>*/
+/* </replacement> */
 
-var Readable = require('./_stream_readable');
-var Writable = require('./_stream_writable');
+const Readable = require('./_stream_readable');
+const Writable = require('./_stream_writable');
 
 util.inherits(Duplex, Readable);
 
 {
   // avoid scope creep, the keys array can then be collected
-  var keys = objectKeys(Writable.prototype);
-  for (var v = 0; v < keys.length; v++) {
-    var method = keys[v];
+  const keys = objectKeys(Writable.prototype);
+  for (let v = 0; v < keys.length; v++) {
+    const method = keys[v];
     if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
   }
 }
@@ -14631,7 +14680,7 @@ Object.defineProperty(Duplex.prototype, 'writableHighWaterMark', {
   // because otherwise some prototype manipulation in
   // userland will fail
   enumerable: false,
-  get: function () {
+  get () {
     return this._writableState.highWaterMark;
   }
 });
@@ -14652,13 +14701,13 @@ function onEndNT(self) {
 }
 
 Object.defineProperty(Duplex.prototype, 'destroyed', {
-  get: function () {
+  get () {
     if (this._readableState === undefined || this._writableState === undefined) {
       return false;
     }
     return this._readableState.destroyed && this._writableState.destroyed;
   },
-  set: function (value) {
+  set (value) {
     // we ignore the value if the stream
     // has not been initialized yet
     if (this._readableState === undefined || this._writableState === undefined) {
@@ -14708,12 +14757,12 @@ Duplex.prototype._destroy = function (err, cb) {
 
 module.exports = PassThrough;
 
-var Transform = require('./_stream_transform');
+const Transform = require('./_stream_transform');
 
-/*<replacement>*/
-var util = require('core-util-is');
+/* <replacement> */
+const util = require('core-util-is');
 util.inherits = require('inherits');
-/*</replacement>*/
+/* </replacement> */
 
 util.inherits(PassThrough, Transform);
 
@@ -14751,39 +14800,39 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 
 'use strict';
 
-/*<replacement>*/
+/* <replacement> */
 
-var pna = require('process-nextick-args');
-/*</replacement>*/
+const pna = require('process-nextick-args');
+/* </replacement> */
 
 module.exports = Readable;
 
-/*<replacement>*/
-var isArray = require('isarray');
-/*</replacement>*/
+/* <replacement> */
+const isArray = require('isarray');
+/* </replacement> */
 
-/*<replacement>*/
-var Duplex;
-/*</replacement>*/
+/* <replacement> */
+let Duplex;
+/* </replacement> */
 
 Readable.ReadableState = ReadableState;
 
-/*<replacement>*/
-var EE = require('events').EventEmitter;
+/* <replacement> */
+const EE = require('events').EventEmitter;
 
-var EElistenerCount = function (emitter, type) {
+const EElistenerCount = function (emitter, type) {
   return emitter.listeners(type).length;
 };
-/*</replacement>*/
+/* </replacement> */
 
-/*<replacement>*/
-var Stream = require('./internal/streams/stream');
-/*</replacement>*/
+/* <replacement> */
+const Stream = require('./internal/streams/stream');
+/* </replacement> */
 
-/*<replacement>*/
+/* <replacement> */
 
-var Buffer = require('safe-buffer').Buffer;
-var OurUint8Array = global.Uint8Array || function () {};
+const {Buffer} = require('safe-buffer');
+const OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
 }
@@ -14791,30 +14840,30 @@ function _isUint8Array(obj) {
   return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
 
-/*</replacement>*/
+/* </replacement> */
 
-/*<replacement>*/
-var util = require('core-util-is');
+/* <replacement> */
+const util = require('core-util-is');
 util.inherits = require('inherits');
-/*</replacement>*/
+/* </replacement> */
 
-/*<replacement>*/
-var debugUtil = require('util');
-var debug = void 0;
+/* <replacement> */
+const debugUtil = require('util');
+let debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
 } else {
   debug = function () {};
 }
-/*</replacement>*/
+/* </replacement> */
 
-var BufferList = require('./internal/streams/BufferList');
-var destroyImpl = require('./internal/streams/destroy');
-var StringDecoder;
+const BufferList = require('./internal/streams/BufferList');
+const destroyImpl = require('./internal/streams/destroy');
+let StringDecoder;
 
 util.inherits(Readable, Stream);
 
-var kProxyEvents = ['error', 'close', 'destroy', 'pause', 'resume'];
+const kProxyEvents = ['error', 'close', 'destroy', 'pause', 'resume'];
 
 function prependListener(emitter, event, fn) {
   // Sadly this is not cacheable as some libraries bundle their own
@@ -14838,7 +14887,7 @@ function ReadableState(options, stream) {
   // However, some cases require setting options to different
   // values for the readable and the writable sides of the duplex stream.
   // These options can be provided separately as readableXXX and writableXXX.
-  var isDuplex = stream instanceof Duplex;
+  const isDuplex = stream instanceof Duplex;
 
   // object stream flag. Used to make read(n) ignore n and to
   // make all the buffer merging and length checks go away
@@ -14848,9 +14897,9 @@ function ReadableState(options, stream) {
 
   // the point at which it stops calling _read() to fill the buffer
   // Note: 0 is a valid value, means "don't call _read preemptively ever"
-  var hwm = options.highWaterMark;
-  var readableHwm = options.readableHighWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
+  const hwm = options.highWaterMark;
+  const readableHwm = options.readableHighWaterMark;
+  const defaultHwm = this.objectMode ? 16 : 16 * 1024;
 
   if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (readableHwm || readableHwm === 0)) this.highWaterMark = readableHwm;else this.highWaterMark = defaultHwm;
 
@@ -14925,13 +14974,13 @@ function Readable(options) {
 }
 
 Object.defineProperty(Readable.prototype, 'destroyed', {
-  get: function () {
+  get () {
     if (this._readableState === undefined) {
       return false;
     }
     return this._readableState.destroyed;
   },
-  set: function (value) {
+  set (value) {
     // we ignore the value if the stream
     // has not been initialized yet
     if (!this._readableState) {
@@ -14956,8 +15005,8 @@ Readable.prototype._destroy = function (err, cb) {
 // similar to how Writable.write() returns true if you should
 // write() some more.
 Readable.prototype.push = function (chunk, encoding) {
-  var state = this._readableState;
-  var skipChunkCheck;
+  const state = this._readableState;
+  let skipChunkCheck;
 
   if (!state.objectMode) {
     if (typeof chunk === 'string') {
@@ -14981,12 +15030,12 @@ Readable.prototype.unshift = function (chunk) {
 };
 
 function readableAddChunk(stream, chunk, encoding, addToFront, skipChunkCheck) {
-  var state = stream._readableState;
+  const state = stream._readableState;
   if (chunk === null) {
     state.reading = false;
     onEofChunk(stream, state);
   } else {
-    var er;
+    let er;
     if (!skipChunkCheck) er = chunkInvalid(state, chunk);
     if (er) {
       stream.emit('error', er);
@@ -15031,7 +15080,7 @@ function addChunk(stream, state, chunk, addToFront) {
 }
 
 function chunkInvalid(state, chunk) {
-  var er;
+  let er;
   if (!_isUint8Array(chunk) && typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
     er = new TypeError('Invalid non-string/buffer chunk');
   }
@@ -15062,7 +15111,7 @@ Readable.prototype.setEncoding = function (enc) {
 };
 
 // Don't raise the hwm > 8MB
-var MAX_HWM = 0x800000;
+const MAX_HWM = 0x800000;
 function computeNewHighWaterMark(n) {
   if (n >= MAX_HWM) {
     n = MAX_HWM;
@@ -15087,7 +15136,7 @@ function howMuchToRead(n, state) {
   if (state.objectMode) return 1;
   if (n !== n) {
     // Only flow one buffer at a time
-    if (state.flowing && state.length) return state.buffer.head.data.length;else return state.length;
+    if (state.flowing && state.length) return state.buffer.head.data.length;return state.length;
   }
   // If we're asking for more than the current hwm, then raise the hwm.
   if (n > state.highWaterMark) state.highWaterMark = computeNewHighWaterMark(n);
@@ -15104,8 +15153,8 @@ function howMuchToRead(n, state) {
 Readable.prototype.read = function (n) {
   debug('read', n);
   n = parseInt(n, 10);
-  var state = this._readableState;
-  var nOrig = n;
+  const state = this._readableState;
+  const nOrig = n;
 
   if (n !== 0) state.emittedReadable = false;
 
@@ -15149,7 +15198,7 @@ Readable.prototype.read = function (n) {
   // 3. Actually pull the requested chunks out of the buffer and return.
 
   // if we need a readable event, then we need to do some reading.
-  var doRead = state.needReadable;
+  let doRead = state.needReadable;
   debug('need readable', doRead);
 
   // if we currently have less than the highWaterMark, then also read some
@@ -15177,7 +15226,7 @@ Readable.prototype.read = function (n) {
     if (!state.reading) n = howMuchToRead(nOrig, state);
   }
 
-  var ret;
+  let ret;
   if (n > 0) ret = fromList(n, state);else ret = null;
 
   if (ret === null) {
@@ -15204,7 +15253,7 @@ Readable.prototype.read = function (n) {
 function onEofChunk(stream, state) {
   if (state.ended) return;
   if (state.decoder) {
-    var chunk = state.decoder.end();
+    const chunk = state.decoder.end();
     if (chunk && chunk.length) {
       state.buffer.push(chunk);
       state.length += state.objectMode ? 1 : chunk.length;
@@ -15220,7 +15269,7 @@ function onEofChunk(stream, state) {
 // another read() call => stack overflow.  This way, it might trigger
 // a nextTick recursion warning, but that's not so bad.
 function emitReadable(stream) {
-  var state = stream._readableState;
+  const state = stream._readableState;
   state.needReadable = false;
   if (!state.emittedReadable) {
     debug('emitReadable', state.flowing);
@@ -15249,7 +15298,7 @@ function maybeReadMore(stream, state) {
 }
 
 function maybeReadMore_(stream, state) {
-  var len = state.length;
+  let len = state.length;
   while (!state.reading && !state.flowing && !state.ended && state.length < state.highWaterMark) {
     debug('maybeReadMore read 0');
     stream.read(0);
@@ -15269,8 +15318,8 @@ Readable.prototype._read = function (n) {
 };
 
 Readable.prototype.pipe = function (dest, pipeOpts) {
-  var src = this;
-  var state = this._readableState;
+  const src = this;
+  const state = this._readableState;
 
   switch (state.pipesCount) {
     case 0:
@@ -15286,9 +15335,9 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
   state.pipesCount += 1;
   debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
 
-  var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
+  const doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
 
-  var endFn = doEnd ? onend : unpipe;
+  const endFn = doEnd ? onend : unpipe;
   if (state.endEmitted) pna.nextTick(endFn);else src.once('end', endFn);
 
   dest.on('unpipe', onunpipe);
@@ -15311,10 +15360,10 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
   // on the source.  This would be more elegant with a .once()
   // handler in flow(), but adding and removing repeatedly is
   // too slow.
-  var ondrain = pipeOnDrain(src);
+  const ondrain = pipeOnDrain(src);
   dest.on('drain', ondrain);
 
-  var cleanedUp = false;
+  let cleanedUp = false;
   function cleanup() {
     debug('cleanup');
     // cleanup event handlers once the pipe is broken
@@ -15341,13 +15390,13 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
   // in ondata again. However, we only want to increase awaitDrain once because
   // dest will only emit one 'drain' event for the multiple writes.
   // => Introduce a guard on increasing awaitDrain.
-  var increasedAwaitDrain = false;
+  let increasedAwaitDrain = false;
   src.on('data', ondata);
   function ondata(chunk) {
     debug('ondata');
     increasedAwaitDrain = false;
-    var ret = dest.write(chunk);
-    if (false === ret && !increasedAwaitDrain) {
+    const ret = dest.write(chunk);
+    if (ret === false && !increasedAwaitDrain) {
       // If the user unpiped during `dest.write()`, it is possible
       // to get stuck in a permanently paused state if that write
       // also returned false.
@@ -15405,7 +15454,7 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
 
 function pipeOnDrain(src) {
   return function () {
-    var state = src._readableState;
+    const state = src._readableState;
     debug('pipeOnDrain', state.awaitDrain);
     if (state.awaitDrain) state.awaitDrain--;
     if (state.awaitDrain === 0 && EElistenerCount(src, 'data')) {
@@ -15416,8 +15465,8 @@ function pipeOnDrain(src) {
 }
 
 Readable.prototype.unpipe = function (dest) {
-  var state = this._readableState;
-  var unpipeInfo = { hasUnpiped: false };
+  const state = this._readableState;
+  const unpipeInfo = { hasUnpiped: false };
 
   // if we're not piping anywhere, then do nothing.
   if (state.pipesCount === 0) return this;
@@ -15441,19 +15490,19 @@ Readable.prototype.unpipe = function (dest) {
 
   if (!dest) {
     // remove all.
-    var dests = state.pipes;
-    var len = state.pipesCount;
+    const dests = state.pipes;
+    const len = state.pipesCount;
     state.pipes = null;
     state.pipesCount = 0;
     state.flowing = false;
 
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       dests[i].emit('unpipe', this, unpipeInfo);
     }return this;
   }
 
   // try to find the right one.
-  var index = indexOf(state.pipes, dest);
+  const index = indexOf(state.pipes, dest);
   if (index === -1) return this;
 
   state.pipes.splice(index, 1);
@@ -15468,13 +15517,13 @@ Readable.prototype.unpipe = function (dest) {
 // set up data events if they are asked for
 // Ensure readable listeners eventually get something
 Readable.prototype.on = function (ev, fn) {
-  var res = Stream.prototype.on.call(this, ev, fn);
+  const res = Stream.prototype.on.call(this, ev, fn);
 
   if (ev === 'data') {
     // Start flowing on next tick if stream isn't explicitly paused
     if (this._readableState.flowing !== false) this.resume();
   } else if (ev === 'readable') {
-    var state = this._readableState;
+    const state = this._readableState;
     if (!state.endEmitted && !state.readableListening) {
       state.readableListening = state.needReadable = true;
       state.emittedReadable = false;
@@ -15498,7 +15547,7 @@ function nReadingNextTick(self) {
 // pause() and resume() are remnants of the legacy readable stream API
 // If the user uses them, then switch into old mode.
 Readable.prototype.resume = function () {
-  var state = this._readableState;
+  const state = this._readableState;
   if (!state.flowing) {
     debug('resume');
     state.flowing = true;
@@ -15529,7 +15578,7 @@ function resume_(stream, state) {
 
 Readable.prototype.pause = function () {
   debug('call pause flowing=%j', this._readableState.flowing);
-  if (false !== this._readableState.flowing) {
+  if (this._readableState.flowing !== false) {
     debug('pause');
     this._readableState.flowing = false;
     this.emit('pause');
@@ -15538,7 +15587,7 @@ Readable.prototype.pause = function () {
 };
 
 function flow(stream) {
-  var state = stream._readableState;
+  const state = stream._readableState;
   debug('flow', state.flowing);
   while (state.flowing && stream.read() !== null) {}
 }
@@ -15547,15 +15596,15 @@ function flow(stream) {
 // This is *not* part of the readable stream interface.
 // It is an ugly unfortunate mess of history.
 Readable.prototype.wrap = function (stream) {
-  var _this = this;
+  const _this = this;
 
-  var state = this._readableState;
-  var paused = false;
+  const state = this._readableState;
+  let paused = false;
 
   stream.on('end', function () {
     debug('wrapped end');
     if (state.decoder && !state.ended) {
-      var chunk = state.decoder.end();
+      const chunk = state.decoder.end();
       if (chunk && chunk.length) _this.push(chunk);
     }
 
@@ -15567,9 +15616,9 @@ Readable.prototype.wrap = function (stream) {
     if (state.decoder) chunk = state.decoder.write(chunk);
 
     // don't skip over falsy values in objectMode
-    if (state.objectMode && (chunk === null || chunk === undefined)) return;else if (!state.objectMode && (!chunk || !chunk.length)) return;
+    if (state.objectMode && (chunk === null || chunk === undefined)) return;if (!state.objectMode && (!chunk || !chunk.length)) return;
 
-    var ret = _this.push(chunk);
+    const ret = _this.push(chunk);
     if (!ret) {
       paused = true;
       stream.pause();
@@ -15578,7 +15627,7 @@ Readable.prototype.wrap = function (stream) {
 
   // proxy all the other methods.
   // important when wrapping filters and duplexes.
-  for (var i in stream) {
+  for (const i in stream) {
     if (this[i] === undefined && typeof stream[i] === 'function') {
       this[i] = function (method) {
         return function () {
@@ -15589,7 +15638,7 @@ Readable.prototype.wrap = function (stream) {
   }
 
   // proxy certain important events.
-  for (var n = 0; n < kProxyEvents.length; n++) {
+  for (let n = 0; n < kProxyEvents.length; n++) {
     stream.on(kProxyEvents[n], this.emit.bind(this, kProxyEvents[n]));
   }
 
@@ -15611,7 +15660,7 @@ Object.defineProperty(Readable.prototype, 'readableHighWaterMark', {
   // because otherwise some prototype manipulation in
   // userland will fail
   enumerable: false,
-  get: function () {
+  get () {
     return this._readableState.highWaterMark;
   }
 });
@@ -15627,7 +15676,7 @@ function fromList(n, state) {
   // nothing buffered
   if (state.length === 0) return null;
 
-  var ret;
+  let ret;
   if (state.objectMode) ret = state.buffer.shift();else if (!n || n >= state.length) {
     // read it all, truncate the list
     if (state.decoder) ret = state.buffer.join('');else if (state.buffer.length === 1) ret = state.buffer.head.data;else ret = state.buffer.concat(state.length);
@@ -15644,7 +15693,7 @@ function fromList(n, state) {
 // This function is designed to be inlinable, so please take care when making
 // changes to the function body.
 function fromListPartial(n, list, hasStrings) {
-  var ret;
+  let ret;
   if (n < list.head.data.length) {
     // slice is the same for buffers and strings
     ret = list.head.data.slice(0, n);
@@ -15664,13 +15713,13 @@ function fromListPartial(n, list, hasStrings) {
 // This function is designed to be inlinable, so please take care when making
 // changes to the function body.
 function copyFromBufferString(n, list) {
-  var p = list.head;
-  var c = 1;
-  var ret = p.data;
+  let p = list.head;
+  let c = 1;
+  let ret = p.data;
   n -= ret.length;
   while (p = p.next) {
-    var str = p.data;
-    var nb = n > str.length ? str.length : n;
+    const str = p.data;
+    const nb = n > str.length ? str.length : n;
     if (nb === str.length) ret += str;else ret += str.slice(0, n);
     n -= nb;
     if (n === 0) {
@@ -15693,14 +15742,14 @@ function copyFromBufferString(n, list) {
 // This function is designed to be inlinable, so please take care when making
 // changes to the function body.
 function copyFromBuffer(n, list) {
-  var ret = Buffer.allocUnsafe(n);
-  var p = list.head;
-  var c = 1;
+  const ret = Buffer.allocUnsafe(n);
+  let p = list.head;
+  let c = 1;
   p.data.copy(ret);
   n -= p.data.length;
   while (p = p.next) {
-    var buf = p.data;
-    var nb = n > buf.length ? buf.length : n;
+    const buf = p.data;
+    const nb = n > buf.length ? buf.length : n;
     buf.copy(ret, ret.length - n, 0, nb);
     n -= nb;
     if (n === 0) {
@@ -15720,7 +15769,7 @@ function copyFromBuffer(n, list) {
 }
 
 function endReadable(stream) {
-  var state = stream._readableState;
+  const state = stream._readableState;
 
   // If we get here before consuming all the bytes, then that is a
   // bug in node.  Should never happen.
@@ -15742,7 +15791,7 @@ function endReadableNT(state, stream) {
 }
 
 function indexOf(xs, x) {
-  for (var i = 0, l = xs.length; i < l; i++) {
+  for (let i = 0, l = xs.length; i < l; i++) {
     if (xs[i] === x) return i;
   }
   return -1;
@@ -15816,20 +15865,20 @@ function indexOf(xs, x) {
 
 module.exports = Transform;
 
-var Duplex = require('./_stream_duplex');
+const Duplex = require('./_stream_duplex');
 
-/*<replacement>*/
-var util = require('core-util-is');
+/* <replacement> */
+const util = require('core-util-is');
 util.inherits = require('inherits');
-/*</replacement>*/
+/* </replacement> */
 
 util.inherits(Transform, Duplex);
 
 function afterTransform(er, data) {
-  var ts = this._transformState;
+  const ts = this._transformState;
   ts.transforming = false;
 
-  var cb = ts.writecb;
+  const cb = ts.writecb;
 
   if (!cb) {
     return this.emit('error', new Error('write callback called multiple times'));
@@ -15843,7 +15892,7 @@ function afterTransform(er, data) {
 
   cb(er);
 
-  var rs = this._readableState;
+  const rs = this._readableState;
   rs.reading = false;
   if (rs.needReadable || rs.length < rs.highWaterMark) {
     this._read(rs.highWaterMark);
@@ -15883,7 +15932,7 @@ function Transform(options) {
 }
 
 function prefinish() {
-  var _this = this;
+  const _this = this;
 
   if (typeof this._flush === 'function') {
     this._flush(function (er, data) {
@@ -15914,12 +15963,12 @@ Transform.prototype._transform = function (chunk, encoding, cb) {
 };
 
 Transform.prototype._write = function (chunk, encoding, cb) {
-  var ts = this._transformState;
+  const ts = this._transformState;
   ts.writecb = cb;
   ts.writechunk = chunk;
   ts.writeencoding = encoding;
   if (!ts.transforming) {
-    var rs = this._readableState;
+    const rs = this._readableState;
     if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
   }
 };
@@ -15928,7 +15977,7 @@ Transform.prototype._write = function (chunk, encoding, cb) {
 // _transform does all the work.
 // That we got here means that the readable side wants more data.
 Transform.prototype._read = function (n) {
-  var ts = this._transformState;
+  const ts = this._transformState;
 
   if (ts.writechunk !== null && ts.writecb && !ts.transforming) {
     ts.transforming = true;
@@ -15941,7 +15990,7 @@ Transform.prototype._read = function (n) {
 };
 
 Transform.prototype._destroy = function (err, cb) {
-  var _this2 = this;
+  const _this2 = this;
 
   Duplex.prototype._destroy.call(this, err, function (err2) {
     cb(err2);
@@ -15992,10 +16041,10 @@ function done(stream, er, data) {
 
 'use strict';
 
-/*<replacement>*/
+/* <replacement> */
 
-var pna = require('process-nextick-args');
-/*</replacement>*/
+const pna = require('process-nextick-args');
+/* </replacement> */
 
 module.exports = Writable;
 
@@ -16010,7 +16059,7 @@ function WriteReq(chunk, encoding, cb) {
 // It seems a linked list but it is not
 // there will be only 2 of these for each stream
 function CorkedRequest(state) {
-  var _this = this;
+  const _this = this;
 
   this.next = null;
   this.entry = null;
@@ -16020,35 +16069,35 @@ function CorkedRequest(state) {
 }
 /* </replacement> */
 
-/*<replacement>*/
-var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
-/*</replacement>*/
+/* <replacement> */
+const asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
+/* </replacement> */
 
-/*<replacement>*/
-var Duplex;
-/*</replacement>*/
+/* <replacement> */
+let Duplex;
+/* </replacement> */
 
 Writable.WritableState = WritableState;
 
-/*<replacement>*/
-var util = require('core-util-is');
+/* <replacement> */
+const util = require('core-util-is');
 util.inherits = require('inherits');
-/*</replacement>*/
+/* </replacement> */
 
-/*<replacement>*/
-var internalUtil = {
+/* <replacement> */
+const internalUtil = {
   deprecate: require('util-deprecate')
 };
-/*</replacement>*/
+/* </replacement> */
 
-/*<replacement>*/
-var Stream = require('./internal/streams/stream');
-/*</replacement>*/
+/* <replacement> */
+const Stream = require('./internal/streams/stream');
+/* </replacement> */
 
-/*<replacement>*/
+/* <replacement> */
 
-var Buffer = require('safe-buffer').Buffer;
-var OurUint8Array = global.Uint8Array || function () {};
+const {Buffer} = require('safe-buffer');
+const OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
 }
@@ -16056,9 +16105,9 @@ function _isUint8Array(obj) {
   return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
 
-/*</replacement>*/
+/* </replacement> */
 
-var destroyImpl = require('./internal/streams/destroy');
+const destroyImpl = require('./internal/streams/destroy');
 
 util.inherits(Writable, Stream);
 
@@ -16074,7 +16123,7 @@ function WritableState(options, stream) {
   // However, some cases require setting options to different
   // values for the readable and the writable sides of the duplex stream.
   // These options can be provided separately as readableXXX and writableXXX.
-  var isDuplex = stream instanceof Duplex;
+  const isDuplex = stream instanceof Duplex;
 
   // object stream flag to indicate whether or not this stream
   // contains buffers or objects.
@@ -16085,9 +16134,9 @@ function WritableState(options, stream) {
   // the point at which write() starts returning false
   // Note: 0 is a valid value, means that we always return false if
   // the entire buffer is not flushed immediately on write()
-  var hwm = options.highWaterMark;
-  var writableHwm = options.writableHighWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
+  const hwm = options.highWaterMark;
+  const writableHwm = options.writableHighWaterMark;
+  const defaultHwm = this.objectMode ? 16 : 16 * 1024;
 
   if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (writableHwm || writableHwm === 0)) this.highWaterMark = writableHwm;else this.highWaterMark = defaultHwm;
 
@@ -16112,7 +16161,7 @@ function WritableState(options, stream) {
   // should we decode strings into buffers before passing to _write?
   // this is here so that some node-core streams can optimize string
   // handling at a lower level.
-  var noDecode = options.decodeStrings === false;
+  const noDecode = options.decodeStrings === false;
   this.decodeStrings = !noDecode;
 
   // Crypto is kind of old and crusty.  Historically, its default string
@@ -16176,8 +16225,8 @@ function WritableState(options, stream) {
 }
 
 WritableState.prototype.getBuffer = function getBuffer() {
-  var current = this.bufferedRequest;
-  var out = [];
+  let current = this.bufferedRequest;
+  const out = [];
   while (current) {
     out.push(current);
     current = current.next;
@@ -16197,11 +16246,11 @@ WritableState.prototype.getBuffer = function getBuffer() {
 
 // Test _writableState for inheritance to account for Duplex streams,
 // whose prototype chain only points to Readable.
-var realHasInstance;
+let realHasInstance;
 if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {
   realHasInstance = Function.prototype[Symbol.hasInstance];
   Object.defineProperty(Writable, Symbol.hasInstance, {
-    value: function (object) {
+    value (object) {
       if (realHasInstance.call(this, object)) return true;
       if (this !== Writable) return false;
 
@@ -16252,7 +16301,7 @@ Writable.prototype.pipe = function () {
 };
 
 function writeAfterEnd(stream, cb) {
-  var er = new Error('write after end');
+  const er = new Error('write after end');
   // TODO: defer error events consistently everywhere, not just the cb
   stream.emit('error', er);
   pna.nextTick(cb, er);
@@ -16262,8 +16311,8 @@ function writeAfterEnd(stream, cb) {
 // mode the stream is in. Currently this means that `null` is never accepted
 // and undefined/non-string values are only allowed in object mode.
 function validChunk(stream, state, chunk, cb) {
-  var valid = true;
-  var er = false;
+  let valid = true;
+  let er = false;
 
   if (chunk === null) {
     er = new TypeError('May not write null values to stream');
@@ -16279,9 +16328,9 @@ function validChunk(stream, state, chunk, cb) {
 }
 
 Writable.prototype.write = function (chunk, encoding, cb) {
-  var state = this._writableState;
-  var ret = false;
-  var isBuf = !state.objectMode && _isUint8Array(chunk);
+  const state = this._writableState;
+  let ret = false;
+  const isBuf = !state.objectMode && _isUint8Array(chunk);
 
   if (isBuf && !Buffer.isBuffer(chunk)) {
     chunk = _uint8ArrayToBuffer(chunk);
@@ -16305,13 +16354,13 @@ Writable.prototype.write = function (chunk, encoding, cb) {
 };
 
 Writable.prototype.cork = function () {
-  var state = this._writableState;
+  const state = this._writableState;
 
   state.corked++;
 };
 
 Writable.prototype.uncork = function () {
-  var state = this._writableState;
+  const state = this._writableState;
 
   if (state.corked) {
     state.corked--;
@@ -16323,7 +16372,7 @@ Writable.prototype.uncork = function () {
 Writable.prototype.setDefaultEncoding = function setDefaultEncoding(encoding) {
   // node::ParseEncoding() requires lower case.
   if (typeof encoding === 'string') encoding = encoding.toLowerCase();
-  if (!(['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'raw'].indexOf((encoding + '').toLowerCase()) > -1)) throw new TypeError('Unknown encoding: ' + encoding);
+  if (!(['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'raw'].indexOf((`${encoding  }`).toLowerCase()) > -1)) throw new TypeError(`Unknown encoding: ${  encoding}`);
   this._writableState.defaultEncoding = encoding;
   return this;
 };
@@ -16340,7 +16389,7 @@ Object.defineProperty(Writable.prototype, 'writableHighWaterMark', {
   // because otherwise some prototype manipulation in
   // userland will fail
   enumerable: false,
-  get: function () {
+  get () {
     return this._writableState.highWaterMark;
   }
 });
@@ -16350,27 +16399,27 @@ Object.defineProperty(Writable.prototype, 'writableHighWaterMark', {
 // If we return false, then we need a drain event, so set that flag.
 function writeOrBuffer(stream, state, isBuf, chunk, encoding, cb) {
   if (!isBuf) {
-    var newChunk = decodeChunk(state, chunk, encoding);
+    const newChunk = decodeChunk(state, chunk, encoding);
     if (chunk !== newChunk) {
       isBuf = true;
       encoding = 'buffer';
       chunk = newChunk;
     }
   }
-  var len = state.objectMode ? 1 : chunk.length;
+  const len = state.objectMode ? 1 : chunk.length;
 
   state.length += len;
 
-  var ret = state.length < state.highWaterMark;
+  const ret = state.length < state.highWaterMark;
   // we must ensure that previous needDrain will not be reset to false.
   if (!ret) state.needDrain = true;
 
   if (state.writing || state.corked) {
-    var last = state.lastBufferedRequest;
+    const last = state.lastBufferedRequest;
     state.lastBufferedRequest = {
-      chunk: chunk,
-      encoding: encoding,
-      isBuf: isBuf,
+      chunk,
+      encoding,
+      isBuf,
       callback: cb,
       next: null
     };
@@ -16428,24 +16477,24 @@ function onwriteStateUpdate(state) {
 }
 
 function onwrite(stream, er) {
-  var state = stream._writableState;
-  var sync = state.sync;
-  var cb = state.writecb;
+  const state = stream._writableState;
+  const {sync} = state;
+  const cb = state.writecb;
 
   onwriteStateUpdate(state);
 
   if (er) onwriteError(stream, state, sync, er, cb);else {
     // Check if we're actually ready to finish, but don't emit yet
-    var finished = needFinish(state);
+    const finished = needFinish(state);
 
     if (!finished && !state.corked && !state.bufferProcessing && state.bufferedRequest) {
       clearBuffer(stream, state);
     }
 
     if (sync) {
-      /*<replacement>*/
+      /* <replacement> */
       asyncWrite(afterWrite, stream, state, finished, cb);
-      /*</replacement>*/
+      /* </replacement> */
     } else {
       afterWrite(stream, state, finished, cb);
     }
@@ -16472,17 +16521,17 @@ function onwriteDrain(stream, state) {
 // if there's something in the buffer waiting, then process it
 function clearBuffer(stream, state) {
   state.bufferProcessing = true;
-  var entry = state.bufferedRequest;
+  let entry = state.bufferedRequest;
 
   if (stream._writev && entry && entry.next) {
     // Fast case, write everything using _writev()
-    var l = state.bufferedRequestCount;
-    var buffer = new Array(l);
-    var holder = state.corkedRequestsFree;
+    const l = state.bufferedRequestCount;
+    const buffer = new Array(l);
+    const holder = state.corkedRequestsFree;
     holder.entry = entry;
 
-    var count = 0;
-    var allBuffers = true;
+    let count = 0;
+    let allBuffers = true;
     while (entry) {
       buffer[count] = entry;
       if (!entry.isBuf) allBuffers = false;
@@ -16507,10 +16556,10 @@ function clearBuffer(stream, state) {
   } else {
     // Slow case, write chunks one-by-one
     while (entry) {
-      var chunk = entry.chunk;
-      var encoding = entry.encoding;
-      var cb = entry.callback;
-      var len = state.objectMode ? 1 : chunk.length;
+      const {chunk} = entry;
+      const {encoding} = entry;
+      const cb = entry.callback;
+      const len = state.objectMode ? 1 : chunk.length;
 
       doWrite(stream, state, false, len, chunk, encoding, cb);
       entry = entry.next;
@@ -16538,7 +16587,7 @@ Writable.prototype._write = function (chunk, encoding, cb) {
 Writable.prototype._writev = null;
 
 Writable.prototype.end = function (chunk, encoding, cb) {
-  var state = this._writableState;
+  const state = this._writableState;
 
   if (typeof chunk === 'function') {
     cb = chunk;
@@ -16589,7 +16638,7 @@ function prefinish(stream, state) {
 }
 
 function finishMaybe(stream, state) {
-  var need = needFinish(state);
+  const need = needFinish(state);
   if (need) {
     prefinish(stream, state);
     if (state.pendingcb === 0) {
@@ -16611,10 +16660,10 @@ function endWritable(stream, state, cb) {
 }
 
 function onCorkedFinish(corkReq, state, err) {
-  var entry = corkReq.entry;
+  let {entry} = corkReq;
   corkReq.entry = null;
   while (entry) {
-    var cb = entry.callback;
+    const cb = entry.callback;
     state.pendingcb--;
     cb(err);
     entry = entry.next;
@@ -16627,13 +16676,13 @@ function onCorkedFinish(corkReq, state, err) {
 }
 
 Object.defineProperty(Writable.prototype, 'destroyed', {
-  get: function () {
+  get () {
     if (this._writableState === undefined) {
       return false;
     }
     return this._writableState.destroyed;
   },
-  set: function (value) {
+  set (value) {
     // we ignore the value if the stream
     // has not been initialized yet
     if (!this._writableState) {
@@ -16658,8 +16707,8 @@ Writable.prototype._destroy = function (err, cb) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Buffer = require('safe-buffer').Buffer;
-var util = require('util');
+const {Buffer} = require('safe-buffer');
+const util = require('util');
 
 function copyBuffer(src, target, offset) {
   src.copy(target, offset);
@@ -16675,14 +16724,14 @@ module.exports = function () {
   }
 
   BufferList.prototype.push = function push(v) {
-    var entry = { data: v, next: null };
+    const entry = { data: v, next: null };
     if (this.length > 0) this.tail.next = entry;else this.head = entry;
     this.tail = entry;
     ++this.length;
   };
 
   BufferList.prototype.unshift = function unshift(v) {
-    var entry = { data: v, next: this.head };
+    const entry = { data: v, next: this.head };
     if (this.length === 0) this.tail = entry;
     this.head = entry;
     ++this.length;
@@ -16690,7 +16739,7 @@ module.exports = function () {
 
   BufferList.prototype.shift = function shift() {
     if (this.length === 0) return;
-    var ret = this.head.data;
+    const ret = this.head.data;
     if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
     --this.length;
     return ret;
@@ -16703,8 +16752,8 @@ module.exports = function () {
 
   BufferList.prototype.join = function join(s) {
     if (this.length === 0) return '';
-    var p = this.head;
-    var ret = '' + p.data;
+    let p = this.head;
+    let ret = `${  p.data}`;
     while (p = p.next) {
       ret += s + p.data;
     }return ret;
@@ -16713,9 +16762,9 @@ module.exports = function () {
   BufferList.prototype.concat = function concat(n) {
     if (this.length === 0) return Buffer.alloc(0);
     if (this.length === 1) return this.head.data;
-    var ret = Buffer.allocUnsafe(n >>> 0);
-    var p = this.head;
-    var i = 0;
+    const ret = Buffer.allocUnsafe(n >>> 0);
+    let p = this.head;
+    let i = 0;
     while (p) {
       copyBuffer(p.data, ret, i);
       i += p.data.length;
@@ -16729,24 +16778,24 @@ module.exports = function () {
 
 if (util && util.inspect && util.inspect.custom) {
   module.exports.prototype[util.inspect.custom] = function () {
-    var obj = util.inspect({ length: this.length });
-    return this.constructor.name + ' ' + obj;
+    const obj = util.inspect({ length: this.length });
+    return `${this.constructor.name  } ${  obj}`;
   };
 }
 },{"safe-buffer":83,"util":40}],77:[function(require,module,exports){
 'use strict';
 
-/*<replacement>*/
+/* <replacement> */
 
-var pna = require('process-nextick-args');
-/*</replacement>*/
+const pna = require('process-nextick-args');
+/* </replacement> */
 
 // undocumented cb() API, needed for core, not for public API
 function destroy(err, cb) {
-  var _this = this;
+  const _this = this;
 
-  var readableDestroyed = this._readableState && this._readableState.destroyed;
-  var writableDestroyed = this._writableState && this._writableState.destroyed;
+  const readableDestroyed = this._readableState && this._readableState.destroyed;
+  const writableDestroyed = this._writableState && this._writableState.destroyed;
 
   if (readableDestroyed || writableDestroyed) {
     if (cb) {
@@ -16805,8 +16854,8 @@ function emitErrorNT(self, err) {
 }
 
 module.exports = {
-  destroy: destroy,
-  undestroy: undestroy
+  destroy,
+  undestroy
 };
 },{"process-nextick-args":68}],78:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
@@ -16831,12 +16880,12 @@ module.exports = require('./lib/_stream_writable.js');
 
 },{"./lib/_stream_writable.js":75}],83:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
-var buffer = require('buffer')
-var Buffer = buffer.Buffer
+const buffer = require('buffer')
+const {Buffer} = buffer
 
 // alternative to using Object.keys for old browsers
 function copyProps (src, dst) {
-  for (var key in src) {
+  for (const key in src) {
     dst[key] = src[key]
   }
 }
@@ -16866,7 +16915,7 @@ SafeBuffer.alloc = function (size, fill, encoding) {
   if (typeof size !== 'number') {
     throw new TypeError('Argument must be a number')
   }
-  var buf = Buffer(size)
+  const buf = Buffer(size)
   if (fill !== undefined) {
     if (typeof encoding === 'string') {
       buf.fill(fill, encoding)
@@ -16917,8 +16966,8 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 module.exports = Stream;
 
-var EE = require('events').EventEmitter;
-var inherits = require('inherits');
+const EE = require('events').EventEmitter;
+const inherits = require('inherits');
 
 inherits(Stream, EE);
 Stream.Readable = require('readable-stream/readable.js');
@@ -16940,11 +16989,11 @@ function Stream() {
 }
 
 Stream.prototype.pipe = function(dest, options) {
-  var source = this;
+  const source = this;
 
   function ondata(chunk) {
     if (dest.writable) {
-      if (false === dest.write(chunk) && source.pause) {
+      if (dest.write(chunk) === false && source.pause) {
         source.pause();
       }
     }
@@ -16967,7 +17016,7 @@ Stream.prototype.pipe = function(dest, options) {
     source.on('close', onclose);
   }
 
-  var didOnEnd = false;
+  let didOnEnd = false;
   function onend() {
     if (didOnEnd) return;
     didOnEnd = true;
@@ -17046,13 +17095,13 @@ Stream.prototype.pipe = function(dest, options) {
 
 'use strict';
 
-/*<replacement>*/
+/* <replacement> */
 
-var Buffer = require('safe-buffer').Buffer;
-/*</replacement>*/
+const {Buffer} = require('safe-buffer');
+/* </replacement> */
 
-var isEncoding = Buffer.isEncoding || function (encoding) {
-  encoding = '' + encoding;
+const isEncoding = Buffer.isEncoding || function (encoding) {
+  encoding = `${  encoding}`;
   switch (encoding && encoding.toLowerCase()) {
     case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
       return true;
@@ -17063,7 +17112,7 @@ var isEncoding = Buffer.isEncoding || function (encoding) {
 
 function _normalizeEncoding(enc) {
   if (!enc) return 'utf8';
-  var retried;
+  let retried;
   while (true) {
     switch (enc) {
       case 'utf8':
@@ -17083,7 +17132,7 @@ function _normalizeEncoding(enc) {
         return enc;
       default:
         if (retried) return; // undefined
-        enc = ('' + enc).toLowerCase();
+        enc = (`${  enc}`).toLowerCase();
         retried = true;
     }
   }
@@ -17092,8 +17141,8 @@ function _normalizeEncoding(enc) {
 // Do not cache `Buffer.isEncoding` when checking encoding names as some
 // modules monkey-patch it to support additional encodings
 function normalizeEncoding(enc) {
-  var nenc = _normalizeEncoding(enc);
-  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  const nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error(`Unknown encoding: ${  enc}`);
   return nenc || enc;
 }
 
@@ -17103,7 +17152,7 @@ function normalizeEncoding(enc) {
 exports.StringDecoder = StringDecoder;
 function StringDecoder(encoding) {
   this.encoding = normalizeEncoding(encoding);
-  var nb;
+  let nb;
   switch (this.encoding) {
     case 'utf16le':
       this.text = utf16Text;
@@ -17131,8 +17180,8 @@ function StringDecoder(encoding) {
 
 StringDecoder.prototype.write = function (buf) {
   if (buf.length === 0) return '';
-  var r;
-  var i;
+  let r;
+  let i;
   if (this.lastNeed) {
     r = this.fillLast(buf);
     if (r === undefined) return '';
@@ -17163,7 +17212,7 @@ StringDecoder.prototype.fillLast = function (buf) {
 // Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
 // continuation byte. If an invalid byte is detected, -2 is returned.
 function utf8CheckByte(byte) {
-  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  if (byte <= 0x7F) return 0;if (byte >> 5 === 0x06) return 2;if (byte >> 4 === 0x0E) return 3;if (byte >> 3 === 0x1E) return 4;
   return byte >> 6 === 0x02 ? -1 : -2;
 }
 
@@ -17171,9 +17220,9 @@ function utf8CheckByte(byte) {
 // incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
 // needed to complete the UTF-8 character (if applicable) are returned.
 function utf8CheckIncomplete(self, buf, i) {
-  var j = buf.length - 1;
+  let j = buf.length - 1;
   if (j < i) return 0;
-  var nb = utf8CheckByte(buf[j]);
+  let nb = utf8CheckByte(buf[j]);
   if (nb >= 0) {
     if (nb > 0) self.lastNeed = nb - 1;
     return nb;
@@ -17224,8 +17273,8 @@ function utf8CheckExtraBytes(self, buf, p) {
 
 // Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
 function utf8FillLast(buf) {
-  var p = this.lastTotal - this.lastNeed;
-  var r = utf8CheckExtraBytes(this, buf, p);
+  const p = this.lastTotal - this.lastNeed;
+  const r = utf8CheckExtraBytes(this, buf, p);
   if (r !== undefined) return r;
   if (this.lastNeed <= buf.length) {
     buf.copy(this.lastChar, p, 0, this.lastNeed);
@@ -17239,10 +17288,10 @@ function utf8FillLast(buf) {
 // partial character, the character's bytes are buffered until the required
 // number of bytes are available.
 function utf8Text(buf, i) {
-  var total = utf8CheckIncomplete(this, buf, i);
+  const total = utf8CheckIncomplete(this, buf, i);
   if (!this.lastNeed) return buf.toString('utf8', i);
   this.lastTotal = total;
-  var end = buf.length - (total - this.lastNeed);
+  const end = buf.length - (total - this.lastNeed);
   buf.copy(this.lastChar, 0, end);
   return buf.toString('utf8', i, end);
 }
@@ -17250,8 +17299,8 @@ function utf8Text(buf, i) {
 // For UTF-8, a replacement character is added when ending on a partial
 // character.
 function utf8End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + '\ufffd';
+  const r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return `${r  }\ufffd`;
   return r;
 }
 
@@ -17261,9 +17310,9 @@ function utf8End(buf) {
 // decode the last character properly.
 function utf16Text(buf, i) {
   if ((buf.length - i) % 2 === 0) {
-    var r = buf.toString('utf16le', i);
+    const r = buf.toString('utf16le', i);
     if (r) {
-      var c = r.charCodeAt(r.length - 1);
+      const c = r.charCodeAt(r.length - 1);
       if (c >= 0xD800 && c <= 0xDBFF) {
         this.lastNeed = 2;
         this.lastTotal = 4;
@@ -17283,16 +17332,16 @@ function utf16Text(buf, i) {
 // For UTF-16LE we do not explicitly append special replacement characters if we
 // end on a partial character, we simply let v8 handle that.
 function utf16End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
+  const r = buf && buf.length ? this.write(buf) : '';
   if (this.lastNeed) {
-    var end = this.lastTotal - this.lastNeed;
+    const end = this.lastTotal - this.lastNeed;
     return r + this.lastChar.toString('utf16le', 0, end);
   }
   return r;
 }
 
 function base64Text(buf, i) {
-  var n = (buf.length - i) % 3;
+  const n = (buf.length - i) % 3;
   if (n === 0) return buf.toString('base64', i);
   this.lastNeed = 3 - n;
   this.lastTotal = 3;
@@ -17306,7 +17355,7 @@ function base64Text(buf, i) {
 }
 
 function base64End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
+  const r = buf && buf.length ? this.write(buf) : '';
   if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
   return r;
 }
@@ -17321,11 +17370,11 @@ function simpleEnd(buf) {
 }
 },{"safe-buffer":83}],86:[function(require,module,exports){
 (function (setImmediate,clearImmediate){
-var nextTick = require('process/browser.js').nextTick;
-var apply = Function.prototype.apply;
-var slice = Array.prototype.slice;
-var immediateIds = {};
-var nextImmediateId = 0;
+const {nextTick} = require('process/browser.js');
+const {apply} = Function.prototype;
+const {slice} = Array.prototype;
+const immediateIds = {};
+let nextImmediateId = 0;
 
 // DOM APIs, for completeness
 
@@ -17361,7 +17410,7 @@ exports.unenroll = function(item) {
 exports._unrefActive = exports.active = function(item) {
   clearTimeout(item._idleTimeoutId);
 
-  var msecs = item._idleTimeout;
+  const msecs = item._idleTimeout;
   if (msecs >= 0) {
     item._idleTimeoutId = setTimeout(function onTimeout() {
       if (item._onTimeout)
@@ -17372,8 +17421,8 @@ exports._unrefActive = exports.active = function(item) {
 
 // That's not how node.js implements it but the exposed api is the same.
 exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-  var id = nextImmediateId++;
-  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+  const id = nextImmediateId++;
+  const args = arguments.length < 2 ? false : slice.call(arguments, 1);
 
   immediateIds[id] = true;
 
@@ -17430,7 +17479,7 @@ function deprecate (fn, msg) {
     return fn;
   }
 
-  var warned = false;
+  let warned = false;
   function deprecated() {
     if (!warned) {
       if (config('throwDeprecation')) {
@@ -17463,8 +17512,8 @@ function config (name) {
   } catch (_) {
     return false;
   }
-  var val = global.localStorage[name];
-  if (null == val) return false;
+  const val = global.localStorage[name];
+  if (val == null) return false;
   return String(val).toLowerCase() === 'true';
 }
 
@@ -17499,10 +17548,10 @@ module.exports = function isBuffer(arg) {
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var formatRegExp = /%[sdj%]/g;
+const formatRegExp = /%[sdj%]/g;
 exports.format = function(f) {
   if (!isString(f)) {
-    var objects = [];
+    const objects = [];
     for (var i = 0; i < arguments.length; i++) {
       objects.push(inspect(arguments[i]));
     }
@@ -17510,9 +17559,9 @@ exports.format = function(f) {
   }
 
   var i = 1;
-  var args = arguments;
-  var len = args.length;
-  var str = String(f).replace(formatRegExp, function(x) {
+  const args = arguments;
+  const len = args.length;
+  let str = String(f).replace(formatRegExp, function(x) {
     if (x === '%%') return '%';
     if (i >= len) return x;
     switch (x) {
@@ -17528,11 +17577,11 @@ exports.format = function(f) {
         return x;
     }
   });
-  for (var x = args[i]; i < len; x = args[++i]) {
+  for (let x = args[i]; i < len; x = args[++i]) {
     if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
+      str += ` ${  x}`;
     } else {
-      str += ' ' + inspect(x);
+      str += ` ${  inspect(x)}`;
     }
   }
   return str;
@@ -17554,7 +17603,7 @@ exports.deprecate = function(fn, msg) {
     return fn;
   }
 
-  var warned = false;
+  let warned = false;
   function deprecated() {
     if (!warned) {
       if (process.throwDeprecation) {
@@ -17573,17 +17622,17 @@ exports.deprecate = function(fn, msg) {
 };
 
 
-var debugs = {};
-var debugEnviron;
+const debugs = {};
+let debugEnviron;
 exports.debuglog = function(set) {
   if (isUndefined(debugEnviron))
     debugEnviron = process.env.NODE_DEBUG || '';
   set = set.toUpperCase();
   if (!debugs[set]) {
-    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-      var pid = process.pid;
+    if (new RegExp(`\\b${  set  }\\b`, 'i').test(debugEnviron)) {
+      const {pid} = process;
       debugs[set] = function() {
-        var msg = exports.format.apply(exports, arguments);
+        const msg = exports.format.apply(exports, arguments);
         console.error('%s %d: %s', set, pid, msg);
       };
     } else {
@@ -17601,10 +17650,10 @@ exports.debuglog = function(set) {
  * @param {Object} obj The object to print out.
  * @param {Object} opts Optional options object that alters the output.
  */
-/* legacy: obj, showHidden, depth, colors*/
+/* legacy: obj, showHidden, depth, colors */
 function inspect(obj, opts) {
   // default options
-  var ctx = {
+  const ctx = {
     seen: [],
     stylize: stylizeNoColor
   };
@@ -17661,14 +17710,14 @@ inspect.styles = {
 
 
 function stylizeWithColor(str, styleType) {
-  var style = inspect.styles[styleType];
+  const style = inspect.styles[styleType];
 
   if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
+    return `\u001b[${  inspect.colors[style][0]  }m${  str 
+           }\u001b[${  inspect.colors[style][1]  }m`;
+  } 
     return str;
-  }
+  
 }
 
 
@@ -17678,7 +17727,7 @@ function stylizeNoColor(str, styleType) {
 
 
 function arrayToHash(array) {
-  var hash = {};
+  const hash = {};
 
   array.forEach(function(val, idx) {
     hash[val] = true;
@@ -17698,7 +17747,7 @@ function formatValue(ctx, value, recurseTimes) {
       value.inspect !== exports.inspect &&
       // Also filter out any prototype objects using the circular check.
       !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes, ctx);
+    let ret = value.inspect(recurseTimes, ctx);
     if (!isString(ret)) {
       ret = formatValue(ctx, ret, recurseTimes);
     }
@@ -17706,14 +17755,14 @@ function formatValue(ctx, value, recurseTimes) {
   }
 
   // Primitive types cannot have properties
-  var primitive = formatPrimitive(ctx, value);
+  const primitive = formatPrimitive(ctx, value);
   if (primitive) {
     return primitive;
   }
 
   // Look up the keys of the object.
-  var keys = Object.keys(value);
-  var visibleKeys = arrayToHash(keys);
+  let keys = Object.keys(value);
+  const visibleKeys = arrayToHash(keys);
 
   if (ctx.showHidden) {
     keys = Object.getOwnPropertyNames(value);
@@ -17729,8 +17778,8 @@ function formatValue(ctx, value, recurseTimes) {
   // Some type of object without properties can be shortcutted.
   if (keys.length === 0) {
     if (isFunction(value)) {
-      var name = value.name ? ': ' + value.name : '';
-      return ctx.stylize('[Function' + name + ']', 'special');
+      const name = value.name ? `: ${  value.name}` : '';
+      return ctx.stylize(`[Function${  name  }]`, 'special');
     }
     if (isRegExp(value)) {
       return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
@@ -17743,7 +17792,7 @@ function formatValue(ctx, value, recurseTimes) {
     }
   }
 
-  var base = '', array = false, braces = ['{', '}'];
+  let base = ''; let array = false; let braces = ['{', '}'];
 
   // Make Array say that they are Array
   if (isArray(value)) {
@@ -17753,23 +17802,23 @@ function formatValue(ctx, value, recurseTimes) {
 
   // Make functions say that they are functions
   if (isFunction(value)) {
-    var n = value.name ? ': ' + value.name : '';
-    base = ' [Function' + n + ']';
+    const n = value.name ? `: ${  value.name}` : '';
+    base = ` [Function${  n  }]`;
   }
 
   // Make RegExps say that they are RegExps
   if (isRegExp(value)) {
-    base = ' ' + RegExp.prototype.toString.call(value);
+    base = ` ${  RegExp.prototype.toString.call(value)}`;
   }
 
   // Make dates with properties first say the date
   if (isDate(value)) {
-    base = ' ' + Date.prototype.toUTCString.call(value);
+    base = ` ${  Date.prototype.toUTCString.call(value)}`;
   }
 
   // Make error with message first say the error
   if (isError(value)) {
-    base = ' ' + formatError(value);
+    base = ` ${  formatError(value)}`;
   }
 
   if (keys.length === 0 && (!array || value.length == 0)) {
@@ -17779,14 +17828,14 @@ function formatValue(ctx, value, recurseTimes) {
   if (recurseTimes < 0) {
     if (isRegExp(value)) {
       return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
+    } 
       return ctx.stylize('[Object]', 'special');
-    }
+    
   }
 
   ctx.seen.push(value);
 
-  var output;
+  let output;
   if (array) {
     output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
   } else {
@@ -17805,15 +17854,15 @@ function formatPrimitive(ctx, value) {
   if (isUndefined(value))
     return ctx.stylize('undefined', 'undefined');
   if (isString(value)) {
-    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+    const simple = `'${  JSON.stringify(value).replace(/^"|"$/g, '')
                                              .replace(/'/g, "\\'")
-                                             .replace(/\\"/g, '"') + '\'';
+                                             .replace(/\\"/g, '"')  }'`;
     return ctx.stylize(simple, 'string');
   }
   if (isNumber(value))
-    return ctx.stylize('' + value, 'number');
+    return ctx.stylize(`${  value}`, 'number');
   if (isBoolean(value))
-    return ctx.stylize('' + value, 'boolean');
+    return ctx.stylize(`${  value}`, 'boolean');
   // For some reason typeof null is "object", so special case here.
   if (isNull(value))
     return ctx.stylize('null', 'null');
@@ -17821,13 +17870,13 @@ function formatPrimitive(ctx, value) {
 
 
 function formatError(value) {
-  return '[' + Error.prototype.toString.call(value) + ']';
+  return `[${  Error.prototype.toString.call(value)  }]`;
 }
 
 
 function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-  var output = [];
-  for (var i = 0, l = value.length; i < l; ++i) {
+  const output = [];
+  for (let i = 0, l = value.length; i < l; ++i) {
     if (hasOwnProperty(value, String(i))) {
       output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
           String(i), true));
@@ -17846,7 +17895,7 @@ function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
 
 
 function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-  var name, str, desc;
+  let name; let str; let desc;
   desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
   if (desc.get) {
     if (desc.set) {
@@ -17854,13 +17903,11 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
     } else {
       str = ctx.stylize('[Getter]', 'special');
     }
-  } else {
-    if (desc.set) {
+  } else if (desc.set) {
       str = ctx.stylize('[Setter]', 'special');
     }
-  }
   if (!hasOwnProperty(visibleKeys, key)) {
-    name = '[' + key + ']';
+    name = `[${  key  }]`;
   }
   if (!str) {
     if (ctx.seen.indexOf(desc.value) < 0) {
@@ -17872,12 +17919,12 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
       if (str.indexOf('\n') > -1) {
         if (array) {
           str = str.split('\n').map(function(line) {
-            return '  ' + line;
+            return `  ${  line}`;
           }).join('\n').substr(2);
         } else {
-          str = '\n' + str.split('\n').map(function(line) {
-            return '   ' + line;
-          }).join('\n');
+          str = `\n${  str.split('\n').map(function(line) {
+            return `   ${  line}`;
+          }).join('\n')}`;
         }
       }
     } else {
@@ -17888,7 +17935,7 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
     if (array && key.match(/^\d+$/)) {
       return str;
     }
-    name = JSON.stringify('' + key);
+    name = JSON.stringify(`${  key}`);
     if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
       name = name.substr(1, name.length - 2);
       name = ctx.stylize(name, 'name');
@@ -17900,28 +17947,28 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
     }
   }
 
-  return name + ': ' + str;
+  return `${name  }: ${  str}`;
 }
 
 
 function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
-  var length = output.reduce(function(prev, cur) {
+  let numLinesEst = 0;
+  const length = output.reduce(function(prev, cur) {
     numLinesEst++;
     if (cur.indexOf('\n') >= 0) numLinesEst++;
     return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
   }, 0);
 
   if (length > 60) {
-    return braces[0] +
-           (base === '' ? '' : base + '\n ') +
-           ' ' +
-           output.join(',\n  ') +
-           ' ' +
-           braces[1];
+    return `${braces[0] +
+           (base === '' ? '' : `${base  }\n `) 
+           } ${ 
+           output.join(',\n  ') 
+           } ${ 
+           braces[1]}`;
   }
 
-  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+  return `${braces[0] + base  } ${  output.join(', ')  } ${  braces[1]}`;
 }
 
 
@@ -18011,17 +18058,17 @@ function objectToString(o) {
 
 
 function pad(n) {
-  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+  return n < 10 ? `0${  n.toString(10)}` : n.toString(10);
 }
 
 
-var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
               'Oct', 'Nov', 'Dec'];
 
 // 26 Feb 16:19:34
 function timestamp() {
-  var d = new Date();
-  var time = [pad(d.getHours()),
+  const d = new Date();
+  const time = [pad(d.getHours()),
               pad(d.getMinutes()),
               pad(d.getSeconds())].join(':');
   return [d.getDate(), months[d.getMonth()], time].join(' ');
@@ -18053,8 +18100,8 @@ exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
   if (!add || !isObject(add)) return origin;
 
-  var keys = Object.keys(add);
-  var i = keys.length;
+  const keys = Object.keys(add);
+  let i = keys.length;
   while (i--) {
     origin[keys[i]] = add[keys[i]];
   }

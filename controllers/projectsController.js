@@ -87,7 +87,7 @@ export default class ProjectsController extends BaseController {
                 )
             }
 
-            // Generate project id.
+            // Generate unique project id.
             const projectId = req.body.name
                 .split(' ')
                 .map(str =>
@@ -173,10 +173,19 @@ export default class ProjectsController extends BaseController {
             )
             if (stake < this._config.votingStakeLimit) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
-          ${this._config.votingTicker} stake less than ${
+                ${this._config.votingTicker} stake less than ${
                     this._config.votingStakeLimit
                 }.`)
             }
+
+            const votedProj = await ProjectModel.findOne({
+                votes: { waves_address: walletAddress },
+            })
+            if (votedProj) {
+                throw new RequestValidationError(`Wallet ${walletAddress} 
+                has already voted for project ${votedProj.project_id}.`)
+            }
+
             const vote = {
                 waves_address: walletAddress,
                 stake,
