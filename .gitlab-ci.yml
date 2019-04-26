@@ -17,10 +17,7 @@ test_job:
   script: 
     - apk update
     - apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
-    - npm i mocha
-    - npm i chai
-    - npm i @babel/plugin-transform-runtime
-    - npm i @babel/plugin-syntax-dynamic-import
+    - npm i
     - npm test
 
 lint_job:
