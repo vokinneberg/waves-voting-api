@@ -28,6 +28,8 @@ lint_job:
       - merge_requests
   allow_failure: false
   script: 
+    - apk update
+    - apk add python
     - npm i eslint
     - npm run lint
 
