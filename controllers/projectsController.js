@@ -171,16 +171,20 @@ export default class ProjectsController extends BaseController {
                     this._config.votingTicker
                 } stake ${stake}.`
             )
-            if (stake < this._config.votingStakeLimit) {
+            if (stake < this._config.votingMinumumStake) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
                 ${this._config.votingTicker} stake less than ${
-                    this._config.votingStakeLimit
+                    this._config.votingMinumumStake
                 }.`)
             }
 
             const votedProj = await ProjectModel.findOne({
-                votes: { waves_address: walletAddress },
-            })
+                votes: {
+                    $elemMatch : {
+                        waves_address : walletAddress
+                    }
+                }
+            });
             if (votedProj) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
                 has already voted for project ${votedProj.project_id}.`)
