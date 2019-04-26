@@ -20,6 +20,7 @@ test_job:
     - npm i mocha
     - npm i chai
     - npm i @babel/plugin-transform-runtime
+    - npm i @babel/plugin-syntax-dynamic-import
     - npm test
 
 lint_job:
