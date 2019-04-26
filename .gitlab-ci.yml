@@ -1,8 +1,35 @@
 stages:
+  - lint
+  - test
   - build
 
 variables:
   CONTAINER_IMAGE: registry.gitlab.com/trustamust/waves-voting
+
+test_job:
+  stage: test
+  image: node:latest
+  only:
+    refs:
+      - tags
+      - merge_requests
+  allow_failure: false
+  script: 
+    - npm i mocha
+    - npm i chai
+    - npm test
+
+lint_job:
+  stage: lint
+  image: node:latest
+  only:
+    refs:
+      - tags
+      - merge_requests
+  allow_failure: false
+  script: 
+    - npm i eslint
+    - npm run lint
 
 build_job:
   stage: build
