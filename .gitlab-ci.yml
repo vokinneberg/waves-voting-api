@@ -15,6 +15,8 @@ test_job:
       - merge_requests
   allow_failure: false
   script: 
+    - apk update
+    - apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
     - npm i mocha
     - npm i chai
     - npm test
