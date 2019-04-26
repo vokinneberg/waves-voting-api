@@ -1,5 +1,5 @@
 stages:
-  - lint
+  - build
 
 variables:
   CONTAINER_IMAGE: registry.gitlab.com/trustamust/waves-voting
