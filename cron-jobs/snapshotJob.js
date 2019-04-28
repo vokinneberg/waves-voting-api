@@ -105,6 +105,8 @@ export default class SnapshotJob {
                     }
                 });
 
+                this._logger.info(JSON.stringify(project));
+
                 if (project.rank !== origProjectRank) {
                     if (project.rank >= this._config.votingMaximumRank) {
                         project.verification_status =
