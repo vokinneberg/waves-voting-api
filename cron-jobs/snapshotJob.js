@@ -40,7 +40,7 @@ export default class SnapshotJob {
                     this._logger.info(
                         `Waves wallet ${vote.waves_address} stake ${stake}.`
                     );
-                    const currentVoteRank = Math.log(stake);
+                    const currentVoteRank = Math.log(stake).toFixed(2);
                     switch (vote.status) {
                         case VoteStatus.Init:
                             if (vote.transaction_id) {
@@ -54,6 +54,7 @@ export default class SnapshotJob {
                                         } not found in blockchain.'`
                                     );
                                 }
+
                                 if (stake < this._config.votingMinumumStake) {
                                     this._logger.info(
                                         'Not enough funds to confirm vote.'
@@ -103,27 +104,24 @@ export default class SnapshotJob {
                         default:
                             this._logger.error('Unknown vote status.');
                     }
-                });
 
-                this._logger.info(JSON.stringify(project));
+                    if (project.rank !== origProjectRank) {
+                        if (project.rank >= this._config.votingMaximumRank) {
+                            project.verification_status =
+                                ProjectVerificationStatus.Verified;
+                        }
 
-                if (project.rank !== origProjectRank) {
-                    if (project.rank >= this._config.votingMaximumRank) {
-                        project.verification_status =
-                            ProjectVerificationStatus.Verified;
+                        this._logger.info(
+                            `New project ${project.project_id} rank ${
+                                project.rank
+                            }.`
+                        );
+                        await ProjectModel.findOneAndUpdate(
+                            { project_id: project.project_id },
+                            project
+                        );
                     }
-
-                    this._logger.info(
-                        `New project ${project.project_id} rank ${
-                            project.rank
-                        }.`
-                    );
-                    const updateCount = await ProjectModel.findOneAndUpdate(
-                        { project_id: project.project_id },
-                        project
-                    );
-                    this._logger.info(`Update count ${updateCount}.`);
-                }
+                });
             });
 
             this._logger.info(`Cron-job SnapshotJob finished.`);
