@@ -120,9 +120,7 @@ export default class SnapshotJob {
                         { project_id: project.project_id },
                         project
                     );
-                    this._logger.info(
-                        `Update count ${updateCount}.`
-                    );
+                    this._logger.info(`Update count ${updateCount}.`);
                 }
             });
 
