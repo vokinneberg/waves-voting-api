@@ -26,10 +26,19 @@ export default class SnapshotJob {
                 const origProjectRank = project.rank;
                 const projectVotes = project.votes;
 
+                this._logger.info(
+                    `Current project ${
+                        project.project_id
+                    } rank ${origProjectRank}.`
+                );
+
                 projectVotes.forEach(async (vote, index) => {
                     const stake = this._wavesHelper.checkAssetStake(
                         vote.waves_address,
                         this._config.votingAssetId
+                    );
+                    this._logger.info(
+                        `Waves wallet ${vote.waves_address} stake ${stake}.`
                     );
                     const currentVoteRank = Math.log(stake);
                     switch (vote.status) {
@@ -52,6 +61,9 @@ export default class SnapshotJob {
                                     project.votes[index].status =
                                         VoteStatus.NoFunds;
                                 } else {
+                                    this._logger.info(
+                                        'Updatating project rank and set to Settled.'
+                                    );
                                     project.rank += currentVoteRank;
                                     project.votes[index].status =
                                         VoteStatus.Settled;
@@ -70,6 +82,9 @@ export default class SnapshotJob {
                                     'Not enough funds to confirm vote.'
                                 );
                             } else {
+                                this._logger.info(
+                                    'Updatating project rank and set to Settled.'
+                                );
                                 project.rank += currentVoteRank;
                                 project.votes[index].status =
                                     VoteStatus.Settled;
@@ -95,6 +110,12 @@ export default class SnapshotJob {
                         project.verification_status =
                             ProjectVerificationStatus.Verified;
                     }
+
+                    this._logger.info(
+                        `New project ${project.project_id} rank ${
+                            project.rank
+                        }.`
+                    );
                     await project.save();
                 }
             });
