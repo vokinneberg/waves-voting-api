@@ -33,7 +33,7 @@ export default class SnapshotJob {
                 );
 
                 projectVotes.forEach(async (vote, index) => {
-                    const stake = this._wavesHelper.checkAssetStake(
+                    const stake = await this._wavesHelper.checkAssetStake(
                         vote.waves_address,
                         this._config.votingAssetId
                     );
@@ -116,9 +116,12 @@ export default class SnapshotJob {
                             project.rank
                         }.`
                     );
-                    await ProjectModel.findOneAndUpdate(
+                    const updateCount = await ProjectModel.findOneAndUpdate(
                         { project_id: project.project_id },
                         project
+                    );
+                    this._logger.info(
+                        `Update count ${updateCount}.`
                     );
                 }
             });
