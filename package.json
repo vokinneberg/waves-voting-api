@@ -9,7 +9,7 @@
     "build": "babel . -d build --ignore node_modules,build",
     "lint": "eslint .",
     "prettier": "prettier --check ./**/*.js",
-    "test": "mocha --require @babel/register --recursive test"
+    "test": "mocha --require @babel/register,@babel/polyfill --recursive test"
   },
   "author": "Trustamust.com",
   "license": "ISC",
@@ -83,7 +83,9 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.11.1",
     "mocha": "^6.1.4",
+    "node-mocks-http": "^1.7.3",
     "nyc": "^14.0.0",
-    "prettier": "1.17.0"
+    "prettier": "1.17.0",
+    "sinon": "^7.3.2"
   }
 }
