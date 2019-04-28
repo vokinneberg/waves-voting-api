@@ -116,7 +116,10 @@ export default class SnapshotJob {
                             project.rank
                         }.`
                     );
-                    await project.save();
+                    await ProjectModel.findOneAndUpdate(
+                        { project_id: project.project_id },
+                        project
+                    );
                 }
             });
 

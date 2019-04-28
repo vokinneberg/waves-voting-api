@@ -99,6 +99,7 @@ const ProjectSchema = new mongoose.Schema(
             {
                 waves_address: {
                     type: String,
+                    unique: true,
                     tags: { type: [String], index: true },
                 },
                 stake: mongoose.Decimal128,
