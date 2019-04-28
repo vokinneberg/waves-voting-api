@@ -7,11 +7,7 @@ import { ProjectModel, ProjectVerificationStatus } from '../../models/project';
 export default class AdminProjectsController extends ProjectsController {
   async all(req, res, next) {
     try {
-      const projects = await ProjectModel.where('verification_status')
-        .in([ProjectVerificationStatus.Described,
-          ProjectVerificationStatus.Verified,
-          ProjectVerificationStatus.Unknown])
-        .exec();
+      const projects = await ProjectModel.find({});
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
@@ -54,7 +50,6 @@ export default class AdminProjectsController extends ProjectsController {
 
   async reject(req, res, next) {
     try {
-      console.log('in reject');
       const { id } = req.params;
 
       if (!id) {

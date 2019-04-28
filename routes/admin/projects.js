@@ -1,10 +1,10 @@
 import logger from '../../core/logger';
 import config from '../../core/config';
-import { ProjectsSchema } from '../../models/project';
+import { ProjectSchema } from '../../models/project';
 import ProjectsRepository from '../../repository/projectsRepository';
 import AdminProjectsController from '../../controllers/admin/adminProjectsController';
 
-const projectsRepository = new ProjectsRepository('Project', ProjectsSchema);
+const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
 const adminProjectsController = new AdminProjectsController(logger, config, projectsRepository);
 
 export default (adminRouter) => {
