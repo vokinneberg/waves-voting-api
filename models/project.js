@@ -4,6 +4,7 @@ const ProjectVerificationStatus = {
     Unknown: 'Unknown',
     Described: 'Described',
     Verified: 'Verified',
+    Suspicious: 'Suspicious',
 }
 
 const ProjectStatus = {
@@ -127,6 +128,7 @@ const ProjectSchema = new mongoose.Schema(
                 ProjectVerificationStatus.Unknown,
                 ProjectVerificationStatus.Described,
                 ProjectVerificationStatus.Verified,
+                ProjectVerificationStatus.Suspicious,
             ],
             default: ProjectVerificationStatus.Unknown,
         },
@@ -146,6 +148,7 @@ ProjectSchema.set('toJSON', {
 const ProjectModel = mongoose.model('Project', ProjectSchema)
 
 export {
+    ProjectSchema,
     ProjectModel,
     ProjectStatus,
     ProjectVerificationStatus,

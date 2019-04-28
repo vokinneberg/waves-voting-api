@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import HttpCodes from 'http-status-codes';
 import ProjectsController from '../projectsController';
 import ObjectNotFoundError from '../../core/errors/objectNotFoundError';
@@ -8,11 +7,7 @@ import { ProjectModel, ProjectVerificationStatus } from '../../models/project';
 export default class AdminProjectsController extends ProjectsController {
   async all(req, res, next) {
     try {
-      const projects = await ProjectModel.where('verification_status')
-        .in([ProjectVerificationStatus.Described,
-          ProjectVerificationStatus.Verified,
-          ProjectVerificationStatus.Unknown])
-        .exec();
+      const projects = await ProjectModel.find({});
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
@@ -39,12 +34,35 @@ export default class AdminProjectsController extends ProjectsController {
       }
 
       this._logger.info(`Confirm project ${id}.`);
-      const project = await ProjectModel.findOne({ project_id: id });
+      const project = await this._projectsRepository.findByProjectId(id);
 
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
         project.verification_status = ProjectVerificationStatus.Described;
+        project.save();
+        res.status(HttpCodes.OK).json(project.toJSON());
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async reject(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        throw new RequestValidationError('Project id should not be empty.', 'id');
+      }
+
+      this._logger.info(`Reject project ${id}.`);
+      const project = await ProjectModel.findOne({ project_id: id });
+
+      if (!project) {
+        throw new ObjectNotFoundError(`Project ${id} not found.`);
+      } else {
+        project.verification_status = ProjectVerificationStatus.Suspicious;
         project.save();
         res.status(HttpCodes.OK).json(project.toJSON());
       }

@@ -11,8 +11,9 @@ import ObjectNotFoundError from '../core/errors/objectNotFoundError'
 import RequestValidationError from '../core/errors/requestValidationError'
 
 export default class ProjectsController extends BaseController {
-    constructor(logger, config, wavesHelper, jwtHelper) {
+    constructor(logger, config, projectsRepository, wavesHelper, jwtHelper) {
         super(logger, config)
+        this._projectsRepository = projectsRepository
         this._wavesHelper = wavesHelper
         this._jwtHelper = jwtHelper
     }
