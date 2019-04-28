@@ -1,21 +1,21 @@
-import HttpCodes from 'http-status-codes'
-import parse from 'url-parse'
+import HttpCodes from 'http-status-codes';
+import parse from 'url-parse';
 import {
     ProjectModel,
     ProjectVerificationStatus,
     StartingProjectRank,
     VoteStatus,
-} from '../models/project'
-import BaseController from './baseController'
-import ObjectNotFoundError from '../core/errors/objectNotFoundError'
-import RequestValidationError from '../core/errors/requestValidationError'
+} from '../models/project';
+import BaseController from './baseController';
+import ObjectNotFoundError from '../core/errors/objectNotFoundError';
+import RequestValidationError from '../core/errors/requestValidationError';
 
 export default class ProjectsController extends BaseController {
     constructor(logger, config, projectsRepository, wavesHelper, jwtHelper) {
-        super(logger, config)
-        this._projectsRepository = projectsRepository
-        this._wavesHelper = wavesHelper
-        this._jwtHelper = jwtHelper
+        super(logger, config);
+        this._projectsRepository = projectsRepository;
+        this._wavesHelper = wavesHelper;
+        this._jwtHelper = jwtHelper;
     }
 
     async all(req, res, next) {
@@ -25,12 +25,12 @@ export default class ProjectsController extends BaseController {
                     ProjectVerificationStatus.Described,
                     ProjectVerificationStatus.Verified,
                 ])
-                .exec()
+                .exec();
 
-            this._logger.info(projects)
+            this._logger.info(projects);
             res.status(HttpCodes.OK).json({
                 projects: projects.map(project => {
-                    this._logger.info(typeof project)
+                    this._logger.info(typeof project);
                     return {
                         name: project.name,
                         project_id: project.project_id,
@@ -47,35 +47,35 @@ export default class ProjectsController extends BaseController {
                         },
                         rank: project.rank,
                         verification_status: project.verification_status,
-                    }
+                    };
                 }),
-            })
+            });
         } catch (err) {
-            next(err)
+            next(err);
         }
     }
 
     async byId(req, res, next) {
         try {
-            const { id } = req.params
+            const { id } = req.params;
 
             if (!id) {
                 throw new RequestValidationError(
                     'Project id should not be empty.',
                     'id'
-                )
+                );
             }
 
-            const project = await ProjectModel.findOne({ project_id: id })
+            const project = await ProjectModel.findOne({ project_id: id });
 
             if (!project) {
-                throw new ObjectNotFoundError(`Project ${id} not found.`)
+                throw new ObjectNotFoundError(`Project ${id} not found.`);
             } else {
-                this._logger.info(`Project ${id} found.`)
-                res.status(HttpCodes.OK).json(project.toJSON())
+                this._logger.info(`Project ${id} found.`);
+                res.status(HttpCodes.OK).json(project.toJSON());
             }
         } catch (err) {
-            next(err)
+            next(err);
         }
     }
 
@@ -85,7 +85,7 @@ export default class ProjectsController extends BaseController {
                 throw new RequestValidationError(
                     'Request body should not be empty.',
                     'body'
-                )
+                );
             }
 
             // Generate unique project id.
@@ -97,7 +97,7 @@ export default class ProjectsController extends BaseController {
                         .join('-')
                         .toLowerCase()
                 )
-                .join('-')
+                .join('-');
 
             const proj = new ProjectModel({
                 name: req.body.name,
@@ -113,70 +113,70 @@ export default class ProjectsController extends BaseController {
                 owner: req.body.owner,
                 rank: StartingProjectRank,
                 verification_status: ProjectVerificationStatus.Unknown,
-            })
+            });
 
-            this._logger.info(`Creating project: ${proj}.`)
-            const newProj = await ProjectModel.create(proj)
-            this._logger.info(`Project created: ${newProj.project_id}.`)
-            res.status(HttpCodes.CREATED).json(newProj.toJSON())
+            this._logger.info(`Creating project: ${proj}.`);
+            const newProj = await ProjectModel.create(proj);
+            this._logger.info(`Project created: ${newProj.project_id}.`);
+            res.status(HttpCodes.CREATED).json(newProj.toJSON());
         } catch (err) {
-            next(err)
+            next(err);
         }
     }
 
     async vote(req, res, next) {
         try {
-            const { id } = req.params
+            const { id } = req.params;
             if (!id) {
                 throw new RequestValidationError(
                     'Project id should not be empty.',
                     'id'
-                )
+                );
             }
 
             const project = await ProjectModel.findOne({ project_id: id })
                 .where('verification_status')
                 .in([ProjectVerificationStatus.Described])
-                .exec()
+                .exec();
 
             if (!project)
                 throw new ObjectNotFoundError(
                     `Project ${id} does not exists or in incorrect state.`
-                )
+                );
 
-            const valid = this._wavesHelper.checkValidity(req.url)
+            const valid = this._wavesHelper.checkValidity(req.url);
             if (!valid) {
-                throw new RequestValidationError('Invalid signature.')
+                throw new RequestValidationError('Invalid signature.');
             }
 
-            const parsedUrl = parse(req.url, true)
-            const publicKey = parsedUrl.query.p
-            const walletAddress = parsedUrl.query.a
+            const parsedUrl = parse(req.url, true);
+            const publicKey = parsedUrl.query.p;
+            const walletAddress = parsedUrl.query.a;
 
             const validWallet = this._wavesHelper.addressValidate(
                 publicKey,
                 walletAddress
-            )
+            );
             if (!validWallet) {
                 throw new RequestValidationError(
                     `Waves wallet ${walletAddress} is not valid.`
-                )
+                );
             }
-            this._logger.info(`Waves wallet ${walletAddress} is valid.`)
+            this._logger.info(`Waves wallet ${walletAddress} is valid.`);
             const stake = await this._wavesHelper.checkAssetStake(
                 walletAddress,
                 this._config.votingAssetId
-            )
+            );
             this._logger.info(
                 `Waves wallet ${walletAddress} ${
                     this._config.votingTicker
                 } stake ${stake}.`
-            )
+            );
             if (stake < this._config.votingMinumumStake) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
                 ${this._config.votingTicker} stake less than ${
                     this._config.votingMinumumStake
-                }.`)
+                }.`);
             }
 
             const votedProj = await ProjectModel.findOne({
@@ -185,10 +185,10 @@ export default class ProjectsController extends BaseController {
                         waves_address: walletAddress,
                     },
                 },
-            })
+            });
             if (votedProj) {
                 throw new RequestValidationError(`Wallet ${walletAddress} 
-                has already voted for project ${votedProj.project_id}.`)
+                has already voted for project ${votedProj.project_id}.`);
             }
 
             const vote = {
@@ -196,9 +196,9 @@ export default class ProjectsController extends BaseController {
                 stake,
                 date: new Date(),
                 status: VoteStatus.Init,
-            }
-            project.votes.push(vote)
-            await project.save()
+            };
+            project.votes.push(vote);
+            await project.save();
             res.status(HttpCodes.CREATED).json(
                 JSON.stringify({
                     ...vote,
@@ -209,9 +209,9 @@ export default class ProjectsController extends BaseController {
                         ),
                     },
                 })
-            )
+            );
         } catch (err) {
-            next(err)
+            next(err);
         }
     }
 }

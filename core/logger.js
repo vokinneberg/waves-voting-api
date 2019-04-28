@@ -1,10 +1,10 @@
-import * as winston from 'winston'
-import config from './config'
+import * as winston from 'winston';
+import config from './config';
 
 const logFormat = winston.format.printf(
     ({ level, message, label, timestamp }) =>
         `${timestamp} [${label}] ${level}: ${message}`
-)
+);
 
 const logger = winston.createLogger({
     format: winston.format.combine(
@@ -23,12 +23,12 @@ const logger = winston.createLogger({
         }),
     ],
     exitOnError: false,
-})
+});
 
 logger.stream = {
     write(message) {
-        logger.info(message)
+        logger.info(message);
     },
-}
+};
 
-export default logger
+export default logger;

@@ -1,18 +1,18 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const ProjectVerificationStatus = {
     Unknown: 'Unknown',
     Described: 'Described',
     Verified: 'Verified',
     Suspicious: 'Suspicious',
-}
+};
 
 const ProjectStatus = {
     Idea: 'Idea',
     MVP: 'MVP',
     Business: 'Working business',
     DAOICO: 'TrustAmust DAOICO',
-}
+};
 
 const TokenMonetizationType = {
     ICO: 'ICO',
@@ -20,15 +20,15 @@ const TokenMonetizationType = {
     Private: 'Private Investors',
     Venture: 'Venture Investments',
     DAOICO: 'TrustAmust DAOICO',
-}
+};
 
 const VoteStatus = {
     Init: 'Init',
     NoFunds: 'No Funds',
     Settled: 'Settled',
-}
+};
 
-const StartingProjectRank = 0
+const StartingProjectRank = 0;
 
 const ProjectSchema = new mongoose.Schema(
     {
@@ -132,20 +132,21 @@ const ProjectSchema = new mongoose.Schema(
             ],
             default: ProjectVerificationStatus.Unknown,
         },
+        verification_transaction_id: String,
     },
     { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
-)
+);
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["__v", "_id"] }] */
 ProjectSchema.set('toJSON', {
     transform: (doc, ret) => {
-        delete ret._id
-        delete ret.__v
-        return ret
+        delete ret._id;
+        delete ret.__v;
+        return ret;
     },
-})
+});
 
-const ProjectModel = mongoose.model('Project', ProjectSchema)
+const ProjectModel = mongoose.model('Project', ProjectSchema);
 
 export {
     ProjectSchema,
@@ -155,4 +156,4 @@ export {
     StartingProjectRank,
     TokenMonetizationType,
     VoteStatus,
-}
+};

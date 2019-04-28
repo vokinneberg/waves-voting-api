@@ -18,12 +18,12 @@ const config = {
     votingAssetId:
         process.env.VOTING_ASSET_ID ||
         '9ck6zXLp6npJTNsy4oJKCR1W8tQgjVfjjDvxKqNtQFhX',
-    snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '* 5 * * *',
+    snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '*/1 * * * *',
     uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
     minioHost: process.env.MINIO_HOST || '104.248.101.178',
     minioPort: process.env.MINIO_PORT || 9000,
     minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
     minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ',
-}
+};
 
-export default config
+export default config;

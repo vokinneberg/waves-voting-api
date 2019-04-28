@@ -15,6 +15,7 @@ import logger from './core/logger';
 import config from './core/config';
 import ConnectionStringBuilder from './core/utils/db';
 import errorHandler from './core/middleware/errorHandler';
+import WavesHelper from './core/utils/waves';
 import SnapshotJob from './cron-jobs/snapshotJob';
 
 const app = express();
@@ -63,7 +64,8 @@ mongoose.connect(mongoConnString, {
   });
 });
 
-const snapshotJob = new SnapshotJob(logger, config);
+const wavesHelper = new WavesHelper(logger, config);
+const snapshotJob = new SnapshotJob(logger, config, wavesHelper);
 const job = new CronJob(config.snapshotCronPattern, () => {
   snapshotJob.run();
 });
