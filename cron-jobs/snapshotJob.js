@@ -18,7 +18,7 @@ export default class SnapshotJob {
             this._logger.info(`Cron-job SnapshotJob started.`);
 
             const projects = await ProjectModel.find({
-                status: ProjectVerificationStatus.Described,
+                verification_status: ProjectVerificationStatus.Described,
             });
 
             this._logger.info(`${projects.length} projects found.`);
