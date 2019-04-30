@@ -13,7 +13,7 @@ const config = {
   jwtVoteExpires: process.env.JWT_VOTE_EXPIRES || 5, // 5 minutes
   saltRounds: process.env.SALT_ROUNDS || 10,
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 100,
-  votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10000,
+  votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
   votingTicker: process.env.VOTING_TICKER || 'WCT-TEST',
   votingAssetId: process.env.VOTING_ASSET_ID || '9ck6zXLp6npJTNsy4oJKCR1W8tQgjVfjjDvxKqNtQFhX',
   snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '*/1 * * * *',

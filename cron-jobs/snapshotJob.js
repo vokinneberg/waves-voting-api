@@ -23,76 +23,63 @@ export default class SnapshotJob {
 
           const votes = await Promise.all(
             project.votes.map(async vote => {
+              // If there is no transaction id stored for the vote - Skip processing.
+              if (!vote.transaction_id) {
+                this._logger.info(
+                  `No transaction for vote with address ${vote.waves_address}. Skip processing.`
+                );
+                return vote;
+              }
+
+              const transaction = await this._wavesHelper.checkTransaction(vote.transaction_id);
+
+              // If there is no transaction in blockchain - Skip processing.
+              if (!transaction) {
+                this._logger.error(
+                  `Transaction ${vote.transaction_id} not found in blockchain. Skip processing.'`
+                );
+                return vote;
+              }
+
+              // Getting voting asset stake and calculate current vote rank.
               const stake = await this._wavesHelper.checkAssetStake(
                 vote.waves_address,
                 this._config.votingAssetId
               );
               this._logger.info(`Waves wallet ${vote.waves_address} stake ${stake}.`);
-              const currentVoteRank = Math.log(stake).toFixed(2);
-              this._logger.info(`Current vote rank ${currentVoteRank}.`);
-              switch (vote.status) {
-                case VoteStatus.Init:
-                  if (vote.transaction_id) {
-                    const transaction = await this._wavesHelper.checkTransaction(
-                      vote.transaction_id
-                    );
-                    if (!transaction) {
-                      this._logger.error(
-                        `Transaction ${
-                          vote.transaction_id
-                        } not found in blockchain. Skip processing.'`
-                      );
-                      break;
-                    }
-                    if (stake < this._config.votingMinumumStake) {
-                      this._logger.info('Not enough funds to confirm vote.');
-                      vote.status = VoteStatus.NoFunds;
-                    } else {
-                      this._logger.info(
-                        `Set vote ${vote.waves_address} rank ${currentVoteRank} to Settled.`
-                      );
-                      vote.rank = currentVoteRank;
-                      vote.status = VoteStatus.Settled;
-                    }
-                  } else {
-                    this._logger.info(
-                      `No transaction for vote with address ${vote.waves_address}.`
-                    );
-                  }
-                  break;
-                case VoteStatus.NoFunds:
-                  if (stake < this._config.votingMinumumStake) {
-                    this._logger.info('Not enough funds to confirm vote.');
-                  } else {
-                    this._logger.info(
-                      `Set set vote ${vote.waves_address} rank ${currentVoteRank} to Settled.`
-                    );
-                    vote.rank = currentVoteRank;
-                    vote.status = VoteStatus.Settled;
-                  }
-                  break;
-                case VoteStatus.Settled:
-                  if (stake < this._config.votingMinumumStake) {
-                    this._logger.info('Not enough funds. Revoke vote.');
-                    vote.rank = 0;
-                    vote.status = VoteStatus.NoFunds;
-                  }
-                  break;
-                default:
-                  this._logger.error('Unknown vote status.');
+
+              // If current user stake less then minimu required. Set vote rank to 0 and status to NoFunds.
+              if (stake < this._config.votingMinumumStake) {
+                this._logger.info('Not enough funds to vote.');
+                vote.stake = stake;
+                vote.rank = 0;
+                vote.status = VoteStatus.NoFunds;
+              } else {
+                // Otherwise update vote rank to the current one and set vote to Settled.
+                const currentVoteRank = Math.log(stake).toFixed(2);
+                this._logger.info(
+                  `Set set vote ${vote.waves_address} rank ${currentVoteRank} to Settled.`
+                );
+                vote.stake = stake;
+                vote.rank = currentVoteRank;
+                vote.status = VoteStatus.Settled;
               }
               return vote;
             })
           );
 
-          // Update project.
+          // Calculate project rank.
           const allVotes = votes.reduce((x, y) => ({
             rank: parseFloat(x.rank) + parseFloat(y.rank),
           }));
+
+          // If project rank changed - Update project.
           if (parseFloat(project.rank) !== parseFloat(allVotes.rank)) {
-            let prjVerStatus = project.verification_status;
+            let prjStatus = project.verification_status;
+
+            // If project rank reached verification threshold - Update project status to Verified.
             if (allVotes.rank >= this._config.votingMaximumRank) {
-              prjVerStatus = ProjectVerificationStatus.Verified;
+              prjStatus = ProjectVerificationStatus.Verified;
               this._logger.info(`Project ${project.project_id} Verified.`);
             }
             await ProjectModel.findOneAndUpdate(
@@ -100,7 +87,7 @@ export default class SnapshotJob {
               {
                 $set: {
                   rank: allVotes.rank,
-                  verification_status: prjVerStatus,
+                  verification_status: prjStatus,
                   votes,
                 },
               }

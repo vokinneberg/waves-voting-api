@@ -25,7 +25,9 @@ export default class WavesHelper {
 
   async checkAssetStake(wavesAddress, assetId) {
     const assetInfo = await this._waves.API.Node.assets.balance(wavesAddress, assetId);
-    return assetInfo.balance;
+    this._logger.info(JSON.stringify(assetInfo));
+    // TODO: Get rid of magic number 1. There should be used decimals proerty of asset.
+    return (assetInfo.balance / (1 * 10)).toFixed(1);
   }
 
   async checkTransaction(transactionId) {
