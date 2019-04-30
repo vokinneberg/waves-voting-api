@@ -134,6 +134,7 @@ ProjectSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret._id;
     delete ret.__v;
+    ret.rank = parseFloat(ret.rank);
     return ret;
   },
 });

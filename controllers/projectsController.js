@@ -44,7 +44,7 @@ export default class ProjectsController extends BaseController {
                 link: project.token.logo.link,
               },
             },
-            rank: project.rank,
+            rank: parseFloat(project.rank),
             verification_status: project.verification_status,
           };
         }),
