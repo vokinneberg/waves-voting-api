@@ -85,13 +85,11 @@ export default class SnapshotJob {
             })
           );
 
-          this._logger.info(JSON.stringify(votes));
-
           // Update project.
           const allVotes = votes.reduce((x, y) => ({
             rank: parseFloat(x.rank) + parseFloat(y.rank),
           }));
-          if (project.rank !== allVotes.rank) {
+          if (parseFloat(project.rank) !== parseFloat(allVotes.rank)) {
             let prjVerStatus = project.verification_status;
             if (allVotes.rank >= this._config.votingMaximumRank) {
               prjVerStatus = ProjectVerificationStatus.Verified;
