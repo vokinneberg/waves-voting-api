@@ -10,27 +10,19 @@ const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
 const jwtHelper = new JWTHelper(config);
 const wavesHelper = new WavesHelper(logger, config);
 const projectsContoller = new ProjectsController(
-    logger,
-    config,
-    projectsRepository,
-    wavesHelper,
-    jwtHelper
+  logger,
+  config,
+  projectsRepository,
+  wavesHelper,
+  jwtHelper
 );
 
 export default router => {
-    router
-        .route('/projects')
-        .get(projectsContoller.all.bind(projectsContoller));
+  router.route('/projects').get(projectsContoller.all.bind(projectsContoller));
 
-    router
-        .route('/projects/:id')
-        .get(projectsContoller.byId.bind(projectsContoller));
+  router.route('/projects/:id').get(projectsContoller.byId.bind(projectsContoller));
 
-    router
-        .route('/projects')
-        .post(projectsContoller.create.bind(projectsContoller));
+  router.route('/projects').post(projectsContoller.create.bind(projectsContoller));
 
-    router
-        .route('/projects/:id/vote')
-        .get(projectsContoller.vote.bind(projectsContoller));
+  router.route('/projects/:id/vote').get(projectsContoller.vote.bind(projectsContoller));
 };

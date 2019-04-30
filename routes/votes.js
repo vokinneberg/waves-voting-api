@@ -5,7 +5,7 @@ import VotesController from '../controllers/votesController';
 const votesContoller = new VotesController(logger, config);
 
 export default router => {
-    router
-        .route('/projects/:project_id/votes/:waves_address')
-        .put(votesContoller.update.bind(votesContoller));
+  router
+    .route('/projects/:project_id/votes/:waves_address')
+    .put(votesContoller.update.bind(votesContoller));
 };
