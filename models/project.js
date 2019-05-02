@@ -134,6 +134,7 @@ ProjectSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret._id;
     delete ret.__v;
+    ret.votes = ret.votes.map(vote => ({...vote, 'stake': parseFloat(vote.stake).toFixed(1), 'rank': parseFloat(vote.rank).toFixed(2) }));
     ret.rank = parseFloat(ret.rank);
     return ret;
   },
