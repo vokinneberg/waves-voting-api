@@ -86,14 +86,14 @@ export default class SnapshotJob {
               { project_id: project.project_id },
               {
                 $set: {
-                  rank: allVotes.rank,
+                  rank: allVotes.rank.toFixed(2),
                   verification_status: prjStatus,
                   votes,
                 },
               }
             );
             this._logger.info(
-              `Project ${project.project_id} rank ${project.rank} changed to ${allVotes.rank}.`
+              `Project ${project.project_id} rank ${project.rank} changed to ${allVotes.ranktoFixed(2)}.`
             );
           }
         })
