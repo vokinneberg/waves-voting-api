@@ -93,7 +93,7 @@ export default class SnapshotJob {
               }
             );
             this._logger.info(
-              `Project ${project.project_id} rank ${project.rank} changed to ${allVotes.ranktoFixed(2)}.`
+              `Project ${project.project_id} rank ${project.rank} changed to ${allVotes.rank.toFixed(2)}.`
             );
           }
         })
