@@ -16,6 +16,8 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Waves address should not be empty.', 'waves_address');
       }
 
+      this._logger.info(`Getting project ${projectId} vote with vaves address ${wavesAddress}.`);
+
       const project = await ProjectModel.findOne({
         project_id: projectId,
       });
