@@ -10,7 +10,7 @@ const config = {
   serverPort: process.env.SERVER_PORT || 8080,
   jwtSecret: process.env.JWT_SECRET || 'example',
   jwtAdminExpires: process.env.JWT_ADMIN_EXPIRES || 60 * 24, // 24 hour
-  jwtVoteExpires: process.env.JWT_VOTE_EXPIRES || 5, // 5 minutes
+  voteExpires: process.env.VOTE_EXPIRES || 1, // 1 minute
   saltRounds: process.env.SALT_ROUNDS || 10,
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 100,
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
