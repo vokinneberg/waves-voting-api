@@ -5,6 +5,37 @@ import RequestValidationError from '../core/errors/requestValidationError';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 
 export default class ProjectsController extends BaseController {
+  async getByWavesAddress(req, res, next) {
+    try {
+      const projectId = req.params.project_id;
+      const wavesAddress = req.params.waves_address;
+      if (!projectId) {
+        throw new RequestValidationError('Project id should not be empty.', 'project_id');
+      }
+      if (!wavesAddress) {
+        throw new RequestValidationError('Waves address should not be empty.', 'waves_address');
+      }
+
+      this._logger.info(`Getting project ${projectId} vote with vaves address ${wavesAddress}.`);
+
+      const project = await ProjectModel.findOne({
+        project_id: projectId,
+      });
+      if (!project) {
+        throw new ObjectNotFoundError(`Project ${projectId} not found.`);
+      }
+
+      const vote = project.votes.find(elem => elem.waves_address === wavesAddress);
+      if (!vote) {
+        throw new ObjectNotFoundError(`Vote from waves address ${wavesAddress} not found.`);
+      }
+
+      res.status(HttpCodes.OK).json(JSON.stringify(vote));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async update(req, res, next) {
     try {
       const projectId = req.params.project_id;
