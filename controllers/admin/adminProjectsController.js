@@ -34,7 +34,7 @@ export default class AdminProjectsController extends ProjectsController {
       }
 
       this._logger.info(`Confirm project ${id}.`);
-      const project = await this._projectsRepository.findByProjectId(id);
+      const project = await this._projectsRepository.findOne(id);
 
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);

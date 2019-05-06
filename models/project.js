@@ -90,23 +90,25 @@ const ProjectSchema = new mongoose.Schema(
       },
     ],
     votes: [
-      {
-        waves_address: {
-          type: String,
-          unique: true,
-          sparse: true,
-          tags: { type: [String], index: true },
+      new mongoose.Schema(
+        {
+          waves_address: {
+            type: String,
+            unique: true,
+            sparse: true,
+            tags: { type: [String], index: true },
+          },
+          stake: { type: mongoose.Types.Decimal128, default: 0 },
+          transaction_id: String,
+          rank: { type: mongoose.Types.Decimal128, default: 0 },
+          status: {
+            type: String,
+            enum: [VoteStatus.Init, VoteStatus.NoFunds, VoteStatus.Settled],
+            default: VoteStatus.Init,
+          },
         },
-        stake: { type: mongoose.Types.Decimal128, default: 0.0 },
-        date: Date,
-        transaction_id: String,
-        rank: { type: mongoose.Types.Decimal128, default: 0.0 },
-        status: {
-          type: String,
-          enum: [VoteStatus.Init, VoteStatus.NoFunds, VoteStatus.Settled],
-          default: VoteStatus.Init,
-        },
-      },
+        { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
+      ),
     ],
     owner: {
       name: String,

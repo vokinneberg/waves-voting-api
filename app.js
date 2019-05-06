@@ -17,6 +17,9 @@ import ConnectionStringBuilder from './core/utils/db';
 import errorHandler from './core/middleware/errorHandler';
 import WavesHelper from './core/utils/waves';
 import SnapshotJob from './cron-jobs/snapshotJob';
+import { ProjectSchema } from './models/project';
+import ProjectsRepository from './repository/projectsRepository';
+import CleanUpJob from './cron-jobs/cleanUpJob';
 
 const app = express();
 const router = express.Router();
@@ -64,12 +67,19 @@ mongoose.connect(mongoConnString, {
   });
 });
 
+// Snapshot Job.
 const wavesHelper = new WavesHelper(logger, config);
 const snapshotJob = new SnapshotJob(logger, config, wavesHelper);
-const job = new CronJob(config.snapshotCronPattern, () => {
+new CronJob(config.snapshotCronPattern, () => {
   snapshotJob.run();
-});
-job.start();
+}).start();
+
+// Clean up Job.
+const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
+const cleanUpJob = new CleanUpJob(logger, config, projectsRepository);
+new CronJob(config.cleanUpCronPattern, () => {
+  cleanUpJob.run();
+}).start();
 
 const port = config.serverPort;
 const server = app.listen(port, () => logger.info(`App listening on port ${port}!`));

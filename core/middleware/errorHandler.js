@@ -12,7 +12,7 @@ export default class ErrorHandler {
           options.logger.error(`${err.name} - ${err.message}. Stack trace: ${err.stack}.`);
         }
         let error = err;
-        if (err instanceof mongoose.Error) {
+        if (err instanceof mongoose.Error || err.name === 'MongoError') {
           error = new DatabaseError(err.message);
         }
         if (err.name === 'S3Error') {

@@ -48,14 +48,14 @@ export default class SnapshotJob {
               );
               this._logger.info(`Waves wallet ${vote.waves_address} stake ${stake}.`);
 
-              // If current user stake less then minimu required. Set vote rank to 0 and status to NoFunds.
+              // If current user stake less then minimum required. Set vote rank to 0 and status to NoFunds.
               if (stake < this._config.votingMinumumStake) {
                 this._logger.info('Not enough funds to vote.');
                 vote.stake = stake;
                 vote.rank = 0;
                 vote.status = VoteStatus.NoFunds;
               } else {
-                // Otherwise update vote rank to the current one and set vote to Settled.
+                // Otherwise update vote rank to the current and set vote to Settled.
                 const currentVoteRank = Math.log(stake).toFixed(2);
                 this._logger.info(
                   `Set set vote ${vote.waves_address} rank ${currentVoteRank} to Settled.`
