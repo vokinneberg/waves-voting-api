@@ -15,7 +15,7 @@ export default class AdminProjectsController extends ProjectsController {
           name: project.name,
           project_id: project.project_id,
           owner: project.owner,
-          rank: project.rank,
+          rank: parseFloat(project.rank),
           verification_status: project.verification_status,
           created_at: project.created_at,
         })),
