@@ -17,6 +17,7 @@ export default class SnapshotJob {
 
       this._logger.info(`${projects.length} projects found.`);
 
+      let update = false;
       await Promise.all(
         projects.map(async project => {
           this._logger.info(`Current project ${project.project_id} rank ${project.rank}.`);
@@ -54,6 +55,7 @@ export default class SnapshotJob {
                 vote.stake = stake;
                 vote.rank = 0;
                 vote.status = VoteStatus.NoFunds;
+                update = true;
               } else {
                 // Otherwise update vote rank to the current and set vote to Settled.
                 const currentVoteRank = Math.log(stake).toFixed(2);
@@ -63,23 +65,25 @@ export default class SnapshotJob {
                 vote.stake = stake;
                 vote.rank = currentVoteRank;
                 vote.status = VoteStatus.Settled;
+                update = true;
               }
               return vote;
             })
           );
 
-          // Calculate project rank.
-          const allVotes = votes.reduce(
-            (x, y) => ({
-              rank: parseFloat(x.rank) + parseFloat(y.rank),
-            }),
-            0
-          );
-
           // If project rank changed - Update project.
-          if (parseFloat(project.rank) !== parseFloat(allVotes.rank)) {
-            let prjStatus = project.verification_status;
+          if (update) {
+            // Calculate project rank.
+            let allVotes = {};
+            if (votes.length > 1) {
+              allVotes = votes.reduce((x, y) => ({
+                rank: parseFloat(x.rank) + parseFloat(y.rank),
+              }));
+            } else {
+              allVotes.rank = parseFloat(votes[0].rank);
+            }
 
+            let prjStatus = project.verification_status;
             // If project rank reached verification threshold - Update project status to Verified.
             if (allVotes.rank >= this._config.votingMaximumRank) {
               prjStatus = ProjectVerificationStatus.Verified;
