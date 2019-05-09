@@ -2,11 +2,24 @@ import BaseRepository from './baseRepository';
 
 export default class ProjectsRepository extends BaseRepository {
   async findOne(conditions) {
-    return this._collection.findOne(conditions);
+    return this._collection.findOne(conditions).exec();
   }
 
   async find(conditions) {
-    return this._collection.find(conditions);
+    return this._collection.find(conditions).exec();
+  }
+
+  async findInStatus(statuses) {
+    return this._collection.where('verification_status')
+      .in(statuses)
+      .exec();
+  }
+
+  async findOneInStatus(condition, statuses) {
+    return this._collection.findOne(condition)
+      .where('verification_status')
+      .in(statuses)
+      .exec();
   }
 
   async update(id, entity) {

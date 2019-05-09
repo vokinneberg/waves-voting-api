@@ -15,7 +15,7 @@ const config = {
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 100,
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
   votingTicker: process.env.VOTING_TICKER || 'WCT-TEST',
-  votingAssetId: process.env.VOTING_ASSET_ID || '9ck6zXLp6npJTNsy4oJKCR1W8tQgjVfjjDvxKqNtQFhX',
+  votingAssetId: process.env.VOTING_ASSET_ID || '38YkE3dEYHayoH9XUriWo1LkgWnXQAmuTLoEQ26GTmDE',
   snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '*/5 * * * *',
   cleanUpCronPattern: process.env.CLEAN_UP_CRON_PATTERN || '*/1 * * * *',
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',

@@ -1,11 +1,6 @@
 import HttpCodes from 'http-status-codes';
 import parse from 'url-parse';
-import {
-  ProjectModel,
-  ProjectVerificationStatus,
-  StartingProjectRank,
-  VoteStatus,
-} from '../models/project';
+import { ProjectVerificationStatus, StartingProjectRank, VoteStatus, ProjectModel } from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';
@@ -22,9 +17,10 @@ export default class ProjectsController extends BaseController {
 
   async all(req, res, next) {
     try {
-      const projects = await ProjectModel.where('verification_status')
-        .in([ProjectVerificationStatus.Described, ProjectVerificationStatus.Verified])
-        .exec();
+      const projects = await this._projectsRepository.findInStatus([
+        ProjectVerificationStatus.Described,
+        ProjectVerificationStatus.Verified,
+      ]);
 
       this._logger.info(projects);
       res.status(HttpCodes.OK).json({
@@ -62,7 +58,7 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      const project = await ProjectModel.findOne({ project_id: id });
+      const project = await this._projectsRepository.findOne({ project_id: id });
 
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
@@ -92,7 +88,7 @@ export default class ProjectsController extends BaseController {
         )
         .join('-');
 
-      const proj = new ProjectModel({
+      const proj = {
         name: req.body.name,
         project_id: projectId,
         short_description: req.body.short_description,
@@ -106,10 +102,10 @@ export default class ProjectsController extends BaseController {
         owner: req.body.owner,
         rank: StartingProjectRank,
         verification_status: ProjectVerificationStatus.Unknown,
-      });
+      };
 
-      this._logger.info(`Creating project: ${proj}.`);
-      const newProj = await ProjectModel.create(proj);
+      this._logger.info(`Creating project: ${projectId}.`);
+      const newProj = await this._projectsRepository.create(proj);
       this._logger.info(`Project created: ${newProj.project_id}.`);
       res.status(HttpCodes.CREATED).json(newProj.toJSON());
     } catch (err) {
@@ -124,10 +120,9 @@ export default class ProjectsController extends BaseController {
         throw new RequestValidationError('Project id should not be empty.', 'id');
       }
 
-      const project = await ProjectModel.findOne({ project_id: id })
-        .where('verification_status')
-        .in([ProjectVerificationStatus.Described])
-        .exec();
+      const project = await this._projectsRepository.findOneInStatus({ project_id: id }, [
+        ProjectVerificationStatus.Described,
+      ]);
 
       if (!project)
         throw new ObjectNotFoundError(`Project ${id} does not exists or in incorrect state.`);
@@ -164,7 +159,7 @@ export default class ProjectsController extends BaseController {
         );
       }
 
-      const votedProj = await ProjectModel.findOne({
+      const votedProj = await this._projectsRepository.findOne({
         votes: {
           $elemMatch: {
             waves_address: walletAddress,
