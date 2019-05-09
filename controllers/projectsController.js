@@ -1,6 +1,6 @@
 import HttpCodes from 'http-status-codes';
 import parse from 'url-parse';
-import { ProjectVerificationStatus, StartingProjectRank, VoteStatus, ProjectModel } from '../models/project';
+import { ProjectVerificationStatus, StartingProjectRank, VoteStatus } from '../models/project';
 import BaseController from './baseController';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 import RequestValidationError from '../core/errors/requestValidationError';

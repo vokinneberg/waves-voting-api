@@ -10,13 +10,15 @@ export default class ProjectsRepository extends BaseRepository {
   }
 
   async findInStatus(statuses) {
-    return this._collection.where('verification_status')
+    return this._collection
+      .where('verification_status')
       .in(statuses)
       .exec();
   }
 
   async findOneInStatus(condition, statuses) {
-    return this._collection.findOne(condition)
+    return this._collection
+      .findOne(condition)
       .where('verification_status')
       .in(statuses)
       .exec();
