@@ -53,7 +53,7 @@ export default class VotesController extends BaseController {
 
       this._logger.info(`Updating project ${projectId} vote with vaves address ${wavesAddress}.`);
 
-      const project = await this.__projectRepository.findOne({
+      const project = await this._projectsRepository.findOne({
         project_id: projectId,
       });
       if (!project) {
