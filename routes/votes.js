@@ -1,13 +1,14 @@
 import logger from '../core/logger';
 import config from '../core/config';
+import { ProjectSchema } from '../models/project';
+import ProjectsRepository from '../repository/projectsRepository';
 import VotesController from '../controllers/votesController';
 
-const votesContoller = new VotesController(logger, config);
+const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
+const votesContoller = new VotesController(logger, config, projectsRepository);
 
 export default router => {
-  router
-    .route('/projects/:project_id/votes/:waves_address')
-    .get(votesContoller.getByWavesAddress.bind(votesContoller));
+  router.route('/votes/:waves_address').get(votesContoller.getByWavesAddress.bind(votesContoller));
 
   router
     .route('/projects/:project_id/votes/:waves_address')

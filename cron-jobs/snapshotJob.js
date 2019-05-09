@@ -69,9 +69,12 @@ export default class SnapshotJob {
           );
 
           // Calculate project rank.
-          const allVotes = votes.reduce((x, y) => ({
-            rank: parseFloat(x.rank) + parseFloat(y.rank),
-          }));
+          const allVotes = votes.reduce(
+            (x, y) => ({
+              rank: parseFloat(x.rank) + parseFloat(y.rank),
+            }),
+            0
+          );
 
           // If project rank changed - Update project.
           if (parseFloat(project.rank) !== parseFloat(allVotes.rank)) {

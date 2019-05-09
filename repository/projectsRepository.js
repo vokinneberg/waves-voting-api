@@ -1,12 +1,12 @@
 import BaseRepository from './baseRepository';
 
 export default class ProjectsRepository extends BaseRepository {
-  async findOne(id) {
-    return this._collection.findOne({ project_id: id });
+  async findOne(conditions) {
+    return this._collection.findOne(conditions);
   }
 
-  async find() {
-    return this._collection.find({});
+  async find(conditions) {
+    return this._collection.find(conditions);
   }
 
   async update(id, entity) {

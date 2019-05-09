@@ -43,18 +43,20 @@ export default class AdminAuthController extends BaseController {
       if (!user) {
         throw new ObjectNotFoundError(`User email:${email} not found`);
       } else {
-        const match = await new Promise((resolve, reject) => bcrypt.compare(
-          password, user.hashedPassword, (error, resp) => {
-            if (error) { reject(error); }
+        const match = await new Promise((resolve, reject) =>
+          bcrypt.compare(password, user.hashedPassword, (error, resp) => {
+            if (error) {
+              reject(error);
+            }
             resolve(resp);
-          },
-        ));
+          })
+        );
 
         if (!match) throw new UnauthorizedError('Wrong password!');
 
         const token = this.jwtHelper.generateToken(
           { email: user.email },
-          this._config.jwtAdminExpires,
+          this._config.jwtAdminExpires
         );
         res.status(HttpCodes.OK).json({ JWT: token });
       }

@@ -34,7 +34,7 @@ export default class AdminProjectsController extends ProjectsController {
       }
 
       this._logger.info(`Confirm project ${id}.`);
-      const project = await this._projectsRepository.findOne(id);
+      const project = await this._projectsRepository.findOne({ project_id: id });
 
       if (!project) {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
@@ -63,6 +63,29 @@ export default class AdminProjectsController extends ProjectsController {
         throw new ObjectNotFoundError(`Project ${id} not found.`);
       } else {
         project.verification_status = ProjectVerificationStatus.Suspicious;
+        project.save();
+        res.status(HttpCodes.OK).json(project.toJSON());
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async revoke(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        throw new RequestValidationError('Project id should not be empty.', 'id');
+      }
+
+      this._logger.info(`Reject project ${id}.`);
+      const project = await ProjectModel.findOne({ project_id: id });
+
+      if (!project) {
+        throw new ObjectNotFoundError(`Project ${id} not found.`);
+      } else {
+        project.verification_status = ProjectVerificationStatus.Unknown;
         project.save();
         res.status(HttpCodes.OK).json(project.toJSON());
       }
@@ -100,7 +123,7 @@ export default class AdminProjectsController extends ProjectsController {
         project.token = req.body.token;
         project.team = req.body.team;
         project.owner = req.body.owner;
-        project.save((err) => {
+        project.save(err => {
           if (err) throw err;
           res.status(HttpCodes.OK).json(project.toJSON());
         });

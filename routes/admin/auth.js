@@ -6,8 +6,6 @@ import JWTHelper from '../../core/utils/jwt';
 const jwtHelper = new JWTHelper(config);
 const adminAuthController = new AdminAuthController(logger, config, jwtHelper);
 
-export default (adminRouter) => {
-  adminRouter
-    .route('/auth')
-    .post(adminAuthController.auth.bind(adminAuthController));
+export default adminRouter => {
+  adminRouter.route('/auth').post(adminAuthController.auth.bind(adminAuthController));
 };

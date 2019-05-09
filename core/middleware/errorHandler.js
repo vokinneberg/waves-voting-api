@@ -24,7 +24,9 @@ export default class ErrorHandler {
         if (error.status) {
           res.status(error.status).send({ code: error.code, message: error.message });
         } else {
-          res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ code: 'internal_error', message: 'Something went wrong!' });
+          res
+            .status(httpStatus.INTERNAL_SERVER_ERROR)
+            .send({ code: 'internal_error', message: 'Something went wrong!' });
         }
       }
       next();

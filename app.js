@@ -7,7 +7,7 @@ import morgan from 'morgan';
 import uuidv4 from 'uuid';
 import { createLightship } from 'lightship';
 import { CronJob } from 'cron';
-import "@babel/polyfill";
+import '@babel/polyfill';
 
 import routes from './routes';
 import adminRoutes from './routes/admin';
@@ -36,7 +36,12 @@ app.use((err, req, res, next) => {
   next();
 });
 morgan.token('id', req => req.id);
-app.use(morgan(':id :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', { stream: logger.stream }));
+app.use(
+  morgan(
+    ':id :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms',
+    { stream: logger.stream }
+  )
+);
 const exprJwt = expressJwt({
   secret: config.jwtSecret,
   getToken: function fromHeader(req) {
@@ -56,16 +61,19 @@ app.use(errorHandler.handleError({ logger }));
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
 const mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
-mongoose.connect(mongoConnString, {
-  useNewUrlParser: true,
-}).then(() => {
-  logger.info('Successfully connected to the database');
-}).catch((err) => {
-  logger.error('Could not connect to the database. Exiting now...', {
-    message: err.message,
-    stack: err.stack,
+mongoose
+  .connect(mongoConnString, {
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    logger.info('Successfully connected to the database');
+  })
+  .catch(err => {
+    logger.error('Could not connect to the database. Exiting now...', {
+      message: err.message,
+      stack: err.stack,
+    });
   });
-});
 
 // Snapshot Job.
 const wavesHelper = new WavesHelper(logger, config);

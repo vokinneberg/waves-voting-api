@@ -9,7 +9,9 @@ export default class WavesHelper {
   constructor(logger, config) {
     this._logger = logger;
     this._config = config;
-    this._waves = WavesAPI.create(this._config.nodeEnv === 'development' ? WavesAPI.TESTNET_CONFIG : WavesAPI.MAINNET_CONFIG);
+    this._waves = WavesAPI.create(
+      this._config.nodeEnv === 'development' ? WavesAPI.TESTNET_CONFIG : WavesAPI.MAINNET_CONFIG
+    );
     this._crypto = sg.utils.crypto;
     this._base58 = sg.libs.base58;
     this._jwt = new JWTUtil(config);
@@ -26,7 +28,7 @@ export default class WavesHelper {
   async checkAssetStake(wavesAddress, assetId) {
     const assetInfo = await this._waves.API.Node.assets.balance(wavesAddress, assetId);
     this._logger.info(JSON.stringify(assetInfo));
-    // TODO: Get rid of magic number 1. There should be used decimals proerty of asset.
+    // TODO: Get rid of magic number 1. There should be used decimals property of asset.
     return (assetInfo.balance / (1 * 10)).toFixed(1);
   }
 
@@ -63,7 +65,7 @@ export default class WavesHelper {
 
   addressValidate(publicKey, address) {
     const addressFromPublicKey = this._waves.tools.getAddressFromPublicKey(publicKey);
-    return (addressFromPublicKey === address);
+    return addressFromPublicKey === address;
   }
 
   _authValidate(data, sign, publicKey) {
@@ -75,7 +77,6 @@ export default class WavesHelper {
       data: data.data,
     });
 
-    return byteGen.getBytes()
-      .then(bytes => this._crypto.isValidSignature(bytes, sign, publicKey));
+    return byteGen.getBytes().then(bytes => this._crypto.isValidSignature(bytes, sign, publicKey));
   }
 }

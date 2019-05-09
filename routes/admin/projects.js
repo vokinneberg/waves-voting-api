@@ -7,10 +7,8 @@ import AdminProjectsController from '../../controllers/admin/adminProjectsContro
 const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
 const adminProjectsController = new AdminProjectsController(logger, config, projectsRepository);
 
-export default (adminRouter) => {
-  adminRouter
-    .route('/projects')
-    .get(adminProjectsController.all.bind(adminProjectsController));
+export default adminRouter => {
+  adminRouter.route('/projects').get(adminProjectsController.all.bind(adminProjectsController));
 
   adminRouter
     .route('/projects/:id')
@@ -23,6 +21,10 @@ export default (adminRouter) => {
   adminRouter
     .route('/projects/:id/reject')
     .put(adminProjectsController.reject.bind(adminProjectsController));
+
+  adminRouter
+    .route('/projects/:id/revoke')
+    .put(adminProjectsController.revoke.bind(adminProjectsController));
 
   adminRouter
     .route('/projects/:id')

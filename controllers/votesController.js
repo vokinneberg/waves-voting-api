@@ -1,28 +1,29 @@
 import HttpCodes from 'http-status-codes';
-import { ProjectModel } from '../models/project';
 import BaseController from './baseController';
 import RequestValidationError from '../core/errors/requestValidationError';
 import ObjectNotFoundError from '../core/errors/objectNotFoundError';
 
-export default class ProjectsController extends BaseController {
+export default class VotesController extends BaseController {
+  constructor(logger, config, projectsRepository) {
+    super(logger, config);
+    this._projectsRepository = projectsRepository;
+  }
+
   async getByWavesAddress(req, res, next) {
     try {
-      const projectId = req.params.project_id;
       const wavesAddress = req.params.waves_address;
-      if (!projectId) {
-        throw new RequestValidationError('Project id should not be empty.', 'project_id');
-      }
       if (!wavesAddress) {
         throw new RequestValidationError('Waves address should not be empty.', 'waves_address');
       }
 
-      this._logger.info(`Getting project ${projectId} vote with vaves address ${wavesAddress}.`);
-
-      const project = await ProjectModel.findOne({
-        project_id: projectId,
+      const project = await this._projectsRepository.findOne({
+        'votes.waves_address': wavesAddress,
       });
+      this._logger.info(JSON.stringify(project));
       if (!project) {
-        throw new ObjectNotFoundError(`Project ${projectId} not found.`);
+        throw new ObjectNotFoundError(
+          `Project with vote from waves address ${wavesAddress} not found.`
+        );
       }
 
       const vote = project.votes.find(elem => elem.waves_address === wavesAddress);
@@ -52,7 +53,7 @@ export default class ProjectsController extends BaseController {
 
       this._logger.info(`Updating project ${projectId} vote with vaves address ${wavesAddress}.`);
 
-      const project = await ProjectModel.findOne({
+      const project = await this.__projectRepository.findOne({
         project_id: projectId,
       });
       if (!project) {

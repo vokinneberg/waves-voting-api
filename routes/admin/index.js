@@ -1,7 +1,7 @@
 import projects from './projects';
 import auth from './auth';
 
-export default (adminRouter) => {
+export default adminRouter => {
   auth(adminRouter);
   projects(adminRouter);
 };
