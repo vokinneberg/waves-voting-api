@@ -20,6 +20,7 @@ import SnapshotJob from './cron-jobs/snapshotJob';
 import { ProjectSchema } from './models/project';
 import ProjectsRepository from './repository/projectsRepository';
 import CleanUpJob from './cron-jobs/cleanUpJob';
+import JWTHelper from './core/utils/jwt';
 
 const app = express();
 const router = express.Router();
@@ -76,7 +77,8 @@ mongoose
   });
 
 // Snapshot Job.
-const wavesHelper = new WavesHelper(logger, config);
+const jwtHelper = new JWTHelper(config.jwtSecret);
+const wavesHelper = new WavesHelper(logger, config, jwtHelper);
 const snapshotJob = new SnapshotJob(logger, config, wavesHelper);
 new CronJob(config.snapshotCronPattern, () => {
   snapshotJob.run();

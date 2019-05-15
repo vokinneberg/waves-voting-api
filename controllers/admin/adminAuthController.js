@@ -58,7 +58,9 @@ export default class AdminAuthController extends BaseController {
           { email: user.email },
           this._config.jwtAdminExpires
         );
-        res.status(HttpCodes.OK).json({ JWT: token });
+        res
+          .status(HttpCodes.OK)
+          .json({ access_token: token, expires_in: this._config.jwtAdminExpires });
       }
     } catch (err) {
       next(err);

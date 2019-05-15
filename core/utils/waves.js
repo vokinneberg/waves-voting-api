@@ -1,12 +1,11 @@
 import URL from 'url';
-import JWTUtil from './jwt';
 
 // TODO: Does not work with import. Fix later.
 const WavesAPI = require('@waves/waves-api');
 const sg = require('@waves/signature-generator');
 
 export default class WavesHelper {
-  constructor(logger, config) {
+  constructor(logger, config, jwtUtil) {
     this._logger = logger;
     this._config = config;
     this._waves = WavesAPI.create(
@@ -14,7 +13,7 @@ export default class WavesHelper {
     );
     this._crypto = sg.utils.crypto;
     this._base58 = sg.libs.base58;
-    this._jwt = new JWTUtil(config);
+    this._jwt = jwtUtil;
 
     const { StringWithLength } = sg;
     /* eslint new-cap: ["error", { "newIsCap": false }] */
@@ -36,7 +35,7 @@ export default class WavesHelper {
     return this._waves.API.Node.transactions.get(transactionId);
   }
 
-  checkValidity(url) {
+  async checkValidity(url) {
     // Get redirect url and parse it.
     const signedData = {
       host: this._config.serverHost,
@@ -68,7 +67,7 @@ export default class WavesHelper {
     return addressFromPublicKey === address;
   }
 
-  _authValidate(data, sign, publicKey) {
+  async _authValidate(data, sign, publicKey) {
     const prefix = 'WavesWalletAuthentication';
 
     const byteGen = new this._generator({
@@ -77,6 +76,7 @@ export default class WavesHelper {
       data: data.data,
     });
 
-    return byteGen.getBytes().then(bytes => this._crypto.isValidSignature(bytes, sign, publicKey));
+    const bytes = await byteGen.getBytes();
+    return this._crypto.isValidSignature(bytes, sign, publicKey);
   }
 }

@@ -3,7 +3,7 @@ import config from '../../core/config';
 import AdminAuthController from '../../controllers/admin/adminAuthController';
 import JWTHelper from '../../core/utils/jwt';
 
-const jwtHelper = new JWTHelper(config);
+const jwtHelper = new JWTHelper(config.jwtSecret);
 const adminAuthController = new AdminAuthController(logger, config, jwtHelper);
 
 export default adminRouter => {

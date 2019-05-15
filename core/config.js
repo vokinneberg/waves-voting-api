@@ -9,8 +9,8 @@ const config = {
   dbPassword: process.env.DB_PASSWORD,
   serverPort: process.env.SERVER_PORT || 8080,
   jwtSecret: process.env.JWT_SECRET || 'example',
-  jwtAdminExpires: process.env.JWT_ADMIN_EXPIRES || 60 * 24, // 24 hour
-  voteExpires: process.env.VOTE_EXPIRES || 1, // 1 minute
+  jwtAdminExpires: process.env.JWT_ADMIN_EXPIRES || 60 * 60 * 24, // 24 hour
+  voteExpires: process.env.VOTE_EXPIRES || 60, // 1 minute
   saltRounds: process.env.SALT_ROUNDS || 10,
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 100,
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,

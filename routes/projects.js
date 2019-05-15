@@ -7,8 +7,8 @@ import WavesHelper from '../core/utils/waves';
 import JWTHelper from '../core/utils/jwt';
 
 const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
-const jwtHelper = new JWTHelper(config);
-const wavesHelper = new WavesHelper(logger, config);
+const jwtHelper = new JWTHelper(config.jwtSecret);
+const wavesHelper = new WavesHelper(logger, config, jwtHelper);
 const projectsContoller = new ProjectsController(
   logger,
   config,
