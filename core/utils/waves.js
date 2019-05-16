@@ -1,5 +1,5 @@
 import URL from 'url';
-/*eslint import/no-unresolved: 0*/
+/* eslint import/no-unresolved: 0 */
 import { data, broadcast } from '@waves/waves-transactions';
 
 // TODO: Does not work with import. Fix later.
