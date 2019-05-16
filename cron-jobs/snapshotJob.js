@@ -84,9 +84,12 @@ export default class SnapshotJob {
             }
 
             let prjStatus = project.verification_status;
+            let verificationTrxId = '';
             // If project rank reached verification threshold - Update project status to Verified.
             if (allVotes.rank >= this._config.votingMaximumRank) {
               prjStatus = ProjectVerificationStatus.Verified;
+              // Write verificatiob status to blockchain.
+              verificationTrxId = await this._wavesHelper.writeVerificationData(project);
               this._logger.info(`Project ${project.project_id} Verified.`);
             }
             await ProjectModel.findOneAndUpdate(
@@ -95,6 +98,7 @@ export default class SnapshotJob {
                 $set: {
                   rank: allVotes.rank.toFixed(2),
                   verification_status: prjStatus,
+                  verification_transaction_id: verificationTrxId,
                   votes,
                 },
               }
@@ -110,7 +114,11 @@ export default class SnapshotJob {
 
       this._logger.info(`Cron-job SnapshotJob finished.`);
     } catch (error) {
-      this._logger.error(`SnapshotJob execution Error: ${error}.`);
+      if (error.tx) {
+        this._logger.error(`SnapshotJob execution Error: ${JSON.stringify(error)}.`);
+      } else {
+        this._logger.error(`SnapshotJob execution Error: ${error}.`);
+      }
     }
   }
 }
