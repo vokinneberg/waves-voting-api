@@ -30,6 +30,11 @@ export default class WavesHelper {
     this._logger.info('Create verification data transaction.');
     const verifiedAssetData = [
       {
+        key: `version_<${project.token.id}>`, // token ID
+        type: 'integer',
+        value: 1,
+      },
+      {
         key: `status_id_<${project.token.id}>`, // token ID
         type: 'integer',
         value: 2, // status
