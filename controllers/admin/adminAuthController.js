@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import HttpCodes from 'http-status-codes';
 import BaseController from '../baseController';
 import UserModel from '../../models/user';
