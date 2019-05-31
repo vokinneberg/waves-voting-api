@@ -31,6 +31,7 @@ lint_job:
   script: 
     - apk update
     - apk add --no-cache --virtual .build-deps libstdc++ binutils-gold curl g++ git gcc gnupg libgcc linux-headers make python libc6-compat bash
+    - npm i
     - npm i eslint
     - npm i prettier
     - npm i eslint-config-prettier
