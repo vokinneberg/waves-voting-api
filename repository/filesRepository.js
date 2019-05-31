@@ -22,10 +22,10 @@ export default class FilesRepository extends BaseRepository {
   async create(data) {
     let mimeType;
     const ft = fileType(data);
-    if (ft) {
-      mimeType = ft.mime;
-    } else if (isSvg(data)) {
+    if (isSvg(data)) {
       mimeType = 'image/svg+xml';
+    } else if (ft) {
+      mimeType = ft.mime;
     }
 
     if (!mimeType) throw new RequestValidationError('File type is not suppoted.');
