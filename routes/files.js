@@ -2,7 +2,9 @@ import { Client } from 'minio';
 import Multer from 'multer';
 import logger from '../core/logger';
 import config from '../core/config';
+import FileSchema from '../models/file';
 import FilesController from '../controllers/filesController';
+import FilesRepository from '../repository/filesRepository';
 
 const minioClient = new Client({
   endPoint: config.minioHost,
@@ -11,7 +13,8 @@ const minioClient = new Client({
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey,
 });
-const filesContoller = new FilesController(minioClient, logger, config);
+const filesRepository = new FilesRepository('File', FileSchema, minioClient);
+const filesContoller = new FilesController(logger, config, filesRepository);
 
 export default router => {
   router.route('/files/:name').get(filesContoller.get.bind(filesContoller));

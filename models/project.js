@@ -77,6 +77,10 @@ const ProjectSchema = new mongoose.Schema(
         name: String,
         link: String,
       },
+      svg_logo: {
+        name: String,
+        link: String,
+      },
     },
     team: [
       {

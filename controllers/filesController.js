@@ -1,18 +1,16 @@
 import HttpCodes from 'http-status-codes';
-import Base64Helper from '../core/utils/base64';
 import BaseController from './baseController';
 
 export default class FilesController extends BaseController {
-  constructor(minio, logger, config) {
+  constructor(logger, config, filesRepository) {
     super(logger, config);
-    this._minioClient = minio;
+    this._filesRepository = filesRepository;
   }
 
   async upload(req, res, next) {
     try {
-      const fileName = Base64Helper.generateUniqueString();
-      await this._minioClient.putObject('trustamust', fileName, req.file.buffer);
-      res.status(HttpCodes.CREATED).json({ file: fileName });
+      const file = await this._filesRepository.create(req.file.buffer);
+      res.status(HttpCodes.CREATED).json({ file: file.name });
     } catch (err) {
       next(err);
     }
@@ -20,8 +18,9 @@ export default class FilesController extends BaseController {
 
   async get(req, res, next) {
     try {
-      const stream = await this._minioClient.getObject('trustamust', req.params.name);
-      stream.pipe(res);
+      const file = await this._filesRepository.get(req.params.name);
+      res.set('Content-Type', file.mime_type);
+      file.stream.pipe(res);
     } catch (err) {
       next(err);
     }
