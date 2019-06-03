@@ -1,7 +1,7 @@
 import URL from 'url';
 /* eslint import/no-unresolved: 0 */
 import { data, broadcast } from '@waves/waves-transactions';
-import Base64Helper from '../../core/utils/base64';
+import Base64Helper from './base64';
 
 // TODO: Does not work with import. Fix later.
 const WavesAPI = require('@waves/waves-api');
