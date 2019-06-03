@@ -1,10 +1,11 @@
 import { ProjectModel, ProjectVerificationStatus, VoteStatus } from '../models/project';
 
 export default class SnapshotJob {
-  constructor(logger, config, wavesHelper) {
+  constructor(logger, config, wavesHelper, filesRepository) {
     this._logger = logger;
     this._config = config;
     this._wavesHelper = wavesHelper;
+    this._filesRepository = filesRepository;
   }
 
   async run() {
@@ -89,6 +90,12 @@ export default class SnapshotJob {
             if (allVotes.rank >= this._config.votingMaximumRank) {
               prjStatus = ProjectVerificationStatus.Verified;
               // Write verificatiob status to blockchain.
+              if (project.token.svg_logo) {
+                const fileStream = this._filesRepository.get(project.token.svg_logo.link);
+                fileStream.on('data', chunk => {
+                  project.token.svg_logo.data += chunk;
+                });
+              }
               verificationTrxId = await this._wavesHelper.writeVerificationData(project);
               this._logger.info(`Project ${project.project_id} Verified.`);
             }

@@ -8,4 +8,8 @@ export default class Base64Helper {
     uniqueString = uniqueString.replace('+', '');
     return uniqueString;
   }
+
+  static svgToBase64(data) {
+    return `data:image/svg+xml;base64,${data.toString('base64')}`;
+  }
 }
