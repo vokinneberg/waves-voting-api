@@ -8,6 +8,7 @@ import uuidv4 from 'uuid';
 import { createLightship } from 'lightship';
 import { CronJob } from 'cron';
 import '@babel/polyfill';
+import { Client } from 'minio';
 
 import routes from './routes';
 import adminRoutes from './routes/admin';
@@ -21,6 +22,8 @@ import { ProjectSchema } from './models/project';
 import ProjectsRepository from './repository/projectsRepository';
 import CleanUpJob from './cron-jobs/cleanUpJob';
 import JWTHelper from './core/utils/jwt';
+import FileSchema from './models/file';
+import FilesRepository from './repository/filesRepository';
 
 const app = express();
 const router = express.Router();
@@ -77,9 +80,17 @@ mongoose
   });
 
 // Snapshot Job.
+const minioClient = new Client({
+  endPoint: config.minioHost,
+  port: config.minioPort,
+  useSSL: false,
+  accessKey: config.minioAccessKey,
+  secretKey: config.minioSecretKey,
+});
+const filesRepository = new FilesRepository('File', FileSchema, minioClient);
 const jwtHelper = new JWTHelper(config.jwtSecret);
 const wavesHelper = new WavesHelper(logger, config, jwtHelper);
-const snapshotJob = new SnapshotJob(logger, config, wavesHelper);
+const snapshotJob = new SnapshotJob(logger, config, wavesHelper, filesRepository);
 new CronJob(config.snapshotCronPattern, () => {
   snapshotJob.run();
 }).start();
