@@ -13,7 +13,7 @@ const config = {
   voteExpires: process.env.VOTE_EXPIRES || 60, // 1 minute
   saltRounds: process.env.SALT_ROUNDS || 10,
   votingMaximumRank: process.env.VOTING_MAXIMUM_RANK || 10,
-  votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 10,
+  votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 100,
   votingTicker: process.env.VOTING_TICKER || 'WCT-TEST',
   votingAssetId: process.env.VOTING_ASSET_ID || '2P266KWxiVTWEjSHE7NDiSxR52V2PkSLaWBpFisJjrjb',
   dataProviderId: process.env.DATA_PROVIDER_ID || '3Mvy79q2zLpWBhdZJCqdfH22y5k4JxY4e2L',
@@ -21,8 +21,9 @@ const config = {
   snapshotCronPattern: process.env.SNAPSHOT_CRON_PATTERN || '*/5 * * * *',
   cleanUpCronPattern: process.env.CLEAN_UP_CRON_PATTERN || '*/1 * * * *',
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
-  minioHost: process.env.MINIO_HOST || '104.248.101.178',
+  minioHost: process.env.MINIO_HOST || 'minio.trustamust.com',
   minioPort: process.env.MINIO_PORT || 9000,
+  minioUseSsl: process.env.MINIO_USE_SSL || false,
   minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
   minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ',
 };

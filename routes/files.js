@@ -9,7 +9,7 @@ import FilesRepository from '../repository/filesRepository';
 const minioClient = new Client({
   endPoint: config.minioHost,
   port: config.minioPort,
-  useSSL: false,
+  useSSL: config.minioUseSsl,
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey,
 });
