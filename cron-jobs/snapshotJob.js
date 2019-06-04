@@ -94,14 +94,12 @@ export default class SnapshotJob {
                 try {
                   const chunks = [];
                   const file = await this._filesRepository.get(project.token.svg_logo.link);
-                  file.stream.on('data', chunk => {
+                  /* eslint no-restricted-syntax: [0] */
+                  for await (const chunk of file.stream) {
                     chunks.push(chunk);
-                  });
-                  file.stream.on('end', () => {
-                    const fileData = Buffer.concat(chunks);
-                    project.token.svg_logo.data = fileData;
-                    this._logger.info(`File data ${fileData}.`);
-                  });
+                  }
+                  const fileData = Buffer.concat(chunks);
+                  project.token.svg_logo.data = fileData;
                 } catch (fileError) {
                   this._logger.error(`File ${project.token.svg_logo.link} not found.`, fileError);
                 }
