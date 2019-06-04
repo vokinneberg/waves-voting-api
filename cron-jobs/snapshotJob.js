@@ -89,15 +89,22 @@ export default class SnapshotJob {
             // If project rank reached verification threshold - Update project status to Verified.
             if (allVotes.rank >= this._config.votingMaximumRank) {
               prjStatus = ProjectVerificationStatus.Verified;
-              // Write verificatiob status to blockchain.
+              // Get svg logo file to store in blockchain.
               if (project.token.svg_logo) {
-                const fileStream = this._filesRepository.get(project.token.svg_logo.link);
-                fileStream.on('data', chunk => {
-                  project.token.svg_logo.data += chunk;
-                });
+                try {
+                  const fileStream = await this._filesRepository.get(project.token.svg_logo.link);
+                  fileStream.on('data', chunk => {
+                    project.token.svg_logo.data += chunk;
+                  });
+                } catch (fileError) {
+                  this._logger.error(`File ${project.token.svg_logo.link} not found.`, fileError);
+                }
               }
+              // Write verificatiob status to blockchain.
               verificationTrxId = await this._wavesHelper.writeVerificationData(project);
-              this._logger.info(`Project ${project.project_id} Verified.`);
+              this._logger.info(
+                `Project ${project.project_id} ${ProjectVerificationStatus.Verified}.`
+              );
             }
             await ProjectModel.findOneAndUpdate(
               { project_id: project.project_id },
