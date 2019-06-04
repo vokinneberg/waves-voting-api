@@ -77,7 +77,7 @@ export default class WavesHelper {
       verifiedAssetData.push({
         key: `logo_<${project.token.id}>`,
         type: 'string',
-        value: Base64Helper.svgToBase64(project.token.svg_logo.data), // project logo
+        value: `data:image/svg+xml;base64,${Base64Helper.svgToBase64(project.token.svg_logo.data)}`, // project logo
       });
     }
     this._logger.info('Asset block described.');

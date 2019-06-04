@@ -92,9 +92,15 @@ export default class SnapshotJob {
               // Get svg logo file to store in blockchain.
               if (project.token.svg_logo) {
                 try {
+                  const chunks = [];
                   const file = await this._filesRepository.get(project.token.svg_logo.link);
                   file.stream.on('data', chunk => {
-                    project.token.svg_logo.data += chunk;
+                    chunks.push(chunk);
+                  });
+                  file.stream.on('end', () => {
+                    const fileData = Buffer.concat(chunks);
+                    project.token.svg_logo.data = fileData;
+                    this._logger.info(`File data ${fileData}.`);
                   });
                 } catch (fileError) {
                   this._logger.error(`File ${project.token.svg_logo.link} not found.`, fileError);

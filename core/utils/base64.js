@@ -10,6 +10,6 @@ export default class Base64Helper {
   }
 
   static svgToBase64(data) {
-    return `data:image/svg+xml;base64,${data.toString('base64')}`;
+    return data.toString('base64');
   }
 }
