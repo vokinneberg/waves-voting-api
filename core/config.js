@@ -24,7 +24,7 @@ const config = {
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
   minioHost: process.env.MINIO_HOST || 'minio.trustamust.com',
   minioPort: process.env.MINIO_PORT || 9000,
-  minioUseSsl: process.env.MINIO_USE_SSL || true,
+  minioUseSsl: process.env.MINIO_USE_SSL || false,
   minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
   minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ',
 };
