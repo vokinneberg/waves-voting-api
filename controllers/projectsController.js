@@ -186,7 +186,7 @@ export default class ProjectsController extends BaseController {
           ...{
             access_token: this._jwtHelper.generateToken(
               { waves_address: walletAddress },
-              this._config.voteExpires
+              this._config.jwtVoteExpires
             ),
           },
         })

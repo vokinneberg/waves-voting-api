@@ -24,7 +24,9 @@ export default class CleanUpJob {
 
           // Set expires date.
           const expiresDate = new Date();
-          expiresDate.setTime(expiresDate.getTime() - this._config.voteExpires * 60 * 1000);
+          expiresDate.setTime(expiresDate.getTime() - this._config.voteExpires);
+
+          this._logger.info(`Vote expires ${expiresDate}`);
 
           // Check if there are votes that already expired.
           const votes = project.votes.filter(
