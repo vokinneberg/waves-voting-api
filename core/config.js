@@ -23,7 +23,7 @@ const config = {
   cleanUpCronPattern: process.env.CLEAN_UP_CRON_PATTERN || '*/1 * * * *',
   uploadSizeLimit: process.env.UPLOAD_SIZE_LIMIT || '4mb',
   minioHost: process.env.MINIO_HOST || 'minio.trustamust.com',
-  minioPort: process.env.MINIO_PORT || 443,
+  minioPort: process.env.MINIO_PORT || 9000,
   minioUseSsl: process.env.MINIO_USE_SSL || true,
   minioAccessKey: process.env.MINIO_ACCESS_KEY || 'minio',
   minioSecretKey: process.env.MINIO_SECRET_KEY || 'nWgn59qU4EJOOMkGnYALGAmmJ',
