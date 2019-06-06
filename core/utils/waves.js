@@ -41,11 +41,19 @@ export default class WavesHelper {
 
   async writeVerificationData(project) {
     this._logger.info('Create verification data transaction.');
+
+    let svgLogoData = '';
+    if (project.token.svg_logo.data) {
+      svgLogoData = `data:image/svg+xml;base64,${Base64Helper.svgToBase64(
+        project.token.svg_logo.data
+      )}`;
+    }
+
     const verifiedAssetData = [
       {
         key: `version_<${project.token.id}>`, // token ID
         type: 'integer',
-        value: 1,
+        value: 0,
       },
       {
         key: `status_<${project.token.id}>`, // token ID
@@ -72,14 +80,13 @@ export default class WavesHelper {
         type: 'string',
         value: project.token.ticker, // assigned project ticker
       },
-    ];
-    if (project.token.svg_logo.data) {
-      verifiedAssetData.push({
+      {
         key: `logo_<${project.token.id}>`,
         type: 'string',
-        value: `data:image/svg+xml;base64,${Base64Helper.svgToBase64(project.token.svg_logo.data)}`, // project logo
-      });
-    }
+        value: `${svgLogoData}`, // project logo
+      },
+    ];
+
     this._logger.info('Asset block described.');
     const verificationData = {
       type: WavesTransactionType.Data,
