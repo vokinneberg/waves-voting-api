@@ -87,7 +87,7 @@ const minioClient = new Client({
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey,
 });
-const filesRepository = new FilesRepository('File', FileSchema, minioClient);
+const filesRepository = new FilesRepository('File', FileSchema, minioClient, config);
 const jwtHelper = new JWTHelper(config.jwtSecret);
 const wavesHelper = new WavesHelper(logger, config, jwtHelper);
 const snapshotJob = new SnapshotJob(logger, config, wavesHelper, filesRepository);

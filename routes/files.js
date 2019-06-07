@@ -13,7 +13,7 @@ const minioClient = new Client({
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey,
 });
-const filesRepository = new FilesRepository('File', FileSchema, minioClient);
+const filesRepository = new FilesRepository('File', FileSchema, minioClient, config);
 const filesContoller = new FilesController(logger, config, filesRepository);
 
 export default router => {

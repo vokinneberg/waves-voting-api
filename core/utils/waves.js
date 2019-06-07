@@ -97,7 +97,7 @@ export default class WavesHelper {
     this._logger.info('Transaction data composed.');
     const signedVerificationTransction = data(
       verificationData,
-      "TrustAmust Platform — 1'st crowdfunding incubator on the blockchain."
+      this._config.dataProviderSeed
     );
     this._logger.info(`Data transaction ${signedVerificationTransction.id} signed.`);
     const resp = await broadcast(signedVerificationTransction, this._config.wavesNodeAddress);
