@@ -16,7 +16,7 @@ export default class FilesRepository extends BaseRepository {
     const file = await this._collection.findOne({ name }).exec();
     if (!file) throw new ObjectNotFoundError(`File: ${name} not found.`);
 
-    const stream = await this._minioClient.getObject(this._config, name);
+    const stream = await this._minioClient.getObject(this._config.minioBucket, name);
     return { stream, mime_type: file.mime_type };
   }
 
