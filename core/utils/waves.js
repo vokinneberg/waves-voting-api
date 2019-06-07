@@ -95,10 +95,7 @@ export default class WavesHelper {
       sender: this._config.dataProviderId,
     };
     this._logger.info('Transaction data composed.');
-    const signedVerificationTransction = data(
-      verificationData,
-      this._config.dataProviderSeed
-    );
+    const signedVerificationTransction = data(verificationData, this._config.dataProviderSeed);
     this._logger.info(`Data transaction ${signedVerificationTransction.id} signed.`);
     const resp = await broadcast(signedVerificationTransction, this._config.wavesNodeAddress);
     this._logger.info(`Data transaction ${resp.id} sent to blockchain.`);
