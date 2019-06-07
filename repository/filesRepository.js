@@ -16,7 +16,7 @@ export default class FilesRepository extends BaseRepository {
     const file = await this._collection.findOne({ name }).exec();
     if (!file) throw new ObjectNotFoundError(`File: ${name} not found.`);
 
-    const stream = await this._minioClient.getObject(this._config.minioBucket, name);
+    const stream = await this._minioClient.getObject(this._config, name);
     return { stream, mime_type: file.mime_type };
   }
 
@@ -32,8 +32,7 @@ export default class FilesRepository extends BaseRepository {
     if (!mimeType) throw new RequestValidationError('File type is not suppoted.');
 
     const fileName = Base64Helper.generateUniqueString();
-    // TODO: Move bucket name to the enviroment variables.
-    await this._minioClient.putObject('trustamust', fileName, data);
+    await this._minioClient.putObject(this._config.minioBucket, fileName, data);
 
     const file = {
       name: fileName,
