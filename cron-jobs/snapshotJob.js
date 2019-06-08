@@ -59,7 +59,7 @@ export default class SnapshotJob {
                 update = true;
               } else {
                 // Otherwise update vote rank to the current and set vote to Settled.
-                const currentVoteRank = Math.log(stake).toFixed(2);
+                const currentVoteRank = Math.log10(stake).toFixed(2);
                 this._logger.info(
                   `Set set vote ${vote.waves_address} rank ${currentVoteRank} to Settled.`
                 );
