@@ -105,8 +105,7 @@ export default class WavesHelper {
   async checkAssetStake(wavesAddress, assetId) {
     const assetInfo = await this._waves.API.Node.assets.balance(wavesAddress, assetId);
     this._logger.info(JSON.stringify(assetInfo));
-    // TODO: Get rid of magic number 1. There should be used decimals property of asset.
-    return (assetInfo.balance / (this._config.votingAssetDecimalPlaces * 10)).toFixed(
+    return (assetInfo.balance / 10 ** this._config.votingAssetDecimalPlaces).toFixed(
       this._config.votingAssetDecimalPlaces
     );
   }
