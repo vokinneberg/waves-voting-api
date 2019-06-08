@@ -17,6 +17,7 @@ const config = {
   votingMinumumStake: process.env.VOTING_MINIMUM_STAKE || 100,
   votingTicker: process.env.VOTING_TICKER || 'WCT-TEST',
   votingAssetId: process.env.VOTING_ASSET_ID || '2P266KWxiVTWEjSHE7NDiSxR52V2PkSLaWBpFisJjrjb',
+  votingAssetDecimalPlaces: process.env.VOTING_ASSET_DECIMAL_PLACES || 2,
   dataProviderId: process.env.DATA_PROVIDER_ID || '3Mvy79q2zLpWBhdZJCqdfH22y5k4JxY4e2L',
   dataProviderSeed: process.env.DATA_PROVIDER_SEED,
   wavesNodeAddress: process.env.WAVES_NODE_ADDRESS || 'https://testnodes.wavesnodes.com',
