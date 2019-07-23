@@ -160,6 +160,7 @@ export default class ProjectsController extends BaseController {
       }
 
       const votedProj = await this._projectsRepository.findOne({
+        verification_status: ProjectVerificationStatus.Described,
         votes: {
           $elemMatch: {
             waves_address: walletAddress,
