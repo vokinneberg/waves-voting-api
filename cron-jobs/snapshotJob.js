@@ -110,11 +110,17 @@ export default class SnapshotJob {
                 `Project ${project.project_id} ${ProjectVerificationStatus.Verified}.`
               );
             }
+
+            // Check if current project rank is greater than votingMaximumRank and make in eqals to votingMaximumRank.
+            const prjRank =
+              allVotes.rank.toFixed(2) > this._config.votingMaximumRank
+                ? this._config.votingMaximumRank.toFixed(2)
+                : allVotes.rank.toFixed(2);
             await ProjectModel.findOneAndUpdate(
               { project_id: project.project_id },
               {
                 $set: {
-                  rank: allVotes.rank.toFixed(2),
+                  rank: prjRank,
                   verification_status: prjStatus,
                   verification_transaction_id: verificationTrxId,
                   votes,
