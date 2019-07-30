@@ -112,13 +112,15 @@ export default class SnapshotJob {
             }
 
             // Check if current project rank is greater than votingMaximumRank and make in equals to votingMaximumRank.
-            const voteMaxRank = parseFloat(this._config.votingMaximumRank).toFixed(2);
-            const prjRank = allVotes.rank > voteMaxRank ? voteMaxRank : allVotes.rank.toFixed(2);
+            const prjRank =
+              allVotes.rank > this._config.votingMaximumRank
+                ? this._config.votingMaximumRank
+                : allVotes.rank;
             await ProjectModel.findOneAndUpdate(
               { project_id: project.project_id },
               {
                 $set: {
-                  rank: prjRank,
+                  rank: parseFloat(prjRank).toFixed(2),
                   verification_status: prjStatus,
                   verification_transaction_id: verificationTrxId,
                   votes,
@@ -126,7 +128,9 @@ export default class SnapshotJob {
               }
             );
             this._logger.info(
-              `Project ${project.project_id} rank ${project.rank} changed to ${prjRank.toFixed(2)}.`
+              `Project ${project.project_id} rank ${project.rank} changed to ${parseFloat(
+                prjRank
+              ).toFixed(2)}.`
             );
           }
         })
