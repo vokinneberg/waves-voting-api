@@ -8,7 +8,9 @@ const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
 const votesContoller = new VotesController(logger, config, projectsRepository);
 
 export default router => {
-  router.route('/votes/:waves_address').get(votesContoller.getByWavesAddress.bind(votesContoller));
+  router
+    .route('/projects/:project_id/votes/:waves_address')
+    .get(votesContoller.get.bind(votesContoller));
 
   router
     .route('/projects/:project_id/votes/:waves_address')

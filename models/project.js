@@ -98,7 +98,6 @@ const ProjectSchema = new mongoose.Schema(
         {
           waves_address: {
             type: String,
-            unique: true,
             sparse: true,
             tags: { type: [String], index: true },
           },

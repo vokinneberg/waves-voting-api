@@ -9,22 +9,31 @@ export default class VotesController extends BaseController {
     this._projectsRepository = projectsRepository;
   }
 
-  async getByWavesAddress(req, res, next) {
+  async get(req, res, next) {
     try {
+      const projectId = req.params.project_id;
       const wavesAddress = req.params.waves_address;
+      if (!projectId) {
+        throw new RequestValidationError('Project id should not be empty.', 'project_id');
+      }
       if (!wavesAddress) {
         throw new RequestValidationError('Waves address should not be empty.', 'waves_address');
       }
 
       const project = await this._projectsRepository.findOne({
-        'votes.waves_address': wavesAddress,
+        project_id: projectId,
+        votes: {
+          $elemMatch: {
+            waves_address: wavesAddress,
+          },
+        },
       });
-      this._logger.info(JSON.stringify(project));
       if (!project) {
         throw new ObjectNotFoundError(
           `Project with vote from waves address ${wavesAddress} not found.`
         );
       }
+      this._logger.info(JSON.stringify(project));
 
       const vote = project.votes.find(elem => elem.waves_address === wavesAddress);
       if (!vote) {
