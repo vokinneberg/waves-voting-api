@@ -111,10 +111,10 @@ export default class SnapshotJob {
               );
             }
 
-            // Check if current project rank is greater than votingMaximumRank and make in eqals to votingMaximumRank.
+            // Check if current project rank is greater than votingMaximumRank and make in equals to votingMaximumRank.
             const prjRank =
-              allVotes.rank.toFixed(2) > this._config.votingMaximumRank
-                ? this._config.votingMaximumRank.toFixed(2)
+              allVotes.rank > parseInt(this._config.votingMaximumRank, 10)
+                ? parseInt(this._config.votingMaximumRank, 10).toFixed(2)
                 : allVotes.rank.toFixed(2);
             await ProjectModel.findOneAndUpdate(
               { project_id: project.project_id },
