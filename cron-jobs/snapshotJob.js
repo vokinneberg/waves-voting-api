@@ -118,7 +118,7 @@ export default class SnapshotJob {
               { project_id: project.project_id },
               {
                 $set: {
-                  rank: prjRank.toFixed(2),
+                  rank: prjRank,
                   verification_status: prjStatus,
                   verification_transaction_id: verificationTrxId,
                   votes,
