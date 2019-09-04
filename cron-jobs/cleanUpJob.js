@@ -18,7 +18,7 @@ export default class CleanUpJob {
 
       this._logger.info(`${projects.length} projects found.`);
 
-      await Promise.all(
+      Promise.all(
         projects.map(async project => {
           this._logger.info(`Cleaning up project ${project.project_id}.`);
 
@@ -37,7 +37,7 @@ export default class CleanUpJob {
           );
           this._logger.info(`Votes to clean up ${votes.length}.`);
           if (votes.length > 0) {
-            await Promise.all(
+            Promise.all(
               votes.map(async vote => {
                 this._logger.info(
                   `Removing vote from address ${vote.waves_address} as no transaction id presented.`
@@ -45,7 +45,7 @@ export default class CleanUpJob {
                 // Remove vote if it is expired.
                 /* eslint no-underscore-dangle: 0 */
                 project.votes.pull(vote._id);
-                await project.save();
+                project.save();
               })
             );
           }

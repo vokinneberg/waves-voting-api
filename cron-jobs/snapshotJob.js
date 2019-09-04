@@ -116,7 +116,7 @@ export default class SnapshotJob {
               allVotes.rank > this._config.votingMaximumRank
                 ? this._config.votingMaximumRank
                 : allVotes.rank;
-            await ProjectModel.findOneAndUpdate(
+            ProjectModel.findOneAndUpdate(
               { project_id: project.project_id },
               {
                 $set: {

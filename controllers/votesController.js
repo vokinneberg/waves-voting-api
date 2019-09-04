@@ -40,7 +40,7 @@ export default class VotesController extends BaseController {
         throw new ObjectNotFoundError(`Vote from waves address ${wavesAddress} not found.`);
       }
 
-      res.status(HttpCodes.OK).json(JSON.stringify(vote));
+      res.status(HttpCodes.OK).json(vote);
     } catch (err) {
       next(err);
     }
@@ -76,7 +76,7 @@ export default class VotesController extends BaseController {
       }
 
       project.votes[voteIndex].transaction_id = req.body.transaction_id;
-      await project.save();
+      project.save();
 
       res.status(HttpCodes.OK).json(project.toJSON());
     } catch (err) {

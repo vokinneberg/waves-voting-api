@@ -180,7 +180,7 @@ export default class ProjectsController extends BaseController {
         status: VoteStatus.Init,
       };
       project.votes.push(vote);
-      await project.save();
+      project.save();
       res.status(HttpCodes.CREATED).json(
         JSON.stringify({
           ...vote,
