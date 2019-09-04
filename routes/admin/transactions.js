@@ -5,8 +5,14 @@ import ProjectsRepository from '../../repository/projectsRepository';
 import AdminTransactionsController from '../../controllers/admin/adminTransactionsController';
 
 const projectsRepository = new ProjectsRepository('Project', ProjectSchema);
-const adminTransactionsController = new AdminTransactionsController(logger, config, projectsRepository);
+const adminTransactionsController = new AdminTransactionsController(
+  logger,
+  config,
+  projectsRepository
+);
 
 export default adminRouter => {
-  adminRouter.route('/transactions').get(adminTransactionsController.all.bind(adminTransactionsController));
+  adminRouter
+    .route('/transactions')
+    .get(adminTransactionsController.all.bind(adminTransactionsController));
 };

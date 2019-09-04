@@ -9,23 +9,28 @@ export default class AdminTransactionsController extends ProjectsController {
 
   async all(req, res, next) {
     try {
-      const projects = await this._projectsRepository.find({});   
+      const projects = await this._projectsRepository.find({});
       this._logger.info(`${projects.length} projects found.`);
 
-      let transactions = [];
-      for await (const project of projects) {
-        transactions = transactions.concat(project.votes.filter(vote => vote.transaction_id).map(vote => {
-          return { 
-            project_id: project.project_id,
-            transaction_id: vote.transaction_id,
-            waves_address: vote.waves_address,
-            stake: parseFloat(vote.stake).toFixed(1),
-            created_at: vote.created_at
-          };
-        }));
-      }
+      const transactions = projects.reduce(
+        (flat, project) =>
+          flat.concat(
+            project.votes
+              .filter(vote => vote.transaction_id)
+              .map(vote => {
+                return {
+                  project_id: project.project_id,
+                  transaction_id: vote.transaction_id,
+                  waves_address: vote.waves_address,
+                  stake: parseFloat(vote.stake).toFixed(1),
+                  created_at: vote.created_at,
+                };
+              })
+          ),
+        []
+      );
 
-      this._logger.debug(transactions); 
+      this._logger.debug(transactions);
 
       res.status(HttpCodes.OK).json(transactions);
     } catch (err) {
