@@ -40,15 +40,15 @@ lint_job:
 
 build_job:
   stage: build
-  image: docker:latest
+  image: docker:18-git
   only:
     refs:
       - tags
   services:
-  - docker:dind
+  - docker:18-dind
   allow_failure: false
   variables:
-    DOCKER_DRIVER: overlay
+    DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://localhost:2375
   before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
