@@ -74,9 +74,7 @@ const mongoConnString = new ConnectionStringBuilder()
 logger.info(`MongoDB Connection string: ${mongoConnString}`);
 
 mongoose
-  .connect(mongoConnString, {
-    useNewUrlParser: true,
-  })
+  .connect(mongoConnString)
   .then(() => {
     logger.info('Successfully connected to the database');
   })
