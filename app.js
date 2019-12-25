@@ -65,8 +65,6 @@ app.use(errorHandler.handleError({ logger }));
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
 const mongoConnString = new ConnectionStringBuilder()
-  .withUser(config.dbUser)
-  .withPassword(config.dbPassword)
   .withHost(config.dbHost)
   .withDatabase(config.dbName)
   .build();
@@ -74,7 +72,12 @@ const mongoConnString = new ConnectionStringBuilder()
 logger.info(`MongoDB Connection string: ${mongoConnString}`);
 
 mongoose
-  .connect(mongoConnString)
+  .connect(mongoConnString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    user: config.dbUser,
+    pass: config.dbPassword
+  })
   .then(() => {
     logger.info('Successfully connected to the database');
   })
