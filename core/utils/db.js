@@ -1,6 +1,4 @@
-
 export default class ConnectionStringBuilder {
-  
   withUser(user) {
     this._user = user;
     return this;
