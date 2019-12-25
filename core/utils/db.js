@@ -1,27 +1,45 @@
+
 export default class ConnectionStringBuilder {
-  constructor(config) {
-    this._config = config;
+  
+  withUser(user) {
+    this._user = user;
+    return this;
   }
 
-  buildConneсtionString() {
+  withPassword(password) {
+    this._password = password;
+    return this;
+  }
+
+  withHost(host) {
+    this._host = host;
+    return this;
+  }
+
+  withDatabase(database) {
+    this._database = database;
+    return this;
+  }
+
+  build() {
     let dbConnectionString = 'mongodb://';
 
-    if (this._config.dbUser) {
-      dbConnectionString += this._config.dbUser;
+    if (this._user) {
+      dbConnectionString += this._user;
     }
 
-    if (this._config.dbPassword) {
-      dbConnectionString += `:${this._config.dbPassword}`;
+    if (this._password) {
+      dbConnectionString += `:${this._password}`;
     }
 
-    if (this._config.dbUser) {
+    if (this._user) {
       dbConnectionString += '@';
     }
 
-    dbConnectionString += this._config.dbHost;
+    dbConnectionString += this._host;
 
-    if (this._config.dbName) {
-      dbConnectionString += `/${this._config.dbName}`;
+    if (this._database) {
+      dbConnectionString += `/${this._database}`;
     }
 
     return dbConnectionString;

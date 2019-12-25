@@ -64,7 +64,15 @@ app.use(errorHandler.handleError({ logger }));
 
 mongoose.set('debug', process.env.NODE_ENV === 'development');
 
-const mongoConnString = new ConnectionStringBuilder(config).buildConneсtionString();
+const mongoConnString = new ConnectionStringBuilder()
+  .withUser(config.dbUser)
+  .withPassword(config.dbPassword)
+  .withHost(config.dbHost)
+  .withDatabase(config.dbName)
+  .build();
+
+logger.info(`MongoDB Connection string: ${mongoConnString}`);
+
 mongoose
   .connect(mongoConnString, {
     useNewUrlParser: true,
