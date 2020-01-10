@@ -74,7 +74,6 @@ logger.info(`MongoDB Connection string: ${mongoConnString}`);
 mongoose
   .connect(mongoConnString, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
     user: config.dbUser,
     pass: config.dbPassword
   })
